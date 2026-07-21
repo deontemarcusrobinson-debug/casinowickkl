@@ -127,16 +127,35 @@ function startApp() {
         process.exit(1);
     }
 
-    console.log('[boot] Starting GoldWitch on PORT=' + (process.env.PORT || process.env.APP_PORT || '3000'));
-    var child = spawn(process.execPath, ['app.js'], {
-        cwd: ROOT,
-        stdio: 'inherit',
-        env: process.env
+    // Verify a core table exists before serving traffic
+    var db = resolveDatabaseConfig();
+    var check = mysql.createConnection({
+        host: db.host,
+        port: db.port || 3306,
+        user: db.user,
+        password: db.password || '',
+        database: db.database,
+        connectTimeout: 8000
     });
+    check.query('SELECT 1 FROM `bannedip` LIMIT 1', function(errCheck) {
+        check.destroy();
+        if(errCheck) {
+            console.error('[boot] Post-migrate check failed:', errCheck.code || '', errCheck.message || errCheck);
+            console.error('[boot] Tables may be missing. Fix MySQL env / migrate, then redeploy.');
+            process.exit(1);
+        }
 
-    child.on('exit', function(code) {
-        console.error('[boot] App process exited with code ' + code);
-        process.exit(code || 0);
+        console.log('[boot] Starting GoldWitch on PORT=' + (process.env.PORT || process.env.APP_PORT || '3000'));
+        var child = spawn(process.execPath, ['app.js'], {
+            cwd: ROOT,
+            stdio: 'inherit',
+            env: process.env
+        });
+
+        child.on('exit', function(code) {
+            console.error('[boot] App process exited with code ' + code);
+            process.exit(code || 0);
+        });
     });
 }
 

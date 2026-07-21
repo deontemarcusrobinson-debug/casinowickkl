@@ -7,7 +7,10 @@ module.exports = (socket) => {
         var ip = (socket.handshake.headers['x-forwarded-for'] || socket.handshake.address || socket.request.connection.remoteAddress).split(',')[0].trim();
 
         pool.query('SELECT `id` FROM `bannedip` WHERE `ip` = ' + pool.escape(ip) + ' AND `removed` = 0', function(err1, row1) {
-            if(err1) return next(new Error('An error occurred while processing ban ip middleware (1)'));
+            if(err1) {
+                console.error('[banip/socket] DB error:', err1.code || '', err1.message || err1);
+                return next(new Error('An error occurred while processing ban ip middleware (1): ' + (err1.code || err1.message)));
+            }
 
             if(row1.length <= 0) return next();
             if(row1.length > 0 && haveRankPermission('exclude_ban_ip', socket.data.user ? socket.data.user.rank : 0)) return next();
