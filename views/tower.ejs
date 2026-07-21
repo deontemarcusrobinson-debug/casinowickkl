@@ -1,0 +1,80 @@
+<div class="bet-container flex justify-center">
+	<div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2">
+		<%- include('./components/inputs/inputGroup.ejs', {
+			type: 'text',
+			label: 'Bet Amount',
+			labelIcon: include('./components/icon.ejs', {
+				icon: 'diamond',
+				className: 'text-primary transition duration-200'
+			}),
+			id: 'betamount_tower',
+			value: '1.00',
+			attributes: [
+				{ name: 'data-amount', value: 'tower' },
+				{ name: 'inputmode', value: 'decimal' }
+			],
+			addons: [			{
+				addon: '<div class="flex flex-wrap flex-row justify-end gap-1">' +
+					'<button class="button button-hover button-accent betshort_action" data-game="tower" data-action="half">1/2</button>' +
+					'<button class="button button-hover button-accent betshort_action" data-game="tower" data-action="double">x2</button>' +
+					'<button class="button button-hover button-accent betshort_action" data-game="tower" data-action="max">Max</button>' +
+				'</div>',
+				align: 'end'
+			}],
+			errors: [ 'required', 'number', 'greater', 'lesser' ]
+		}); %>
+
+        <%- include('./components/inputs/selectField.ejs', {
+            type: 'bottom',
+            label: 'Difficulty',
+            id: 'tower_difficulty',
+            selected: 1,
+            items: [
+                { name: 'Easy', value: 'easy' },
+                { name: 'Medium', value: 'medium' },
+                { name: 'Hard', value: 'hard' },
+                { name: 'Expert', value: 'expert' },
+                { name: 'Master', value: 'master' }
+            ]
+        }); %>
+
+		<div class="bet-cashout bg-secondary rounded-2 border-2 border-card flex flex-row justify-between items-center gap-2 px-4 py-2 disabled">
+			<div class="flex flex-row items-center justify-center gap-1">
+				<%- include('./components/icon.ejs', {
+					icon: 'diamond',
+					className: 'text-primary size-4'
+				}); %>
+
+				<span>Cashout</span>
+			</div>
+
+			<div class="flex flex-col items-end justify-center gap-1">
+				<span class="amount" id="tower_cashout_amount">0.00</span>
+
+				<div class="profit">
+					<span data-type="negative">-</span>
+					<span data-type="positive">+</span>
+
+					<span class="positive" id="tower_cashout_profit">0.00</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="flex justify-center items-center">
+			<button class="button button-hover button-primary shadow-2 large w-full" id="tower_bet">Place Bet</button>
+			<button class="button button-hover button-success shadow-2 large w-full hidden" id="tower_cashout">Cashout</button>
+		</div>
+	</div>
+
+	<div class="flex items-center justify-center flex-col gap-4 bg-card bg-opacity-50 rounded-2">
+		<div class="tower-container flex items-center justify-center">
+			<div class="tower-grid medium" id="tower_grid">
+				<% for(var i = 8; i >= 0; i--) { %>
+					<% for(var j = 0; j < 3; j++) { %>
+				        <div class="item flex justify-center items-center rounded-2 relative transition duration-200 disabled" data-stage="<%= i %>" data-button="<%= j %>">0.00</div>
+					<% } %>
+				<% } %>
+			</div>
+		</div>
+	</div>
+</div>

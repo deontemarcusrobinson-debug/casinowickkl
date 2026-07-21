@@ -1,0 +1,101 @@
+<div class="flex flex-col gap-2">
+    <% if(response.admin.paypal.just_connected){ %>
+        <div class="flex flex-row items-center gap-2 bg-primary bg-opacity-10 border-2 border-primary rounded-2 p-4">
+            <%- include('../components/icon.ejs', {
+                icon: 'check',
+                className: 'text-primary size-4'
+            }); %>
+            <div class="text-sm font-bold text-primary">PayPal connected. You can accept payments to this account.</div>
+        </div>
+    <% } %>
+
+    <% if(response.admin.paypal.disconnected){ %>
+        <div class="flex flex-row items-center gap-2 bg-secondary border-2 border-card rounded-2 p-4">
+            <div class="text-sm font-bold">PayPal disconnected.</div>
+        </div>
+    <% } %>
+
+    <% if(response.admin.paypal.error){ %>
+        <div class="flex flex-row items-center gap-2 bg-danger bg-opacity-10 border-2 border-danger rounded-2 p-4">
+            <div class="text-sm font-bold text-danger">
+                <% if(response.admin.paypal.error == 'not_configured'){ %>
+                    PayPal app credentials are missing on the server.
+                <% } else if(response.admin.paypal.error == 'auth_failed'){ %>
+                    PayPal rejected the app credentials. Check Client ID / Secret and whether the app is Sandbox or Live.
+                <% } else { %>
+                    Could not finish PayPal connect (<%= response.admin.paypal.error %>). Try again.
+                <% } %>
+            </div>
+        </div>
+    <% } %>
+
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-row max-md:flex-col gap-4 items-center justify-between w-full">
+            <div class="flex flex-row items-center gap-3">
+                <div class="flex items-center justify-center size-12 rounded-2 bg-secondary border-2 border-card shrink-0">
+                    <%- include('../components/icon.ejs', {
+                        icon: 'wallet',
+                        className: 'text-primary size-6'
+                    }); %>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <div class="text-left font-bold text-base">Accept payments with PayPal</div>
+                    <div class="text-sm text-muted-foreground">Your GoldWitch PayPal app is linked on the server — no Client ID or Secret on this page.</div>
+                </div>
+            </div>
+
+            <% if(response.admin.paypal.connected){ %>
+                <div class="flex flex-row flex-wrap items-center gap-2">
+                    <span class="text-xs font-bold text-primary bg-primary bg-opacity-10 border-1 border-primary rounded-1 px-3 py-2">PayPal Connected · <%= response.admin.paypal.mode %></span>
+                    <form method="POST" action="/admin/paypal/disconnect">
+                        <button type="submit" class="button button-hover button-card shadow-2">Disconnect</button>
+                    </form>
+                </div>
+            <% } else if(response.admin.paypal.platform_ready){ %>
+                <a href="/admin/paypal/connect" class="shrink-0">
+                    <button type="button" class="button button-hover button-primary shadow-2 large">Connect PayPal</button>
+                </a>
+            <% } else { %>
+                <span class="text-xs font-bold text-muted-foreground bg-secondary border-1 border-card rounded-1 px-3 py-2">Server setup required</span>
+            <% } %>
+        </div>
+
+        <% if(response.admin.paypal.connected){ %>
+            <div class="flex flex-col gap-1 bg-secondary border-1 border-card rounded-2 p-4">
+                <div class="text-sm font-bold">Linked account</div>
+                <div class="text-sm"><%= response.admin.paypal.display_name || 'GoldWitch' %></div>
+                <% if(response.admin.paypal.email){ %>
+                    <div class="text-sm text-muted-foreground"><%= response.admin.paypal.email %></div>
+                <% } else { %>
+                    <div class="text-sm text-muted-foreground">PayPal Business app linked</div>
+                <% } %>
+            </div>
+        <% } %>
+
+        <div class="flex flex-col gap-2">
+            <div class="text-sm text-muted-foreground">Payment methods you can accept</div>
+            <div class="flex flex-row flex-wrap items-center gap-2">
+                <div class="flex flex-row items-center gap-2 bg-secondary border-1 border-card rounded-1 px-3 py-2 text-sm font-bold">PayPal</div>
+                <div class="flex flex-row items-center gap-2 bg-secondary border-1 border-card rounded-1 px-3 py-2 text-sm font-bold">PayPal Credit</div>
+                <div class="flex flex-row items-center gap-2 bg-secondary border-1 border-card rounded-1 px-3 py-2 text-sm font-bold">Venmo</div>
+                <div class="flex flex-row items-center gap-2 bg-secondary border-1 border-card rounded-1 px-3 py-2 text-sm text-muted-foreground">
+                    <%- include('../components/icon.ejs', {
+                        icon: 'wallet',
+                        className: 'size-3.5'
+                    }); %>
+                    <span>Major credit / debit cards</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <% if(!response.admin.paypal.connected){ %>
+        <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+            <div class="flex flex-col gap-2">
+                <div class="text-left font-bold text-base">How it works</div>
+                <div class="text-muted-foreground">Click Connect PayPal — we verify your GoldWitch app with PayPal and mark it connected. No paste fields here.</div>
+            </div>
+        </div>
+    <% } %>
+</div>

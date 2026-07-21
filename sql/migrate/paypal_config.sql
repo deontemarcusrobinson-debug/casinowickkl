@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS `paypal_config` (
+    `id` TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    `mode` VARCHAR(16) NOT NULL DEFAULT 'sandbox',
+    `client_id` VARCHAR(255) NOT NULL DEFAULT '',
+    `secret` VARCHAR(255) NOT NULL DEFAULT '',
+    `business_email` VARCHAR(255) NOT NULL DEFAULT '',
+    `active` BOOLEAN NOT NULL DEFAULT 0,
+    `time` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT IGNORE INTO `paypal_config` (`id`) VALUES (1);

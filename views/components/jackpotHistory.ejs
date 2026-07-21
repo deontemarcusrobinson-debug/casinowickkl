@@ -1,0 +1,14 @@
+<div class="jackpot_historyitem bg-card flex flex-col gap-1 rounded-1 p-1">
+    <% var style = 'style="background: ' + bets[winner].color + '40;"'; %>
+
+    <div class="flex justify-between items-center gap-2 p-2" <%- style %>>
+        <div class="font-bold"><%= bets[winner].user.name %> won the pot valued at <%= amount %> coins with a chance of <%= chance %>%</div>
+        <div class="bg-secondary py-1 px-2 rounded-1 pointer font-bold fair-results" data-fair="<%= JSON.stringify(fair) %>">Provably Fair</div>
+    </div>
+
+    <div class="jackpot-grid-bets bg-card rounded-1" id="jackpot_betlist">
+        <% bets.forEach(function(item){ %>
+            <%- include('./jackpotBet.ejs', item); %>
+        <% }); %>
+    </div>
+</div>

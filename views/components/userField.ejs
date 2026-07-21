@@ -1,0 +1,13 @@
+<% if(user.anonymous){ %>
+    <div class="flex items-center gap-2">
+        <%- include('./userAvatar.ejs', { user, size: 'size-8' }); %>
+
+        <div class="text-left w-full truncate"><%= user.name %></div>
+    </div>
+<% } else { %>
+    <a class="flex items-center gap-2" href="/user/<%= user.userid %>" target="_blank">
+        <%- include('./userAvatar.ejs', { user, size: 'size-8' }); %>
+
+        <div class="text-left w-full truncate"><%= user.name %></div>
+    </a>
+<% } %>

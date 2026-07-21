@@ -1,0 +1,19 @@
+CREATE TABLE IF NOT EXISTS `rain_tips` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `userid` VARCHAR(36) BINARY NOT NULL,
+    `amount` DECIMAL(32,2) UNSIGNED NOT NULL,
+    `rainid` BIGINT UNSIGNED NOT NULL,
+    `time` BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `IX_rain_tips_rainid` (`rainid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `rain_tips` CHARACTER SET=utf8mb4, COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `rain_tips` CHANGE COLUMN `id` `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `rain_tips` CHANGE COLUMN `userid` `userid` VARCHAR(36) BINARY NOT NULL;
+ALTER TABLE `rain_tips` CHANGE COLUMN `amount` `amount` DECIMAL(32,2) UNSIGNED NOT NULL;
+ALTER TABLE `rain_tips` CHANGE COLUMN `rainid` `rainid` BIGINT UNSIGNED NOT NULL;
+ALTER TABLE `rain_tips` CHANGE COLUMN `time` `time` BIGINT UNSIGNED NOT NULL;
+
+CREATE INDEX IF NOT EXISTS `IX_rain_tips_rainid` ON `rain_tips` (`rainid`) USING BTREE;

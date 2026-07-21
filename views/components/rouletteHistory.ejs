@@ -1,0 +1,23 @@
+<div class="item <%= colors.join(' ') %> shadow-2 flex row items-center">
+    <% if(colors.some(a => a == 'bait')){ %>
+        <%- include('./icon.ejs', {
+            icon: 'flashbang',
+            className: 'opacity-70 text-foreground h-8/12 w-full'
+        }); %>
+    <% } else if(colors.some(a => a == 'red')){ %>
+        <%- include('./icon.ejs', {
+            icon: 'counter-terrorist',
+            className: 'opacity-70 text-foreground h-8/12 w-full'
+        }); %>
+    <% } else if(colors.some(a => a == 'black')){ %>
+        <%- include('./icon.ejs', {
+            icon: 'terrorist',
+            className: 'opacity-70 text-foreground h-8/12 w-full'
+        }); %>
+    <% } else if(colors.some(a => a == 'green')){ %>
+        <%- include('./icon.ejs', {
+            icon: 'hat',
+            className: 'opacity-70 text-foreground h-8/12 w-full'
+        }); %>
+    <% } %>
+</div>

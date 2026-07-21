@@ -1,0 +1,98 @@
+.tower-grid {
+	display: grid;
+    grid-gap: 0.75rem;
+	width: 100%;
+	height: 100%;
+    grid-template-rows: repeat(9, calc((100% - 8 * 0.75rem) / 9));
+}
+
+.tower-grid.easy {
+    grid-template-columns: repeat(4, calc((100% - 3 * 0.75rem) / 4));
+}
+
+.tower-grid.medium {
+    grid-template-columns: repeat(3, calc((100% - 2 * 0.75rem) / 3));
+}
+
+.tower-grid.hard {
+    grid-template-columns: repeat(2, calc((100% - 1 * 0.75rem) / 2));
+}
+
+.tower-grid.expert {
+    grid-template-columns: repeat(3, calc((100% - 2 * 0.75rem) / 3));
+}
+
+.tower-grid.master {
+    grid-template-columns: repeat(4, calc((100% - 3 * 0.75rem) / 4));
+}
+
+.tower-grid .item{
+	overflow: hidden;
+	background: var(--accent);
+	box-shadow: 0px 0.25rem color-mix(in oklab, var(--accent) 50%, transparent);
+	cursor: pointer;
+	top: 0px;
+}
+
+.tower-grid .item:not(.danger):not(.success):hover {
+	top: -4px;
+}
+
+.tower-grid .item.danger{
+	background: var(--color-danger);
+	box-shadow: 0px 0.25rem color-mix(in oklab, var(--color-danger) 50%, transparent);
+}
+
+.tower-grid .item.success {
+	background: var(--color-success);
+	box-shadow: 0px 0.25rem color-mix(in oklab, var(--color-success) 50%, transparent);
+}
+
+.tower-grid .item.danger,
+.tower-grid .item.success {
+	-webkit-animation: tower-hit 200ms ease-in forwards;
+	-moz-animation: tower-hit 200ms ease-in forwards;
+	-o-animation: tower-hit 200ms ease-in forwards;
+	animation: tower-hit 200ms ease-in forwards;
+}
+
+@keyframes tower-hit {
+	0% { scale: 1; }
+	50% { scale: 1.1; }
+	100% { scale: 1; }
+}
+
+@-webkit-keyframes tower-hit {
+	0% { scale: 1; }
+	50% { scale: 1.1; }
+	100% { scale: 1; }
+}
+
+.tower-grid .item.checked{
+	background: var(--card);
+	box-shadow: 0px 0.25rem color-mix(in oklab, var(--card) 50%, transparent);
+}
+
+@media (min-width: 768px){
+	.tower-container{
+		width: 80%;
+		height: 100%;
+	}
+
+	.tower-grid .item{
+		font-size: 16px;
+		font-weight: bold;
+	}
+}
+
+@media (max-width: 768px){
+	.tower-container{
+		width: 100%;
+		height: 400px;
+	}
+
+	.tower-grid .item{
+		font-size: 12px;
+		font-weight: bold;
+	}
+}

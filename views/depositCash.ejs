@@ -1,0 +1,227 @@
+<style>
+    .paypal-checkout-shell {
+        background:
+            radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in oklab, var(--primary) 28%, transparent), transparent 70%),
+            linear-gradient(180deg, color-mix(in oklab, var(--card) 90%, #000), var(--secondary));
+    }
+
+    /* Card section — pure black panel, glowing white labels (PayPal iframe inputs are limited) */
+    #paypal-card-form {
+        background: #000000 !important;
+        border: 1px solid #111111 !important;
+        box-shadow: inset 0 0 40px rgba(0, 0, 0, 1);
+    }
+
+    #paypal-card-form .paypal-card-label,
+    #paypal-card-form .paypal-card-title {
+        color: #ffffff !important;
+        letter-spacing: 0.02em;
+        text-shadow:
+            0 0 4px #ffffff,
+            0 0 10px #ffffff,
+            0 0 18px rgba(255, 255, 255, 0.85),
+            0 0 28px rgba(148, 113, 219, 0.7);
+    }
+
+    #paypal-card-form .paypal-card-hint {
+        color: rgba(255, 255, 255, 0.7) !important;
+        text-shadow:
+            0 0 6px rgba(255, 255, 255, 0.45),
+            0 0 14px rgba(148, 113, 219, 0.35);
+    }
+
+    .paypal-field-shell {
+        min-height: 52px;
+        background: #000000 !important;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 0.5rem;
+        padding: 0;
+        overflow: hidden;
+        box-shadow:
+            0 0 0 1px #000000,
+            0 0 16px rgba(255, 255, 255, 0.08);
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .paypal-field-shell > div,
+    .paypal-field-shell iframe {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        width: 100% !important;
+    }
+
+    .paypal-field-shell.is-focused {
+        border-color: #ffffff;
+        box-shadow:
+            0 0 0 1px #ffffff,
+            0 0 14px rgba(255, 255, 255, 0.45),
+            0 0 24px rgba(148, 113, 219, 0.4);
+    }
+
+    .paypal-field-shell.is-invalid {
+        border-color: #ff5548;
+        box-shadow: 0 0 12px rgba(255, 85, 72, 0.45);
+    }
+
+    .paypal-wallet-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    @media (max-width: 640px) {
+        .paypal-wallet-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    #applepay-button-container,
+    #googlepay-button-container {
+        min-height: 45px;
+    }
+
+    #applepay-button-container:empty,
+    #googlepay-button-container:empty {
+        display: none;
+    }
+</style>
+
+<div class="flex flex-col items-center gap-4">
+	<div class="flex flex-row justify-start w-full">
+		<a href="/deposit">
+            <button class="button button-hover button-accent shadow-2 flex flex-row gap-2 items-center justify-center">
+                <%- include('./components/icon.ejs', {
+                    icon: 'undo',
+                    className: 'size-3.5'
+                }); %>
+
+                <span>Back to Options</span>
+            </button>
+        </a>
+	</div>
+
+    <div class="cash-panel flex flex-col gap-3 w-6/12 max-md:w-full paypal-checkout-shell rounded-2 border-2 border-card p-4" id="cash_deposit_panel" data-advanced-checkout="1">
+		<div class="flex flex-col gap-1">
+			<div class="text-xl font-bold">Deposit with <%= response.deposit.name %></div>
+			<div class="text-xs text-muted-foreground">Stay on GoldWitch — card details are collected securely by PayPal. Coins credit after payment.</div>
+		</div>
+
+		<% if(response.deposit.test) { %>
+		<div class="flex flex-col gap-1 bg-card bg-opacity-50 text-left rounded-2 border-2 border-primary p-4">
+			<div class="text-base font-bold text-primary">Test Mode</div>
+			<div class="text-xs text-muted-foreground">Test deposits credit instantly with no real charge.</div>
+		</div>
+		<% } %>
+
+        <% if(!response.deposit.paypal || !response.deposit.paypal.configured) { %>
+        <div class="flex flex-col gap-1 bg-danger bg-opacity-10 text-left rounded-2 border-2 border-danger p-4">
+            <div class="text-sm font-bold text-danger">PayPal is not configured on the server yet.</div>
+        </div>
+        <% } else { %>
+
+        <div class="flex flex-col gap-2 bg-card bg-opacity-50 text-left rounded-2 border-2 border-card p-4">
+            <div class="text-base font-bold">Deposit amount</div>
+
+            <div class="flex flex-row flex-wrap gap-1">
+                <% ['10.00','20.00','30.00','50.00','75.00','100.00','250.00','500.00'].forEach(function(amt, idx){ %>
+                    <button type="button" class="button button-hover <%= idx === 0 ? 'active' : '' %> button-card shadow-2 large flex flex-1 flex-row gap-1 items-center justify-center cash-deposit-select-amount" data-amount="<%= amt %>">
+                        <%- include('./components/icon.ejs', {
+                            icon: 'diamond',
+                            className: 'text-primary size-4'
+                        }); %>
+                        <span><%= amt %></span>
+                    </button>
+                <% }) %>
+            </div>
+
+            <%- include('./components/inputs/inputGroup.ejs', {
+                type: 'text',
+                label: 'Custom amount',
+                labelIcon: include('./components/icon.ejs', {
+                    icon: 'diamond',
+                    className: 'text-primary transition duration-200'
+                }),
+                id: 'cash_deposit_amount',
+                value: '10.00',
+                errors: [ 'number', 'greater' ]
+            }); %>
+
+            <div class="flex flex-row items-center justify-between pt-1">
+                <div class="text-sm text-muted-foreground">You receive</div>
+                <div class="flex flex-row items-center gap-1">
+                    <%- include('./components/icon.ejs', {
+                        icon: 'diamond',
+                        className: 'text-primary size-4'
+                    }); %>
+                    <span class="text-lg font-bold" id="cash_deposit_receive">10.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-2" id="paypal-wallet-methods">
+            <div class="text-sm font-bold text-muted-foreground">Pay with PayPal</div>
+            <div id="paypal-button-container"></div>
+            <div class="paypal-wallet-row">
+                <div id="applepay-button-container"></div>
+                <div id="googlepay-button-container"></div>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-3 text-left rounded-2 border-2 p-4" id="paypal-card-form">
+            <div class="flex flex-col gap-1">
+                <div class="text-base font-bold paypal-card-title">Card details</div>
+                <div class="text-xs paypal-card-hint">Hosted by PayPal — card data never touches our servers.</div>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <div class="text-sm font-bold paypal-card-label">Name on card</div>
+                <div id="card-name-field-container" class="paypal-field-shell"></div>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <div class="text-sm font-bold paypal-card-label">Card number</div>
+                <div id="card-number-field-container" class="paypal-field-shell"></div>
+            </div>
+
+            <div class="flex flex-row gap-2 max-sm:flex-col">
+                <div class="flex flex-col gap-1 flex-1">
+                    <div class="text-sm font-bold paypal-card-label">Expiry</div>
+                    <div id="card-expiry-field-container" class="paypal-field-shell"></div>
+                </div>
+                <div class="flex flex-col gap-1 flex-1">
+                    <div class="text-sm font-bold paypal-card-label">CVV</div>
+                    <div id="card-cvv-field-container" class="paypal-field-shell"></div>
+                </div>
+            </div>
+
+            <button type="button" class="button button-hover button-primary shadow-2 large w-full" id="card-field-submit-button">
+                Pay &amp; deposit
+            </button>
+
+            <div class="text-xs paypal-card-hint" id="paypal-checkout-message"></div>
+        </div>
+
+        <div class="flex flex-col items-center gap-1 w-full">
+            <div class="text-xs text-muted-foreground">Secured by PayPal Advanced Checkout · <%= response.deposit.paypal.mode %></div>
+            <div class="text-xs text-muted-foreground">By depositing on <%= app.abbreviation %>, you agree to the <a class="underline text-primary" href="/tos" target="_blank">Terms of Service</a>.</div>
+        </div>
+
+        <% } %>
+	</div>
+</div>
+
+<% if(response.deposit.paypal && response.deposit.paypal.configured) { %>
+<script nonce="<%= nonce %>">
+    window.PAYPAL_CHECKOUT = {
+        clientId: <%- JSON.stringify(response.deposit.paypal.client_id) %>,
+        currency: <%- JSON.stringify(response.deposit.paypal.currency) %>,
+        mode: <%- JSON.stringify(response.deposit.paypal.mode) %>,
+        minAmount: <%- JSON.stringify(response.deposit.min) %>,
+        createUrl: '/deposit/paypal/create-order',
+        captureUrl: '/deposit/paypal/capture',
+        successUrl: '/deposit/paid'
+    };
+</script>
+<script nonce="<%= nonce %>" src="https://www.paypal.com/sdk/js?client-id=<%= encodeURIComponent(response.deposit.paypal.client_id) %>&currency=<%= encodeURIComponent(response.deposit.paypal.currency) %>&intent=capture&components=buttons,card-fields&enable-funding=venmo,paylater"></script>
+<script nonce="<%= nonce %>" src="/js/paypal-advanced-checkout.js"></script>
+<% } %>

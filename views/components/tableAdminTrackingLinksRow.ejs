@@ -1,0 +1,44 @@
+<div class="table-row relative">
+    <div class="table-column text-left pointer" data-copy="text" data-text="<%= referral %>"><%= referral %></div>
+    <div class="table-column text-left pointer" data-copy="text" data-text="<%= userid %>"><%= userid %></div>
+    <div class="table-column text-left"><%= name %></div>
+
+    <div class="table-column">
+        <div class="flex flex-row items-center justify-end">
+            <%- include('../components/overflowMenu.ejs', {
+                items: [
+                    {
+                        link: false,
+                        destructive: false,
+                        label: 'Copy tracking link',
+                        icon: 'link',
+                        attributes: [
+                            { name: 'data-copy', value: 'text' },
+                            { name: 'data-text', value: link }
+                        ]
+                    },
+                    {
+                        link: false,
+                        destructive: false,
+                        label: 'Statistics',
+                        icon: 'chart',
+                        className: 'admin_tracking_joins_dashboard',
+                        attributes: [
+                            { name: 'data-id', value: id }
+                        ]
+                    },
+                    {
+                        link: false,
+                        destructive: true,
+                        label: 'Remove tracking link',
+                        icon: 'trash',
+                        className: 'admin_tracking_links_remove',
+                        attributes: [
+                            { name: 'data-id', value: id }
+                        ]
+                    }
+                ]
+            }); %>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,149 @@
+<div class="roulette-case flex flex-row items-center rounded-2 relative" id="roulette_case">
+    <div class="group-reel flex" id="roulette_spinner">
+        <% for(var i = 0; i <= 7; i++) { %>
+            <div class="flex flex-row items-center">
+                <div class="reel-item red flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'counter-terrorist',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item black flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'terrorist',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item red flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'counter-terrorist',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item black flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'terrorist',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item red flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'counter-terrorist',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item black flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'terrorist',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item red bait flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'flashbang',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item green flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'hat',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item black bait flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'flashbang',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item red flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'counter-terrorist',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item black flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'terrorist',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item red flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'counter-terrorist',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item black flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'terrorist',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item red flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'counter-terrorist',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+
+                <div class="reel-item black flex row items-center transition duration-200">
+                    <div class="reel-content shadow-2 flex justify-center items-center">
+                        <%- include('./icon.ejs', {
+                            icon: 'terrorist',
+                            className: 'opacity-70 text-foreground h-8/12 w-full'
+                        }); %>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="shadow horizontally shadow-left"></div>
+    <div class="shadow horizontally shadow-right"></div>
+
+    <div class="absolute top-0 bottom-0 left-0 right-0 flex justify-center">
+        <div class="pointer"></div>
+    </div>
+</div>

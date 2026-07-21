@@ -1,0 +1,37 @@
+<%
+    var viewYear = new Date(timestemp).getFullYear();
+    var viewMonth = new Date(timestemp).getMonth();
+    var viewDay = new Date(timestemp).getDate();
+
+    function pad(s, n) {
+        return String(s).padStart(n, '0');
+    }
+
+    function toISO(d) {
+        return d.getFullYear() + '-' + pad(d.getMonth() + 1, 2) + '-' + pad(d.getDate(), 2);
+    }
+%>
+
+<div class="calendar-popover months flex flex-col gap-4 bg-secondary border-2 border-accent rounded-2 p-1 overflow-h transition duration-200 w-full">
+    <div class="calendar-popover-header flex flex-row items-center justify-between gap-2 border-b-2 border-card p-2 w-full">
+        <div class="flex flex-row items-center gap-1">
+            <button class="button flex flex-row items-center justify-center transition duration-200" data-value="<%= toISO(new Date(viewYear - 1, viewMonth, viewDay)) %>">‹</button>
+        </div>
+
+        <button class="calendar-popover-date text-sm text-nowrap font-bold px-2 py-1 rounded-1 pointer transition duration-200"><%= viewYear %></button>
+
+        <div class="flex flex-row items-center gap-1">
+            <button class="button flex flex-row items-center justify-center transition duration-200" data-value="<%= toISO(new Date(viewYear + 1, viewMonth, viewDay)) %>">›</button>
+        </div>
+    </div>
+
+    <div class="calendar-popover-content px-2 pb-2">
+        <% Array.from(Array(12), (e, i) => ({
+            name: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ][i].slice(0, 3),
+            value: toISO(new Date(viewYear, i, viewDay)),
+            type: i == viewMonth ? 'active' : null
+        })).forEach(function(item){ %>
+            <button class="calendar-popover-option <%= item.type %> flex items-center justify-center text-sm rounded-1 pointer transition duration-200" value="<%= item.value %>" <% if(item.type == 'outside'){ %>disabled<% } %>><%= item.name %></button>
+        <% }); %>
+    </div>
+</div>

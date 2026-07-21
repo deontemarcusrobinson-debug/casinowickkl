@@ -1,0 +1,42 @@
+<div class="table-row relative">
+    <div class="table-column text-left pointer" data-copy="text" data-text="<%= code %>"><%= code %></div>
+    <div class="table-column text-left"><span class="text-success"><%= uses.total %></span> / <%= uses.max %></div>
+
+    <div class="table-column text-left">
+        <div class="flex flex-row items-center justify-start gap-1">
+            <%- include('./icon.ejs', {
+                icon: 'diamond',
+                id: null,
+                className: 'text-primary size-4'
+            }); %>
+
+            <span><%= amount %></span>
+        </div>
+    </div>
+
+    <div class="table-column">
+        <div class="flex flex-row justify-start">
+            <div class="<%= { 'active': 'bg-success bg-opacity-50', 'used': 'bg-danger bg-opacity-50', 'expired': 'bg-danger bg-opacity-50' }[status] %> p-1 rounded-1"><%= { 'active': 'Active', 'used': 'Used', 'expired': 'Expired' }[status] %></div>
+        </div>
+    </div>
+    <div class="table-column text-left"><%= expire %></div>
+
+    <div class="table-column">
+        <div class="flex flex-row items-center justify-end">
+            <%- include('./overflowMenu.ejs', {
+                items: [
+                    {
+                        link: false,
+                        destructive: true,
+                        label: 'Remove bonus code',
+                        icon: 'trash',
+                        className: 'admin_bonus_codes_remove',
+                        attributes: [
+                            { name: 'data-id', value: id }
+                        ]
+                    }
+                ]
+            }); %>
+        </div>
+    </div>
+</div>

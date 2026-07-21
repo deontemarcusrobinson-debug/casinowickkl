@@ -1,0 +1,29 @@
+<div class="overflow-menu-popover flex flex-col bg-secondary border-2 border-card text-nowrap overflow-hidden rounded-2">
+    <% items.forEach(function(item){ %>
+        <% if(item.link){ %>
+            <a href="<%= item.href %>" class="overflow-menu-option <% if(item.destructive){ %>destructive<% } %> flex flex-row items-center gap-1 bg-secondary flex flex-row items-center gap-2 px-4 py-3 font-bold <% if(typeof item.className !== 'undefined' && item.className != null){ %><%= item.className %><% } %>" <% if(typeof item.id !== 'undefined') { %>id="<%= item.id %>"<% } %> <% if(typeof item.attributes !== 'undefined' && Array.isArray(item.attributes)){ %><%- item.attributes.map(a => a.name + '="' + a.value.toString().replace(/"/g, '&quot;') + '"').join(' ') %><% } %>>
+                <% if(typeof item.icon !== 'undefined') { %>
+                    <%- include('./icon.ejs', {
+                        icon: item.icon,
+                        id: null,
+                        className: 'size-3.5'
+                    }); %>
+                <% } %>
+
+                <span><%= item.label %></span>
+            </a>
+        <% } else { %>
+            <div class="overflow-menu-option <% if(item.destructive){ %>destructive<% } %> flex flex-row items-center gap-1 bg-secondary flex flex-row items-center gap-2 px-4 py-3 font-bold <% if(typeof item.className !== 'undefined' && item.className != null){ %><%= item.className %><% } %>" <% if(typeof item.id !== 'undefined') { %>id="<%= item.id %>"<% } %> <% if(typeof item.attributes !== 'undefined' && Array.isArray(item.attributes)){ %><%- item.attributes.map(a => a.name + '="' + a.value.toString().replace(/"/g, '&quot;') + '"').join(' ') %><% } %>>
+                <% if(typeof item.icon !== 'undefined') { %>
+                    <%- include('./icon.ejs', {
+                        icon: item.icon,
+                        id: null,
+                        className: 'size-3.5'
+                    }); %>
+                <% } %>
+
+                <span><%= item.label %></span>
+            </div>
+        <% } %>
+    <% }); %>
+</div>

@@ -1,0 +1,193 @@
+<div class="flex flex-col gap-4">
+	<div class="flex flex-row justify-end items-center w-full">
+		<button class="button button-hover button-accent shadow-2" data-modal="show" data-id="#modal_fair_roulette">Provably fair</button>
+	</div>
+
+	<div class="roulette-grid items-end justify-between gap-2">
+		<div class="roulette-tab flex flex-col items-start justify-center gap-2">
+			<span class="text-muted-foreground text-base font-bold">Last 100 Rolls</span>
+
+			<div class="roulette-history flex flex-row gap-2">
+				<%- include('./components/rouletteHundredHistorySkeleton.ejs', { color: 'red' }); %>
+				<%- include('./components/rouletteHundredHistorySkeleton.ejs', { color: 'green' }); %>
+				<%- include('./components/rouletteHundredHistorySkeleton.ejs', { color: 'black' }); %>
+				<%- include('./components/rouletteHundredHistorySkeleton.ejs', { color: 'bait' }); %>
+			</div>
+		</div>
+
+		<%- include('./components/rouletteJackpotSkeleton.ejs'); %>
+
+		<div class="roulette-tab flex flex-col items-end justify-center gap-2">
+			<span class="text-muted-foreground text-base font-bold">Previous Rolls</span>
+
+			<div class="roulette-history flex flex-row gap-1" id="roulette_rolls">
+                <% for(var i = 0; i < 10; i++){ %>
+                    <%- include('./components/rouletteHistorySkeleton.ejs'); %>
+                <% } %>
+            </div>
+		</div>
+	</div>
+
+	<%- include('./components/rouletteSpinnerSkeleton.ejs'); %>
+
+	<div class="progress-container w-full rounded-1">
+		<div class="progress-bar" id="roulette_counter" style="width: 100%"></div>
+	</div>
+
+	<div class="flex flex-col gap-2 pt-2">
+		<%- include('./components/inputs/inputGroup.ejs', {
+			type: 'text',
+			label: 'Bet Amount',
+			labelIcon: include('./components/icon.ejs', {
+				icon: 'diamond',
+				className: 'text-primary transition duration-200'
+			}),
+			id: 'betamount_roulette',
+			value: '1.00',
+			attributes: [
+				{ name: 'data-amount', value: 'roulette' },
+				{ name: 'inputmode', value: 'decimal' }
+			],
+			addons: [			{
+				addon: '<div class="flex flex-wrap flex-row justify-end gap-1">' +
+					'<button class="button button-hover button-accent betshort_action" data-game="roulette" data-action="clear">Clear</button>' +
+					'<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="roulette" data-action="1.00">+1.00</button>' +
+					'<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="roulette" data-action="10.00">+10.00</button>' +
+					'<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="roulette" data-action="100.00">+100.00</button>' +
+					'<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="roulette" data-action="half">1/2</button>' +
+					'<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="roulette" data-action="double">x2</button>' +
+					'<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="roulette" data-action="max">Max</button>' +
+				'</div>',
+				align: 'end'
+			}],
+			errors: [ 'required', 'number', 'greater', 'lesser' ]
+		}); %>
+
+		<div class="flex flex-wrap flex-row gap-1 md:hidden">
+			<button class="button button-hover button-accent betshort_action flex-1" data-game="roulette" data-action="1.00">+1.00</button>
+			<button class="button button-hover button-accent betshort_action flex-1" data-game="roulette" data-action="10.00">+10.00</button>
+			<button class="button button-hover button-accent betshort_action flex-1" data-game="roulette" data-action="100.00">+100.00</button>
+			<button class="button button-hover button-accent betshort_action flex-1" data-game="roulette" data-action="half">1/2</button>
+			<button class="button button-hover button-accent betshort_action flex-1" data-game="roulette" data-action="double">x2</button>
+			<button class="button button-hover button-accent betshort_action flex-1" data-game="roulette" data-action="max">Max</button>
+		</div>
+	</div>
+
+	<div class="roulette-panels flex flex-row max-md:flex-col gap-4">
+		<div class="w-4/12 max-md:w-full" id="roulette_panel_red">
+			<div class="flex flex-col gap-2">
+				<button class="button button-hover button-primary shadow-2 large w-full roulette-bet" data-color="red">
+					<div class="w-full flex flex-row items-center justify-between gap-2">
+						<div class="flex flex-row items-center justify-center gap-2">
+							<%- include('./components/icon.ejs', {
+								icon: 'counter-terrorist',
+								className: 'size-7'
+							}); %>
+
+							<span class="text-sm">Place Bet</span>
+						</div>
+
+						<span class="text-xl">2x</span>
+					</div>
+				</button>
+
+				<div class="flex flex-col gap-1">
+					<%- include('./components/rouletteTotalBetsSkeleton.ejs'); %>
+
+					<div class="roulette-betslist grid gap-1">
+                        <% for(var i = 0; i < 3; i++){ %>
+                            <%- include('./components/rouletteBetSkeleton.ejs'); %>
+                        <% } %>
+                    </div>
+				</div>
+			</div>
+		</div>
+
+		<div class="w-4/12 max-md:w-full" id="roulette_panel_green">
+			<div class="flex flex-col gap-2">
+				<button class="button button-hover button-primary shadow-2 large w-full roulette-bet" data-color="green">
+					<div class="w-full flex flex-row items-center justify-between gap-2">
+						<div class="flex flex-row items-center justify-center gap-2">
+							<%- include('./components/icon.ejs', {
+								icon: 'hat',
+								className: 'size-7'
+							}); %>
+
+							<span class="text-sm">Place Bet</span>
+						</div>
+
+						<span class="text-xl">14x</span>
+					</div>
+				</button>
+
+				<div class="flex flex-col gap-1">
+					<%- include('./components/rouletteTotalBetsSkeleton.ejs'); %>
+
+					<div class="roulette-betslist grid gap-1">
+                        <% for(var i = 0; i < 3; i++){ %>
+                            <%- include('./components/rouletteBetSkeleton.ejs'); %>
+                        <% } %>
+                    </div>
+				</div>
+			</div>
+		</div>
+
+		<div class="w-4/12 max-md:w-full" id="roulette_panel_black">
+			<div class="flex flex-col gap-2">
+				<button class="button button-hover button-primary shadow-2 large w-full roulette-bet" data-color="black">
+					<div class="w-full flex flex-row items-center justify-between gap-2">
+						<div class="flex flex-row items-center justify-center gap-2">
+							<%- include('./components/icon.ejs', {
+								icon: 'terrorist',
+								className: 'size-7'
+							}); %>
+
+							<span class="text-sm">Place Bet</span>
+						</div>
+
+						<span class="text-xl">2x</span>
+					</div>
+				</button>
+
+				<div class="flex flex-col gap-1">
+					<%- include('./components/rouletteTotalBetsSkeleton.ejs'); %>
+
+					<div class="roulette-betslist grid gap-1">
+                        <% for(var i = 0; i < 3; i++){ %>
+                            <%- include('./components/rouletteBetSkeleton.ejs'); %>
+                        <% } %>
+                    </div>
+				</div>
+			</div>
+		</div>
+
+		<div class="w-4/12 max-md:w-full" id="roulette_panel_bait">
+			<div class="flex flex-col gap-2">
+				<button class="button button-hover button-primary shadow-2 large w-full roulette-bet" data-color="bait">
+					<div class="w-full flex flex-row items-center justify-between gap-2">
+						<div class="flex flex-row items-center justify-center gap-2">
+							<%- include('./components/icon.ejs', {
+								icon: 'flashbang',
+								className: 'size-7'
+							}); %>
+
+							<span class="text-sm">Place Bet</span>
+						</div>
+
+						<span class="text-xl">7x</span>
+					</div>
+				</button>
+
+				<div class="flex flex-col gap-1">
+					<%- include('./components/rouletteTotalBetsSkeleton.ejs'); %>
+
+					<div class="roulette-betslist grid gap-1">
+                        <% for(var i = 0; i < 3; i++){ %>
+                            <%- include('./components/rouletteBetSkeleton.ejs'); %>
+                        <% } %>
+                    </div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

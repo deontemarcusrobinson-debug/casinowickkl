@@ -1,0 +1,102 @@
+<div class="footer">
+	<div class="flex flex-col gap-6">
+		<div class="footer-top flex flex-row max-md:flex-col justify-between gap-6">
+			<div class="footer-logo flex flex-col gap-4">
+				<div class="justify-center">
+					<a class="justify-center flex" href="/">
+						<img src="/img/logo.png">
+					</a>
+				</div>
+
+				<div>Your favorite place to trade & win skins!</div>
+			</div>
+
+			<div class="footer-grid flex flex-row max-md:flex-col gap-2">
+                <div class="flex flex-row gap-2">
+                    <div class="column flex flex-col items-start gap-4">
+                        <div class="title text-lg font-bold">Support</div>
+
+                        <div class="flex flex-col text-left gap-2">
+                            <a class="text-muted-foreground" href="/faq">FAQ</a>
+                            <a class="text-muted-foreground" href="/tos">Terms of Service</a>
+                            <a class="text-muted-foreground" href="/support">Support</a>
+                        </div>
+                    </div>
+
+                    <div class="column flex flex-col items-start gap-4">
+                        <div class="title text-lg font-bold">Games</div>
+
+                        <div class="flex flex-col text-left gap-2">
+                        <% settings.games.classic.forEach(function(item){ %>
+                            <% if(item.enable || account.permissions.play_disabled){ %>
+                                <a class="text-muted-foreground" href="/<%= item.game %>"><%= item.name %></a>
+                            <% } %>
+                        <% }); %>
+
+                        <% settings.games.original.forEach(function(item){ %>
+                            <% if(item.enable || account.permissions.play_disabled){ %>
+                                <a class="text-muted-foreground" href="/<%= item.game %>"><%= item.name %></a>
+                            <% } %>
+                        <% }); %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-row gap-2">
+                    <div class="column flex flex-col items-start gap-4">
+                        <div class="title text-lg font-bold">Informations</div>
+
+                        <div class="flex flex-col text-left gap-2">
+                            <a class="text-muted-foreground" href="/fair">Provably Fair</a>
+                            <a class="text-muted-foreground" href="/leaderboard">Leaderboard</a>
+                            <a class="text-muted-foreground" href="/rewards">Rewards</a>
+                            <a class="text-muted-foreground" href="/affiliates">Affiliates</a>
+                        </div>
+                    </div>
+
+                    <div class="column flex flex-col items-start gap-4">
+                        <div class="title text-lg font-bold">Context</div>
+
+                        <div class="flex flex-col text-left gap-2">
+                            <a class="flex flex-row gap-2 items-center text-muted-foreground" href="<%= app.links.discord_server %>" target="_blank">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'discord',
+                                    className: 'size-3.5'
+                                }); %>
+
+                                <span>Discord</span>
+                            </a>
+
+                            <a class="flex flex-row gap-2 items-center text-muted-foreground" href="<%= app.links.twitter_page %>" target="_blank">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'twitter',
+                                    className: 'size-3.5'
+                                }); %>
+
+                                <span>Twitter</span>
+                            </a>
+
+                            <a class="flex flex-row gap-2 items-center text-muted-foreground" href="<%= app.links.steam_group %>" target="_blank">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'steam',
+                                    className: 'size-3.5'
+                                }); %>
+
+                                <span>Steam</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+			</div>
+		</div>
+
+		<div class="footer-bottom flex flex-row max-md:flex-col justify-between items-center gap-2 pt-2 border-t-2 border-card">
+			<div class="flex flex-row items-center gap-4">
+				<div class="bg-primary bg-opacity-50 py-1 px-2 rounded-1 font-bold">+18</div>
+				<div class="text-muted-foreground">© <%= new Date().getFullYear() %> <%= app.name %>. All rights reserved.</div>
+			</div>
+
+			<img src="/img/fair.png">
+		</div>
+	</div>
+</div>

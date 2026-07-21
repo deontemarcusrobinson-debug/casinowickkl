@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS `deposit_bonuses` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `userid` VARCHAR(36) BINARY NOT NULL,
+    `bonusid` BIGINT UNSIGNED NOT NULL,
+    `amount` DECIMAL(32,5) UNSIGNED NOT NULL,
+    `time` BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `deposit_bonuses` CHARACTER SET=utf8mb4, COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `deposit_bonuses` CHANGE COLUMN `id` `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `deposit_bonuses` CHANGE COLUMN `userid` `userid` VARCHAR(36) BINARY NOT NULL;
+ALTER TABLE `deposit_bonuses` CHANGE COLUMN `bonusid` `bonusid` BIGINT UNSIGNED NOT NULL;
+ALTER TABLE `deposit_bonuses` CHANGE COLUMN `amount` `amount` DECIMAL(32,5) UNSIGNED NOT NULL;
+ALTER TABLE `deposit_bonuses` CHANGE COLUMN `time` `time` BIGINT UNSIGNED NOT NULL;

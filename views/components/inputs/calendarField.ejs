@@ -1,0 +1,18 @@
+<%
+    function pad(s, n) {
+        return String(s).padStart(n, '0');
+    }
+
+    function toISO(d) {
+        return d.getFullYear() + '-' + pad(d.getMonth() + 1, 2) + '-' + pad(d.getDate(), 2);
+    }
+%>
+
+<div class="calendar-field flex flex-row items-center relative w-full <% if(typeof disabled !== 'undefined' && disabled) { %>disabled<% } %>">
+    <%- include('./calendarPopoverDays.ejs', {
+        selected: typeof selected !== 'undefined' && selected != null ? selected : null,
+        timestemp: typeof selected !== 'undefined' && selected != null ? new Date(new Date(selected).getFullYear(), new Date(selected).getMonth(), 1).getTime() : new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime()
+    }); %>
+
+    <input type="text" class="calendar-element w-full h-full <% if(typeof className !== 'undefined' && className != null){ %><%= className %><% } %>" <% if(typeof id !== 'undefined' && id != null) { %>id="<%= id %>"<% } %> <% if(typeof attributes !== 'undefined' && Array.isArray(attributes)){ %><%- attributes.map(a => a.name + '="' + a.value.toString().replace(/"/g, '&quot;') + '"').join(' ') %><% } %> <% if(typeof selected !== 'undefined' && selected != null) { %>value="<%= toISO(new Date(selected)) %>"<% } %> data-timestemp="<%= typeof selected !== 'undefined' && selected != null ? new Date(new Date(selected).getFullYear(), new Date(selected).getMonth(), 1).getTime() : new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime() %>" disabled>
+</div>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!--  META  -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title><%= name %> | <%= app.name %></title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1">
+        <meta name="keywords" content="<%= app.keywords.join(',') %>">
+        <meta name="description" content="<%= app.description %>">
+        <meta name="author" content="<%= app.author %>">
+        <meta name="theme-color" content="<%= app.themecolor %>">
+
+        <meta property="og:url" content="<%= app.url %>">
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="<%= app.name %>">
+        <meta property="og:title" content="<%= app.name %>">
+        <meta property="og:description" content="<%= app.description %>">
+        <meta property="og:image" content="<%= app.url %>/img/logo.png">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+
+        <link rel="icon" type="image/png" href="/img/favicon-16x16.png" sizes="16x16">
+        <link rel="icon" type="image/png" href="/img/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="/img/favicon-96x96.png" sizes="96x96">
+
+        <!--  CSS  -->
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,500,400italic,500italic,700,700italic" rel="stylesheet">
+        <link href="/css/vendor/toastr.min.css" rel="stylesheet">
+
+        <link href="/css/globals.<%= manifest.globals_css_version %>.css" rel="stylesheet">
+        <link href="/css/bouncer.css" rel="stylesheet">
+
+        <!--  JAVASCRIPT  -->
+        <script nonce="<%= nonce %>" src="/js/vendor/jquery.min.js"></script>
+        <script nonce="<%= nonce %>" src="/js/vendor/socket.io.js"></script>
+        <script nonce="<%= nonce %>" src="/js/vendor/tinysort.min.js"></script>
+        <script nonce="<%= nonce %>" src="/js/vendor/toastr.min.js"></script>
+        <script nonce="<%= nonce %>" src="/js/vendor/qrcode.min.js"></script>
+
+        <script nonce="<%= nonce %>" src="/js/vendor/Chart.min.js"></script>
+
+        <script nonce="<%= nonce %>" src='https://www.google.com/recaptcha/api.js'></script>
+
+        <%- '<script nonce="' + nonce + '">var app = ' + JSON.stringify({ page: page, url: app.url, name: app.name, paths: app.paths, port: app.port, secure: app.secure, recaptcha: app.recaptcha }, null, 4) + ';</script>' %>
+
+        <script nonce="<%= nonce %>" type="text/javascript" src="/js/components.<%= manifest.components_js_version %>.js"></script>
+        <script nonce="<%= nonce %>" type="text/javascript" src="/js/app.<%= manifest.app_js_version %>.js"></script>
+	</head>
+
+	<body>
+        <%- include('../partials/modals.ejs') %>
+
+		<div class="flex flex-col size-full">
+            <%- include('../partials/adminHeader.ejs') %>
+
+            <div class="wrapper-page flex flex-row admin-active" id="page">
+            <%- include('../partials/adminMenu.ejs') %>
+
+                <div class="main-panel">
+                    <div class="body flex flex-col w-full p-4">
+                        <%- body %>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</body>
+</html>

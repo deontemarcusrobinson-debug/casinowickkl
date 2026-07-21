@@ -1,0 +1,31 @@
+<div class="table-row <%= { completed: 'text-success', declined: 'text-danger', pending: 'text-warning', partially_paid: 'text-warning', clearing: 'text-warning' }[status] %>">
+    <div class="table-column text-left"><%= id %></div>
+
+    <div class="table-column text-left">
+        <div class="flex flex-row items-center justify-start gap-1">
+            <%- include('./icon.ejs', {
+                icon: 'diamond',
+                id: null,
+                className: 'text-primary size-4'
+            }); %>
+
+            <span><%= amount %></span>
+        </div>
+    </div>
+
+    <div class="table-column text-left">
+        <div class="flex flex-row items-center justify-start gap-1">
+            <%- include('./icon.ejs', {
+                icon: 'diamond',
+                id: null,
+                className: 'text-primary size-4'
+            }); %>
+
+            <span><%= paid %></span>
+        </div>
+    </div>
+
+    <div class="table-column text-left"><%= method %></div>
+    <div class="table-column text-left"><%= { completed: 'Completed', declined: 'Declined', pending: 'Pending', partially_paid: 'Partially Paid', clearing: 'Clearing' }[status] %></div>
+    <div class="table-column text-left"><%= date %></div>
+</div>

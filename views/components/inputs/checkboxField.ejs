@@ -1,0 +1,13 @@
+<label class="checkbox-field flex flex-row items-center relative <% if(typeof disabled !== 'undefined' && disabled) { %>disabled<% } %>">
+    <div class="checkbox-track flex flex-row items-center justify-center rounded-1 overflow-h transition duration-200">
+        <div class="checkbox-thumb transition duration-200">
+            <%- include('../icon.ejs', {
+                icon: 'check',
+                id: null,
+                className: 'size-3'
+            }); %>
+        </div>
+    </div>
+
+    <input type="checkbox" class="checkbox-element w-full h-full <% if(typeof className !== 'undefined' && className != null){ %><%= className %><% } %>" <% if(typeof id !== 'undefined' && id != null) { %>id="<%= id %>"<% } %> <% if(typeof attributes !== 'undefined' && Array.isArray(attributes)){ %><%- attributes.map(a => a.name + '="' + a.value.toString().replace(/"/g, '&quot;') + '"').join(' ') %><% } %> <% if(typeof checked !== 'undefined' && checked) { %>checked<% } %>>
+</label>

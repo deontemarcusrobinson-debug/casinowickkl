@@ -1,0 +1,46 @@
+<div class="item bg-card bg-opacity-50 relative size-full flex justify-between p-2" data-id="<%= id %>">
+    <%- include('./coinflipPlayer.ejs', {
+        id,
+        user: players.find(a => a.position == 0) ? players.find(a => a.position == 0).user : null,
+        amount: amount,
+        position: 0,
+        winner: status == 4 ? data.winner == 0 : true,
+        joined: joined,
+		creator: creator
+    }); %>
+
+    <div class="flex justify-center items-center relative p-2">
+        <% if(status == 0) { %>
+            <div class="font-bold text-xl">VS</div>
+        <% } else if(status == 1) { %>
+            <div class="border-2 border-secondary bg-secondary rounded-full flex justify-center items-center font-bold p-4 text-xl">
+                <div class="countdown absolute"><%= data.time %></div>
+            </div>
+        <% } else if(status == 2) { %>
+            <div class="font-bold text-xl">EOS</div>
+        <% } else if(status == 3) { %>
+            <div class="flex justify-center items-center relative">
+                <div class="coinflip-coin coinflip-coin-animation-<%= data.winner %>">
+                    <div class="front absolute top-0 bottom-0 left-0 right-0"></div>
+                    <div class="back absolute top-0 bottom-0 left-0 right-0"></div>
+                </div>
+            </div>
+        <% } else if(status == 4) { %>
+            <div class="flex justify-center items-center relative">
+                <div class="coinflip-pick-<%= data.winner %>"></div>
+            </div>
+        <% } %>
+
+        <div class="coinflip-fair text-center pointer absolute bottom-0 text-2xs fair-results" data-fair="<%= JSON.stringify(data.fair) %>">Provably fair</div>
+    </div>
+
+    <%- include('./coinflipPlayer.ejs', {
+        id,
+        user: players.find(a => a.position == 1) ? players.find(a => a.position == 1).user : null,
+        amount: amount,
+        position: 1,
+        winner: status == 4 ? data.winner == 1 : true,
+        joined: joined,
+		creator: creator
+    }); %>
+</div>

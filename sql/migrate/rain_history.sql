@@ -1,0 +1,19 @@
+CREATE TABLE IF NOT EXISTS `rain_history` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `ended` BOOLEAN NOT NULL DEFAULT 0,
+    `amount` DECIMAL(32,2) UNSIGNED NOT NULL,
+    `finish` BIGINT UNSIGNED NOT NULL,
+    `time` BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `IX_rain_history_ended` (`ended`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `rain_history` CHARACTER SET=utf8mb4, COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `rain_history` CHANGE COLUMN `id` `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `rain_history` CHANGE COLUMN `ended` `ended` BOOLEAN NOT NULL DEFAULT 0;
+ALTER TABLE `rain_history` CHANGE COLUMN `amount` `amount` DECIMAL(32,2) UNSIGNED NOT NULL;
+ALTER TABLE `rain_history` CHANGE COLUMN `finish` `finish` BIGINT UNSIGNED NOT NULL;
+ALTER TABLE `rain_history` CHANGE COLUMN `time` `time` BIGINT UNSIGNED NOT NULL;
+
+CREATE INDEX IF NOT EXISTS `IX_rain_history_ended` ON `rain_history` (`ended`) USING BTREE;

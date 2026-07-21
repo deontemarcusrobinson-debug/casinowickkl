@@ -1,0 +1,112 @@
+<div class="slider left flex flex-row items-center justify-center bg-card border-1 border-l-0 border-accent p-3 pointer" data-pullout="chat">
+	<%- include('../components/icon.ejs', {
+        icon: 'chat',
+        className: 'text-muted-foreground size-4'
+    }); %>
+</div>
+
+<div class="pullout left h-full transition duration-500" data-id="chat">
+    <div class="pullout-content flex flex-col bg-secondary border-r-1 border-card h-full">
+        <%- include('../components/chatRain.ejs'); %>
+
+        <div class="chat-group flex flex-col">
+            <div class="chat-area" id="chat-area">
+                <% for(var i = 0; i < 10; i++){ %>
+                    <%- include('../components/chatMessageSkeleton.ejs'); %>
+                <% } %>
+            </div>
+
+            <div class="flex flex-col items-center gap-2 p-2 relative">
+                <div class="chat-paused button button-hover button-accent shadow-2 p-2 flex flex-row gap-2 items-center justify-center hidden" id="chat_paused">
+                    <%- include('../components/icon.ejs', {
+                        icon: 'pause',
+                        className: 'size-3.5'
+                    }); %>
+
+                    <span>Chat is Paused</span>
+                </div>
+
+                <form class="chat-form flex flex-col gap-2 bg-card p-1 rounded-2 w-full" id="chat_form">
+                    <div class="chat-reply flex flex-row justify-between items-center gap-2 mt-1 ml-2 mr-2 hidden" id="chat_reply">
+                        <div class="flex flex-row items-center gap-2">
+                            <%- include('../components/icon.ejs', {
+                                icon: 'reply',
+                                className: ' size-3.5'
+                            }); %>
+
+                            <div class="inline-block">
+                                <img class="avatar" src="">
+
+                                <span class="name"></span>
+                                <span class="message"></span>
+                            </div>
+                        </div>
+
+                        <div class="pointer" id="chat_reply_close">
+                            <%- include('../components/icon.ejs', {
+                                icon: 'close',
+                                className: ' size-2'
+                            }); %>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-row items-center gap-2">
+                        <input type="text" class="chat-input" placeholder="Type a message..." id="chat_message" maxlength="200" autocomplete="off">
+
+                        <button type="submit" class="button button-hover button-primary shadow-2">Send</button>
+                    </div>
+                </form>
+
+                <div class="flex flex-row gap-1 w-full">
+                    <%- include('../components/inputs/selectField.ejs', {
+                        type: 'top',
+                        id: 'chat_channel',
+                        items: Object.entries(chat.channels).map(([key, value]) => ({
+                            name: '<div class="flex flex-row items-center justify-between gap-4 w-full">' +
+                                '<div class="flex flex-row items-center gap-2">' +
+                                    '<img class="size-4 rounded-full" src="/img/flags/' + key + '.svg">' +
+                                    '<span>' + value + '</span>' +
+                                '</div>' +
+                                '<div class="online flex flex-row items-center" data-channel="' + key + '">0</div>' +
+                            '</div>',
+                            value: key
+                        }))
+                    }); %>
+
+                    <div class="emojis-menu">
+                        <button class="button button-hover button-card rounded-2 flex flex-row items-center h-full">
+                            <%- include('../components/icon.ejs', {
+                                icon: 'smile',
+                                className: ' size-3.5'
+                            }); %>
+                        </button>
+
+                        <div class="emojis-menu-select transition duration-200">
+                            <div class="emojis-menu-popover flex flex-wrap flex-row justify-center gap-2 bg-secondary border-2 border-card px-1 py-2 overflow-hidden rounded-2">
+                                <% [ 'smile', 'smiley', 'grin', 'pensive', 'weary', 'astonished', 'rolling_eyes', 'relaxed', 'wink', 'woozy_face', 'zany_face', 'hugging', 'joy', 'sob', 'grimacing', 'rofl', 'face_monocle', 'thinking', 'pleading_face', 'sleeping', 'sunglasses', 'heart_eyes', 'smiling_hearts', 'kissing_heart', 'star_struck', 'nerd', 'innocent', 'face_vomiting', 'money_mouth', 'cold_sweat', 'partying_face', 'exploding_head', 'rage', 'hot_face', 'cold_face', 'smiling_imp', 'alien', 'clown', 'scream_cat', 'smiley_cat', 'robot', 'ghost', 'skull', 'poop', 'jack_o_lantern', '100', 'bell', 'birthday', 'gift', 'first_place', 'trophy', 'tada', 'crown', 'fire', 'heart', 'broken_heart', 'wave', 'clap', 'raised_hands', 'thumbsup', 'peace', 'ok_hand', 'muscle', 'punch', 'moneybag' ].forEach(function(item){ %>
+                                    <img class="item size-5 pointer" title=":<%= item %>:" data-emoji=":<%= item %>:" src="/img/emojis/<%= item %>.png">
+                                <% }); %>
+
+                                <% [ 'crypepe', 'firinpepe', 'happepe', 'monkachrist', 'okpepe', 'sadpepe' ].forEach(function(item){ %>
+                                    <img class="item size-5 pointer" title=":<%= item %>:" data-emoji=":<%= item %>:" src="/img/emojis/<%= item %>.png">
+                                <% }); %>
+
+                                <% [ 'gaben', 'kappa', 'kappapride', 'kim', 'pogchamp', 'shaq' ].forEach(function(item){ %>
+                                    <img class="item size-5 pointer" title=":<%= item %>:" data-emoji=":<%= item %>:" src="/img/emojis/<%= item %>.png">
+                                <% }); %>
+
+                                <% [ 'alert', 'awp', 'bananadance', 'carlton', 'fortdance', 'grenade', 'lolizard', 'partyblob', 'saxguy', 'squidab', 'turtle', 'zombie' ].forEach(function(item){ %>
+                                    <img class="item size-5 pointer" title=":<%= item %>:" data-emoji=":<%= item %>:" src="/img/emojis/<%= item %>.gif">
+                                <% }); %>
+
+                                <% [ 'bet', 'cant', 'cashout', 'doit', 'dont', 'feelsbad', 'feelsgood', 'gg', 'gl', 'highroller', 'joinme', 'letsgo', 'win', 'lose', 'nice', 'sniped', 'midtick', 'lowtick' ].forEach(function(item){ %>
+                                    <img class="item size-5 pointer" title=":<%= item %>:" data-emoji=":<%= item %>:" src="/img/emojis/<%= item %>.png">
+                                <% }); %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

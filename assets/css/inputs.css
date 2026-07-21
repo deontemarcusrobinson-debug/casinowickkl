@@ -1,0 +1,894 @@
+/* INPUT GROUP */
+
+.input-group .input-wrapper {
+    background-color: var(--card);
+    border: 2px solid var(--secondary);
+}
+
+.input-group .input-addon:not(.end) {
+    padding: 8px 0px 8px 8px;
+    order: -9999;
+}
+
+.input-group .input-addon.end {
+    padding: 8px 8px 8px 0px;
+    order: 9999;
+}
+
+.input-group .input-wrapper:has(.input-element:focus),
+.input-group .input-wrapper:has(.input-element:hover) {
+    border: 2px solid var(--accent);
+}
+
+.input-group:has(.input-subscript > .error.active) .input-wrapper {
+    border: 2px solid var(--color-danger);
+}
+
+.input-group:not(:has(.input-subscript > .error.active)) .input-wrapper:has(.input-element:focus:not(:invalid)) {
+    border: 2px solid var(--color-success);
+}
+
+.input-group .input-wrapper .input-element {
+    min-width: 120px;
+    background: transparent;
+    padding: 14px 8px;
+    font-size: 14px;
+    height: 100%;
+    z-index: 1;
+}
+
+.input-group .input-wrapper .input-element:-webkit-autofill,
+.input-group .input-wrapper .input-element:-webkit-autofill:hover,
+.input-group .input-wrapper .input-element:-webkit-autofill:focus,
+.input-group .input-wrapper .input-element:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--foreground) !important;
+    caret-color: var(--foreground);
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+    background-color: transparent !important;
+    background-clip: content-box !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.input-group .input-wrapper .input-element[type="number"]::-webkit-outer-spin-button,
+.input-group .input-wrapper .input-element[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.input-group .input-wrapper .input-element[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.input-group:has(.input-subscript > .error.active) .input-element {
+    color: var(--color-danger);
+}
+
+.input-group .input-wrapper .input-element::placeholder {
+    font-size: 14px;
+    color: var(--muted-foreground);
+}
+
+.input-group .input-wrapper .input-label-wrapper {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    z-index: 0;
+}
+
+.input-group .input-wrapper .input-label-wrapper .input-label {
+    max-width: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translate(0%, -50%);
+    font-size: 14px;
+    color: var(--muted-foreground);
+}
+
+.input-group:has(.input-subscript > .error.active) .input-label-wrapper .input-label {
+    color: var(--color-danger);
+}
+
+.input-group .input-wrapper .input-label-wrapper .input-label .icon {
+    height: 14px;
+    width: 14px;
+    min-height: 14px;
+    min-width: 14px;
+}
+
+.input-group .input-wrapper:has(.input-element:focus) .input-label-wrapper .input-label,
+.input-group .input-wrapper:has(.input-element:not(:focus):not(:invalid)) .input-label-wrapper .input-label {
+    top: -0.125rem;
+    font-size: 10px;
+    gap: 0.25rem;
+}
+
+.input-group .input-wrapper:has(.input-element:focus) .input-label-wrapper .input-label .icon,
+.input-group .input-wrapper:has(.input-element:not(:focus):not(:invalid)) .input-label-wrapper .input-label .icon {
+    height: 10px;
+    width: 10px;
+    min-height: 10px;
+    min-width: 10px;
+}
+
+.input-group .input-subscript:has(.error.active) {
+    padding-top: 4px;
+}
+
+.input-group .input-subscript .error:not([data-error="default"]):not(.active),
+.input-group .input-subscript:has(.error.active) .error[data-error="default"] {
+    display: none;
+}
+
+.input-group .input-wrapper .input-password-show,
+.input-group .input-wrapper .input-password-hide {
+    padding: 6px;
+}
+
+.input-group .input-wrapper:has(.input-element:not([type="password"])) .input-password-show {
+    display: none;
+}
+
+.input-group .input-wrapper:has(.input-element[type="password"]) .input-password-hide {
+    display: none;
+}
+
+/* END INPUT GROUP */
+
+/* TEXTAREA FIELD */
+
+.textarea-field .textarea-wrapper {
+    background-color: var(--card);
+    border: 2px solid var(--secondary);
+}
+
+.textarea-field .textarea-wrapper:has(.textarea-element:focus),
+.textarea-field .textarea-wrapper:has(.textarea-element:hover) {
+    border: 2px solid var(--accent);
+}
+
+.textarea-field:has(.textarea-subscript > .error.active) .textarea-wrapper {
+    border: 2px solid var(--color-danger);
+}
+
+.textarea-field:not(:has(.textarea-subscript > .error.active)) .textarea-wrapper:has(.textarea-element:focus:not(:invalid)) {
+    border: 2px solid var(--color-success);
+}
+
+.textarea-field .textarea-wrapper .textarea-element {
+    min-width: 240px;
+    background: transparent;
+    padding: 14px 8px;
+    font-size: 14px;
+    height: 160px;
+    max-height: 320px;
+    min-height: 64px;
+    z-index: 1;
+}
+
+.textarea-field .textarea-wrapper .textarea-element:-webkit-autofill,
+.textarea-field .textarea-wrapper .textarea-element:-webkit-autofill:hover,
+.textarea-field .textarea-wrapper .textarea-element:-webkit-autofill:focus,
+.textarea-field .textarea-wrapper .textarea-element:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--foreground) !important;
+    caret-color: var(--foreground);
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+    background-color: transparent !important;
+    background-clip: content-box !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.textarea-field .textarea-wrapper .textarea-element[type="number"]::-webkit-outer-spin-button,
+.textarea-field .textarea-wrapper .textarea-element[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.textarea-field .textarea-wrapper .textarea-element[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.textarea-field:has(.textarea-subscript > .error.active) .textarea-element {
+    color: var(--color-danger);
+}
+
+.textarea-field .textarea-wrapper .textarea-element::placeholder {
+    font-size: 14px;
+    color: var(--muted-foreground);
+}
+
+.textarea-field .textarea-wrapper .textarea-label-wrapper {
+    height: 44px;
+    position: absolute;
+    z-index: 0;
+}
+
+.textarea-field .textarea-wrapper .textarea-label-wrapper .textarea-label {
+    max-width: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translate(0%, -50%);
+    font-size: 14px;
+    color: var(--muted-foreground);
+}
+
+.textarea-field:has(.textarea-subscript > .error.active) .textarea-label-wrapper .textarea-label {
+    color: var(--color-danger);
+}
+
+.textarea-field .textarea-wrapper .textarea-label-wrapper .textarea-label .icon {
+    height: 14px;
+    width: 14px;
+    min-height: 14px;
+    min-width: 14px;
+}
+
+.textarea-field .textarea-wrapper:has(.textarea-element:focus) .textarea-label-wrapper .textarea-label,
+.textarea-field .textarea-wrapper:has(.textarea-element:not(:focus):not(:invalid)) .textarea-label-wrapper .textarea-label {
+    top: -0.125rem;
+    font-size: 10px;
+    gap: 0.25rem;
+}
+
+.textarea-field .textarea-wrapper:has(.textarea-element:focus) .textarea-label-wrapper .textarea-label .icon,
+.textarea-field .textarea-wrapper:has(.textarea-element:not(:focus):not(:invalid)) .textarea-label-wrapper .textarea-label .icon {
+    height: 10px;
+    width: 10px;
+    min-height: 10px;
+    min-width: 10px;
+}
+
+.textarea-field .textarea-subscript:has(.error.active) {
+    padding-top: 4px;
+}
+
+.textarea-field .textarea-subscript .error:not([data-error="default"]):not(.active),
+.textarea-field .textarea-subscript:has(.error.active) .error[data-error="default"] {
+    display: none;
+}
+
+/* END TEXTAREA FIELD */
+
+/* SELECT FIELD */
+
+.select-field .select-wrapper {
+    background-color: var(--card);
+    border: 2px solid var(--secondary);
+}
+
+.select-field .select-wrapper:has(.select-trigger:hover),
+.select-field .select-wrapper:has(.select-element:focus) {
+    background-color: var(--accent);
+}
+
+.select-field:has(.select-subscript > .error.active) .select-wrapper {
+    border: 2px solid var(--color-danger);
+}
+
+.select-field .select-wrapper .select-element {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.select-field .select-wrapper .select-value {
+    min-width: 120px;
+    padding: 15px 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.select-field:has(.select-subscript > .error.active) .select-value {
+    color: var(--color-danger);
+}
+
+.select-field .select-wrapper .select-label-wrapper {
+    max-width: 100%;
+    position: absolute;
+    z-index: 0;
+    top: -0.125rem;
+    transform: translate(0%, -50%);
+    font-size: 10px;
+    color: var(--muted-foreground);
+}
+
+.select-field:has(.select-subscript > .error.active) .select-label-wrapper {
+    color: var(--color-danger);
+}
+
+.select-field .select-wrapper .select-label-wrapper .icon {
+    height: 10px;
+    width: 10px;
+    min-height: 10px;
+    min-width: 10px;
+}
+
+.select-field .select-trigger .select-chevron {
+    margin: 8px 8px 8px 0px;
+}
+
+.select-field.active .select-trigger .select-chevron {
+    transform: rotate(180deg);
+}
+
+.select-field .select-wrapper .select-options {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    border: 2px solid var(--card);
+    background: var(--card);
+    opacity: 0;
+    visibility: hidden;
+    max-height: 340px;
+    overflow-x: auto;
+    z-index: 2;
+    pointer-events: none;
+    transform: scaleY(0);
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+.select-field.bottom .select-wrapper .select-options {
+    top: calc(100% - 1rem);
+    transform-origin: top;
+}
+
+.select-field.top .select-wrapper .select-options {
+    bottom: calc(100% - 1rem);
+    transform-origin: bottom;
+}
+
+.select-field.active .select-options {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: scaleY(1);
+}
+
+.select-field.bottom.active .select-options {
+    top: calc(100% + 0.5rem);
+}
+
+.select-field.top.active .select-options {
+    bottom: calc(100% + 0.5rem);
+}
+
+.select-field .select-wrapper .select-options .select-option {
+    background-color: var(--secondary);
+    font-size: 14px;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.select-field .select-wrapper .select-options .select-option img {
+	height: 14px;
+}
+
+.select-field .select-wrapper .select-options .select-option.focus,
+.select-field .select-wrapper .select-options .select-option:hover {
+	background-color: var(--accent);
+}
+
+.select-field .select-wrapper .select-options .select-option .select-option-checked {
+    font-size: 12px;
+}
+
+.select-field .select-wrapper .select-options .select-option:not(.active) .select-option-checked {
+    visibility: hidden;
+}
+
+.select-field .select-wrapper .select-options .select-option .select-option-content {
+    padding: 14px 8px;
+}
+
+.select-field .select-subscript:has(.error.active) {
+    padding-top: 4px;
+}
+
+.select-field .select-subscript .error:not(.active) {
+    display: none;
+}
+
+/* END SELECT FIELD */
+
+/* SWITCH FIELD */
+
+.switch-field {
+    cursor: pointer;
+    width: fit-content;
+}
+
+.switch-field .switch-element {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    margin: unset;
+}
+
+.switch-field .switch-track {
+    background-color: var(--card);
+    border: 2px solid var(--secondary);
+    width: 44px;
+    height: 24px;
+}
+
+.switch-field:hover .switch-track,
+.switch-field:has(.switch-element:focus-visible) .switch-track {
+    background-color: var(--accent);
+}
+
+.switch-field:has(.switch-element:checked) .switch-track {
+    background: var(--primary);
+}
+
+.switch-field .switch-track .switch-thumb {
+    position: absolute;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: var(--color-white);
+}
+
+.switch-field:hover .switch-track .switch-thumb {
+    width: 20px;
+}
+
+.switch-field:has(.switch-element:checked) .switch-track .switch-thumb {
+    transform: translateX(20px);
+}
+
+.switch-field:has(.switch-element:checked):hover .switch-track .switch-thumb {
+    transform: translateX(16px);
+}
+
+/* END SWITCH FIELD */
+
+/* SLIDER FIELD */
+
+.slider-field .slider-wrapper {
+    --slider-width: 0%;
+}
+
+.slider-field .slider-wrapper:has(.slider-tooltip) {
+    padding-top: 16px;
+}
+
+.slider-field .slider-wrapper .slider-element {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    outline: none;
+    cursor: pointer;
+    background: linear-gradient(to right, var(--primary) 0%, var(--primary) var(--slider-width, 0%), var(--card) var(--slider-width, 0%), var(--card) 100%);
+}
+
+.slider-field .slider-wrapper .slider-element::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-white);
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 40%, transparent), 0 2px 6px color-mix(in oklab, var(--card) 80%, transparent);
+    cursor: grab;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slider-field .slider-wrapper .slider-element::-webkit-slider-thumb:active {
+    cursor: grabbing;
+}
+
+.slider-field .slider-wrapper .slider-element::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-white);
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 40%, transparent), 0 2px 6px color-mix(in oklab, var(--accent) 80%, transparent);
+    cursor: grab;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slider-field .slider-wrapper .slider-element:hover::-webkit-slider-thumb {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 40%, transparent), 0 2px 6px color-mix(in oklab, var(--accent) 80%, transparent);
+    transform: scale(1.1);
+}
+
+.slider-field .slider-wrapper .slider-element:hover::-moz-range-thumb {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 40%, transparent), 0 2px 6px color-mix(in oklab, var(--accent) 80%, transparent);
+    transform: scale(1.1);
+}
+
+.slider-field .slider-wrapper .slider-element:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 40%, transparent), 0 0 0 2px color-mix(in oklab, var(--accent) 80%, transparent);
+}
+
+.slider-field .slider-wrapper .slider-element:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 40%, transparent), 0 0 0 2px color-mix(in oklab, var(--accent) 80%, transparent);
+}
+
+.slider-field .slider-wrapper .slider-element:active::-webkit-slider-thumb {
+    transform: scale(0.95);
+}
+
+.slider-field .slider-wrapper .slider-element:active::-moz-range-thumb {
+    transform: scale(0.95);
+}
+
+.slider-field .slider-wrapper .slider-tooltip-wrapper {
+    width: calc(100% - 18px);
+}
+
+.slider-field .slider-wrapper .slider-tooltip-wrapper .slider-tooltip {
+    position: absolute;
+    bottom: 0;
+    left: var(--slider-width, 0%);
+    height: 16px;
+    transform: translateX(-50%);
+    background: var(--accent);
+}
+
+.slider-field .slider-wrapper .slider-tooltip-wrapper .slider-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--accent);
+}
+
+.slider-field .slider-ticks {
+    padding: 0 calc(18px / 2);
+}
+
+/* END SLIDER FIELD */
+
+/* FILE FIELD */
+
+.file-field .file-wrapper {
+    position: relative;
+    min-width: 300px;
+    min-height: 180px;
+    border: 2px dashed var(--card);
+    background: var(--secondary);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.file-field:hover .file-wrapper,
+.file-field.dragover .file-wrapper,
+.file-field .file-wrapper:has(.file-element:focus-visible) {
+    border-color: var(--primary);
+}
+
+.file-field.dragover .file-wrapper {
+    cursor: copy;
+}
+
+.file-field .file-wrapper .file-element {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.file-field .file-wrapper:has(.file-cover.active) .file-empty {
+    display: none;
+}
+
+.file-field:hover .file-wrapper .file-empty .file-empty-icon,
+.file-field.dragover .file-wrapper .file-empty .file-empty-icon {
+    color: var(--primary) !important;
+    transform: translateY(-4px);
+}
+
+.file-field .file-wrapper .file-empty .file-empty-title span {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.file-field .file-wrapper .file-cover:not(.active) {
+    display: none;
+}
+
+/* END FILE FIELD */
+
+/* CHECKBOX FIELD */
+
+.checkbox-field {
+    cursor: pointer;
+    width: fit-content;
+}
+
+.checkbox-field .checkbox-element {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    margin: unset;
+}
+
+.checkbox-field:has(.checkbox-element:focus-visible) .checkbox-track {
+    outline: none;
+    border: 2px solid var(--primary);
+}
+
+.checkbox-field:has(.checkbox-element:checked) .checkbox-track {
+    background: var(--primary);
+    border: 2px solid var(--primary);
+    animation: checkbox-pop 0.2s ease-in-out forwards;
+}
+
+.checkbox-field:has(.checkbox-element:checked) .checkbox-track .checkbox-thumb {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+}
+
+.checkbox-field .checkbox-track {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--card);
+    background: transparent;
+}
+
+.checkbox-field .checkbox-track .checkbox-thumb {
+    color: var(--color-white);
+    opacity: 0;
+    transform: scale(0.4) rotate(-10deg);
+}
+
+.checkbox-field:hover .checkbox-track {
+    border: 2px solid var(--accent);
+    background: color-mix(in oklab, var(--accent) 40%, transparent);
+}
+
+@keyframes checkbox-pop {
+    0% { transform: scale(1); }
+    35% { transform: scale(0.8); }
+    65% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@-webkit-keyframes checkbox-pop {
+    0% { transform: scale(1); }
+    35% { transform: scale(0.8); }
+    65% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* END CHECKBOX FIELD */
+
+/* CALENDAR FIELD */
+
+.calendar-field .calendar-element {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none !important;
+}
+
+.calendar-field .calendar-popover {
+    min-width: 280px;
+}
+
+.calendar-field .calendar-popover .calendar-popover-header .button {
+    width: 28px;
+    height: 28px;
+    padding: 0px;
+    font-size: 12px;
+    color: var(--muted-foreground);
+    border: 1.5px solid transparent;
+    background: transparent;
+}
+
+.calendar-field .calendar-popover .calendar-popover-header .button:hover,
+.calendar-field .calendar-popover .calendar-popover-header .button:focus-visible {
+    background: var(--card);
+    border: 1.5px solid var(--accent);
+    color: var(--foreground);
+}
+
+.calendar-field .calendar-popover .calendar-popover-date {
+    background: transparent;
+}
+
+.calendar-field .calendar-popover .calendar-popover-date:hover,
+.calendar-field .calendar-popover .calendar-popover-date:focus-visible {
+    color: var(--primary);
+}
+
+.calendar-field .calendar-popover.days .calendar-popover-content {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+}
+
+.calendar-field .calendar-popover.days .calendar-popover-content .calendar-popover-option {
+    height: 32px;
+    background: transparent;
+    border: 1px solid transparent;
+}
+
+.calendar-field .calendar-popover.days .calendar-popover-content .calendar-popover-option:hover:not(.disabled):not(.active):not(.today),
+.calendar-field .calendar-popover.days .calendar-popover-content .calendar-popover-option:focus-visible:not(.disabled):not(.active):not(.today) {
+    background: var(--card);
+    border: 1px solid var(--accent);
+}
+
+.calendar-field .calendar-popover.days .calendar-popover-content .calendar-popover-option.outside {
+    color: color-mix(in oklab, var(--muted-foreground) 40%, var(--secondary));
+    pointer-events: none;
+}
+
+.calendar-field .calendar-popover.days .calendar-popover-content .calendar-popover-option.today:not(.active) {
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    background: color-mix(in oklab, var(--primary) 20%, var(--secondary));
+    font-weight: 700;
+}
+
+.calendar-field .calendar-popover.days .calendar-popover-content .calendar-popover-option.active {
+    background: var(--primary);
+    font-weight: 700;
+}
+
+.calendar-field .calendar-popover.months .calendar-popover-content,
+.calendar-field .calendar-popover.years .calendar-popover-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+}
+
+.calendar-field .calendar-popover.months .calendar-popover-content .calendar-popover-option,
+.calendar-field .calendar-popover.years .calendar-popover-content .calendar-popover-option {
+    height: 36px;
+    background: transparent;
+    border: 1px solid transparent;
+}
+
+.calendar-field .calendar-popover.months .calendar-popover-content .calendar-popover-option:hover:not(.active),
+.calendar-field .calendar-popover.years .calendar-popover-content .calendar-popover-option:hover:not(.active),
+.calendar-field .calendar-popover.months .calendar-popover-content .calendar-popover-option:focus-visible:not(.active),
+.calendar-field .calendar-popover.years .calendar-popover-content .calendar-popover-option:focus-visible:not(.active) {
+    background: var(--card);
+    border: 1px solid var(--accent);
+}
+
+.calendar-field .calendar-popover.months .calendar-popover-content .calendar-popover-option.active,
+.calendar-field .calendar-popover.years .calendar-popover-content .calendar-popover-option.active {
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    background: color-mix(in oklab, var(--primary) 20%, var(--secondary));
+    font-weight: 700;
+}
+
+.calendar-field .calendar-popover.months .calendar-popover-content .calendar-popover-option.outside,
+.calendar-field .calendar-popover.years .calendar-popover-content .calendar-popover-option.outside {
+    color: color-mix(in oklab, var(--muted-foreground) 40%, var(--secondary));
+    pointer-events: none;
+}
+
+.calendar-field .calendar-popover .calendar-popover-footer .button {
+    font-size: 12px;
+    padding: 4px 0px;
+}
+
+.calendar-field .calendar-popover .calendar-popover-footer .button.today { color: var(--primary); }
+.calendar-field .calendar-popover .calendar-popover-footer .button.today:hover,
+.calendar-field .calendar-popover .calendar-popover-footer .button.today:focus-visible {
+    color: color-mix(in oklab, var(--primary) 60%, var(--secondary));
+}
+
+.calendar-field .calendar-popover .calendar-popover-footer .button.clear { color: var(--muted-foreground); }
+.calendar-field .calendar-popover .calendar-popover-footer .button.clear:hover,
+.calendar-field .calendar-popover .calendar-popover-footer .button.clear:focus-visible {
+    color: var(--color-danger);
+}
+
+/* END CALENDAR FIELD */
+
+/* DATE PICKER */
+
+.date-picker .date-wrapper {
+    background-color: var(--card);
+    border: 2px solid var(--secondary);
+}
+
+.date-picker:has(.date-trigger:hover) .date-wrapper,
+.date-picker:has(.date-element:focus) .date-wrapper,
+.date-picker.active .date-wrapper {
+    background-color: var(--accent);
+}
+
+.date-picker:has(.date-subscript > .error.active) .date-wrapper {
+    border: 2px solid var(--color-danger);
+}
+
+.date-picker .date-wrapper .date-trigger .date-icon {
+    padding: 14px 0px 14px 8px;
+    color: var(--muted-foreground);
+}
+
+.date-picker .date-wrapper .date-trigger .date-placeholder {
+    min-width: 120px;
+    padding: 15px 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.date-picker .date-wrapper .date-trigger .date-placeholder:empty::before {
+    content: "Pick a date…";
+}
+
+.date-picker:has(.date-subscript > .error.active) .date-wrapper .date-trigger .date-placeholder {
+    color: var(--color-danger);
+}
+
+.date-picker .date-wrapper .date-label-wrapper {
+    max-width: 100%;
+    position: absolute;
+    z-index: 0;
+    top: -0.125rem;
+    transform: translate(0%, -50%);
+    font-size: 10px;
+    color: var(--muted-foreground);
+}
+
+.date-picker:has(.date-subscript > .error.active) .date-label-wrapper {
+    color: var(--color-danger);
+}
+
+.date-picker .date-wrapper .date-label-wrapper .icon {
+    height: 10px;
+    width: 10px;
+    min-height: 10px;
+    min-width: 10px;
+}
+
+.date-picker .date-wrapper .date-trigger .date-chevron {
+    margin: 8px 8px 8px 0px;
+}
+
+.date-picker.active .date-wrapper .date-trigger .date-chevron {
+    transform: rotate(180deg);
+}
+
+.date-picker .date-wrapper .date-element {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none !important;
+}
+
+.date-picker .date-wrapper .date-calendar {
+    position: absolute;
+    top: calc(100% - 1rem);
+    left: 0px;
+    opacity: 0;
+    visibility: hidden;
+    overflow-x: auto;
+    z-index: 2;
+    pointer-events: none;
+    transform: scaleY(0);
+    transform-origin: top;
+    overflow: hidden;
+}
+
+.date-picker.active .date-wrapper .date-calendar {
+    top: calc(100% + 0.5rem);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: scaleY(1);
+}
+
+.date-picker .date-subscript:has(.error.active) {
+    padding-top: 4px;
+}
+
+.date-picker .date-subscript .error:not(.active) {
+    display: none;
+}
+
+/* END DATE PICKER */

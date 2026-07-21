@@ -1,0 +1,21 @@
+<% var style = 'style="border-left: solid 4px ' + color + ';"'; %>
+
+<div class="item flex items-center justify-between flex-row gap-1 bg-secondary p-2 rounded-1" <%- style %>>
+    <div class="flex items-center gap-1 overflow-hidden p-1">
+        <%- include('./userAvatar.ejs', { user, size: 'size-8' }); %>
+
+        <div class="flex flex-col items-start justify-center gap-1 w-full overflow-hidden">
+            <div class="text-base text-left w-full truncate"><%= user.name %></div>
+            <div class="text-xs text-muted-foreground">Tickets: <%= tickets.min %> - <%= tickets.max %></div>
+        </div>
+    </div>
+
+    <div class="flex flex-row items-center justify-center gap-1">
+        <%- include('./icon.ejs', {
+            icon: 'diamond',
+            className: 'text-primary size-4'
+        }); %>
+
+        <span><%= amount %></span>
+    </div>
+</div>

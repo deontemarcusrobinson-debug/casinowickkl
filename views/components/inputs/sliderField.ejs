@@ -1,0 +1,15 @@
+<div class="slider-field flex flex-col gap-2 w-full <% if(typeof disabled !== 'undefined' && disabled) { %>disabled<% } %>">
+    <div class="slider-wrapper flex flex-col items-center gap-3 py-2 relative w-full">
+        <% if(typeof tooltip !== 'undefined' && tooltip) { %>
+            <div class="slider-tooltip-wrapper relative">
+                <div class="slider-tooltip flex flex-row items-center gap-2 text-2xs text-nowrap font-bold px-1 rounded-1"><% if(typeof value !== 'undefined') { %><%= value %><% } else if(typeof min !== 'undefined') { %><%= min %><% } else { %>0<% } %></div>
+            </div>
+        <% } %>
+
+        <input type="range" class="slider-element rounded-full w-full <% if(typeof className !== 'undefined' && className != null){ %><%= className %><% } %>" <% if(typeof id !== 'undefined' && id != null) { %>id="<%= id %>"<% } %> <% if(typeof attributes !== 'undefined' && Array.isArray(attributes)){ %><%- attributes.map(a => a.name + '="' + a.value.toString().replace(/"/g, '&quot;') + '"').join(' ') %><% } %> min="<% if(typeof min !== 'undefined') { %><%= min %><% } else { %>0<% } %>" max="<% if(typeof max !== 'undefined') { %><%= max %><% } else { %>0<% } %>" step="<% if(typeof step !== 'undefined') { %><%= step %><% } else { %>0.01<% } %>" value="<% if(typeof value !== 'undefined') { %><%= value %><% } else if(typeof min !== 'undefined') { %><%= min %><% } else { %>0<% } %>">
+    </div>
+
+    <% if(typeof ticks !== 'undefined') { %>
+        <%- include('./sliderTicks.ejs', { ticks }); %>
+    <% } %>
+</div>

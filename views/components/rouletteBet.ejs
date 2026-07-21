@@ -1,0 +1,17 @@
+<div class="roulette-betitem bg-secondary bg-opacity-50 flex items-center justify-between p-2 rounded-2" data-id="<%= id %>" data-amount="<%= amount %>">
+    <div class="flex items-center gap-1">
+        <%- include('./userAvatar.ejs', { user, size: 'size-8' }); %>
+
+        <div class="text-left w-full truncate"><%= user.name %></div>
+    </div>
+
+    <div class="flex flex-row items-center justify-center gap-1">
+        <%- include('./icon.ejs', {
+            icon: 'diamond',
+            id: null,
+            className: 'size-4'
+        }); %>
+
+        <span><%= amount %></span>
+    </div>
+</div>

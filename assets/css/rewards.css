@@ -1,0 +1,141 @@
+/* CONTAINER */
+
+.rewards-container {
+    max-width: 1200px;
+}
+
+.rewards-container .rewards-header {
+    background-color: color-mix(in oklab, var(--color-success) 20%, var(--secondary));
+}
+
+.rewards-container .rewards-header .rewards-header-background {
+    background-image: radial-gradient(circle at 50% 50%, var(--color-success-10) 0%, #00000000 100%);
+}
+
+.rewards-container .rewards-header .rewards-header-background .image {
+    max-height: 240px;
+}
+
+@media (max-width: 768px){
+    .rewards-container .rewards-header {
+        padding: 1rem 2rem !important;
+    }
+
+    .rewards-container .rewards-header {
+        background-image: radial-gradient(circle at 50% 50%, var(--color-success-10) 0%, #00000000 100%);
+    }
+
+    .rewards-container .rewards-header .rewards-header-background {
+        display: none;
+    }
+}
+
+/* END CONTAINER */
+
+/* TABS */
+
+.rewards-tabs {
+    height: 100%;
+    width: 100%;
+}
+
+.rewards-tabs .item {
+    position: relative;
+    border: solid 2px #ffffff00; /* color */
+    height: 120px;
+    width: 100%;
+    padding: 20px 30px;
+    cursor: pointer;
+}
+
+@media (max-width: 768px){
+    .rewards-tabs .item {
+        padding: 1rem 2rem !important;
+    }
+}
+
+.rewards-tabs .item:hover::after{
+    background-size: auto 320px !important;
+    background-position: right 6% top 45% !important;
+}
+
+.rewards-tabs .item::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    -webkit-transition: all 200ms;
+	-moz-transition: all 200ms;
+	transition: all 200ms;
+}
+
+.rewards-tabs .item.tasks {
+    background-color: #0f2524; /* color */
+}
+
+.rewards-tabs .item.tasks::after {
+    background-image: url(/img/rewards/tasks.png);
+    background-size: auto 300px;
+    background-repeat: no-repeat;
+    background-position: right 10% top 45%;
+}
+
+.rewards-tabs .item.tasks.active {
+    border: solid 2px #3eb7b2; /* color */
+}
+
+.rewards-tabs .item.tasks:hover {
+    background-color: #142d2c; /* color */
+    border: solid 2px #3eb7b240; /* color */
+}
+
+.rewards-tabs .item .name, .rewards-tabs .item .description {
+    z-index: 1;
+}
+
+@media (max-width: 768px){
+    .rewards-tabs {
+        gap: 0.5rem !important;
+    }
+}
+
+/* END TABS */
+
+/* TASKS */
+
+.rewards-container .rewards-tasks {
+    width: 100%;
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    overflow: hidden;
+}
+
+.rewards-container .rewards-tasks .item .image {
+    height: 72px;
+    width: 72px;
+    min-height: 72px;
+    min-width: 72px;
+}
+
+.rewards-container .rewards-tasks .item .image:after {
+    content: "";
+    height: 75%;
+    width: 75%;
+}
+
+.rewards-container .rewards-tasks .item .image.google { background: var(--color-google); }
+.rewards-container .rewards-tasks .item .image.google:after {
+	background: url(../img/social/google_icon.png) no-repeat 50% 50%;
+    background-size: contain;
+}
+
+.rewards-container .rewards-tasks .item .image.discord { background: var(--color-discord); }
+.rewards-container .rewards-tasks .item .image.discord:after {
+	background: url(../img/social/discord_icon.png) no-repeat 50% 50%;
+    background-size: contain;
+}
+
+/* END TASKS */

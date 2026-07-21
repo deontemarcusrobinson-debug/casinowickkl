@@ -1,0 +1,83 @@
+/* CONTAINER */
+
+.affiliates-container {
+    max-width: 1200px;
+}
+
+.affiliates-container .affiliates-header {
+    background-image: radial-gradient(circle at 50% -200%, var(--color-warning-10) 0%, #00000000 100%);
+}
+
+.affiliates-container .affiliates-header .input_field {
+    margin-bottom: 0px !important;
+}
+
+.affiliates-container .affiliates-header .affiliates-tier {
+    width: 100%;
+    max-width: 320px;
+}
+
+.affiliates-container .affiliates-header .affiliates-tier img {
+    height: 32px;
+}
+
+.affiliates-container .affiliates-header .affiliates-tier .progress-container {
+    background-color: var(--card-disabled);
+    height: 0.5rem;
+    border-radius: 0.25rem;
+    width: 100%;
+}
+
+.affiliates-container .affiliates-header .affiliates-tier .button.view {
+    border-radius: 0px;
+    background-color: var(--accent);
+}
+
+.affiliates-container .affiliates-overview:not(.earnings) {
+    background-image: radial-gradient(circle at 20% 200%, var(--color-success-10) 0%, #00000000 100%);
+}
+
+.affiliates-container .affiliates-overview.earnings {
+    background-image: radial-gradient(circle at 20% 200%, color-mix(in oklab, var(--primary) 20%, transparent) 0%, #00000000 100%);
+}
+
+@media (max-width: 768px){
+    .affiliates-container .affiliates-header {
+        padding: 1rem 2rem !important;
+        gap: 1rem !important;
+    }
+
+    .affiliates-container .affiliates-header .affiliates-tier {
+        width: 100%;
+        max-width: 100% !important;
+    }
+}
+
+.affiliates-container .affiliates-chart {
+    height: 340px;
+}
+
+.affiliates-container .affiliates-chart .affiliates-loader {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
+	right: 0px;
+	left: 0px;
+}
+
+.affiliates-container .affiliates-chart .affiliates-chart-date .button.active {
+    background-color: var(--accent);
+    box-shadow: 0 -4px #0003 inset, 0 2px #ffffff3d inset;
+}
+
+/* END CONTAINER */
+
+/* TIERS */
+
+.affiliates-tiers .item img {
+    height: 40px;
+}
+
+/* END TIERS */

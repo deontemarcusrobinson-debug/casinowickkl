@@ -1,0 +1,121 @@
+<div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Create Bonus Codes</div>
+
+            <div class="text-muted-foreground">Generate a new bonus code that users can redeem for rewards on the website.</div>
+        </div>
+
+        <div class="flex flex-col gap-6 w-full">
+            <div class="flex flex-col gap-4 items-start w-full">
+                <div class="flex flex-row max-md:flex-col gap-1 max-md:gap-4 items-start w-full">
+                    <%- include('../components/inputs/inputGroup.ejs', {
+                        type: 'text',
+                        label: 'Bonus Code',
+                        id: 'admin_bonus_codes_code',
+                        errors: [ 'required', 'minimum_6_characters', 'only_letters_numbers' ],
+                        addons: [{
+                            addon: include('../components/icon.ejs', {
+                                icon: 'shuffle pointer',
+                                id: 'admin_bonus_codes_generate',
+                                className: 'size-3.5'
+                            }),
+                            align: 'end'
+                        }]
+                    }); %>
+
+                    <%- include('../components/inputs/inputGroup.ejs', {
+                        type: 'text',
+                        label: 'Amount',
+                        id: 'admin_bonus_codes_amount',
+                        value: '1.00',
+                        errors: [ 'required', 'number' ]
+                    }); %>
+                </div>
+
+                <%- include('../components/inputs/datePicker.ejs', {
+                    label: 'Expire Date',
+                    id: 'admin_bonus_codes_expire',
+                    errors: [ 'required' ]
+                }); %>
+
+                <div class="flex flex-row items-center gap-2">
+                    <%- include('../components/inputs/switchField.ejs', {
+                        id: 'admin_bonus_codes_never',
+                        checked: false
+                    }); %>
+
+                    <div class="text-sm text-muted-foreground">Expire never</div>
+                </div>
+
+                <button class="button button-hover button-primary shadow-2" id="admin_bonus_codes_create">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Bonus Codes List</div>
+
+            <div class="text-muted-foreground">View and manage all available bonus codes.</div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <div class="flex flex-row gap-1">
+                <%- include('../components/inputs/inputGroup.ejs', {
+                    type: 'text',
+                    label: 'Search Bonus Code',
+                    id: 'admin_bonus_codes_search'
+                }); %>
+
+                <div class="flex flex-row gap-1">
+                    <%- include('../components/inputs/selectField.ejs', {
+                        type: 'bottom',
+                        label: 'Status',
+                        id: 'admin_bonus_codes_status',
+                        items: [
+                            { name: 'Any', value: 0 },
+                            { name: 'Active', value: 1 },
+                            { name: 'Inactive', value: 2 }
+                        ]
+                    }); %>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-row">
+                        <div class="table-column text-left">Code</div>
+                        <div class="table-column text-left">Uses</div>
+                        <div class="table-column text-left">Amount</div>
+                        <div class="table-column text-left">Status</div>
+                        <div class="table-column text-left">Expires At</div>
+                        <div class="table-column text-right">Action</div>
+                    </div>
+                </div>
+
+                <div class="table-body" id="admin_bonus_codes">
+                    <% if(response.admin.bonuscodes.bonus_codes.list.length > 0){ %>
+                        <% response.admin.bonuscodes.bonus_codes.list.forEach(function(item){ %>
+                            <%- include('../components/tableAdminBonusCodesRow.ejs', item); %>
+                        <% }); %>
+                    <% } else { %>
+                        <%- include('../components/emptyTable.ejs', {
+                            title: 'No data found'
+                        }); %>
+                    <% } %>
+                </div>
+
+                <div class="table-footer">
+                    <div class="flex items-center justify-center bg-secondary p-2">
+                        <%- include('../components/pageNavigator.ejs', {
+                            id: 'pagination_admin_bonus_codes',
+                            page: response.admin.bonuscodes.bonus_codes.page,
+                            pages: response.admin.bonuscodes.bonus_codes.pages
+                        }); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

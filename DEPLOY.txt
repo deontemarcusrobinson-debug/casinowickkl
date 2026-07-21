@@ -1,0 +1,23 @@
+GOLDWITCH → RENDER (recommended)
+
+A) Blueprint (easiest — web + MySQL together)
+1. Push this WHOLE folder to GitHub (public, views, services, sql, docker, …). Do NOT upload .env.
+2. Render.com → New → Blueprint → connect the repo (uses render.yaml).
+3. Approve the two services: goldwitch (web) + goldwitch-mysql (private).
+4. Wait until both are Live. Open the .onrender.com URL.
+5. Optional: set APP_URL to that https URL (or leave blank — auto from RENDER_EXTERNAL_URL).
+6. Custom domain: Web service → Settings → Custom Domains → paste your domain → add the DNS records Render shows.
+7. Add payment keys (PayPal / Drakon) under Environment if needed → Manual Deploy.
+
+B) Manual (no Blueprint)
+1. Render → New → Private Service → Docker → use docker/mysql (disk mount /var/lib/mysql).
+2. Render → New → Web Service → this repo
+   Build: npm install --omit=dev
+   Start: node start.js
+3. Link MySQL env: MYSQLHOST, MYSQLPORT=3306, MYSQLUSER, MYSQLPASSWORD, MYSQLDATABASE=vgowitch
+
+Notes
+- Free web sleeps after idle; first open can take ~30–60s. MySQL with a disk needs a paid plan.
+- Do NOT use github.io — that cannot run Node.
+- Do NOT put .env on GitHub.
+- Start command must be: node start.js

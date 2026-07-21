@@ -1,0 +1,154 @@
+<div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Maintenance Mode</div>
+
+            <div class="flex flex-col gap-1">
+                <div class="text-muted-foreground">Temporarily disable public access to the website while performing updates or maintenance.</div>
+                <div class="text-muted-foreground">Maintenance status: <% if(response.admin.settings.maintenance.status) { %><span class="text-danger">Active - Reason: <%= response.admin.settings.maintenance.reason %></span><% } else { %><span class="text-success">Inactive</span><% } %></div>
+            </div>
+        </div>
+
+        <div class="flex flex-row max-md:flex-col gap-1 max-md:gap-4 items-start w-full">
+            <%- include('../components/inputs/inputGroup.ejs', {
+                type: 'text',
+                label: 'Reason',
+                id: 'admin_maintenance_reason'
+            }); %>
+
+            <div class="flex flex-row gap-1 items-center max-md:w-full">
+                <%- include('../components/inputs/selectField.ejs', {
+                    type: 'bottom',
+                    label: 'Status',
+                    id: 'admin_maintenance_status',
+                    selected: response.admin.settings.maintenance.status ? 1 : 0,
+                    items: [
+                        { name: 'Enable', value: 1 },
+                        { name: 'Disable', value: 0 }
+                    ]
+                }); %>
+
+                <button class="button button-hover button-primary shadow-2" id="admin_maintenance_set">Set</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Admin Access</div>
+
+            <div class="text-muted-foreground">Grant or revoke administrative privileges for users on the website.</div>
+            <div class="text-muted-foreground">List of users with admin rights: <span class="text-success"><%= response.admin.settings.allowed.admin.join(', ') %></span></div>
+        </div>
+
+        <%- include('../components/inputs/inputGroup.ejs', {
+            type: 'text',
+            label: 'User Id',
+            id: 'admin_admin_access_userid',
+            errors: [ 'required' ],
+            addons: [{
+                addon: '<div class="flex flex-wrap flex-row justify-end gap-1">' +
+                    '<button class="button button-hover button-primary shadow-2" id="admin_admin_access_set">Set</button>' +
+                    '<button class="button button-hover button-primary shadow-2" id="admin_admin_access_unset">Unset</button>' +
+                '</div>',
+                align: 'end'
+            }]
+        }); %>
+    </div>
+
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Push Notifications (will be implemented)</div>
+
+            <div class="text-muted-foreground">Manage and send push notifications to users to alert them about updates, promotions, or important messages.</div>
+        </div>
+
+        <%- include('../components/inputs/inputGroup.ejs', {
+            type: 'text',
+            label: 'Notification',
+            id: 'admin_notification_message',
+            errors: [ 'required' ],
+            addons: [{
+                addon: '<button class="button button-hover button-primary shadow-2" id="admin_notify_push">Push</button>',
+                align: 'end'
+            }]
+        }); %>
+    </div>
+
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Tracking Links</div>
+
+            <div class="text-muted-foreground">Create and manage internal tracking links to monitor performance of promotional efforts.</div>
+        </div>
+
+        <div class="flex flex-col gap-6 w-full">
+            <div class="flex flex-row flex-col gap-4 items-start w-full">
+                <%- include('../components/inputs/inputGroup.ejs', {
+                    type: 'text',
+                    label: 'Name',
+                    id: 'admin_tracking_links_name',
+                    errors: [ 'required' ]
+                }); %>
+
+                <%- include('../components/inputs/datePicker.ejs', {
+                    label: 'Expire Date',
+                    id: 'admin_tracking_links_expire',
+                    errors: [ 'required' ]
+                }); %>
+
+                <div class="flex flex-row items-center gap-2">
+                    <%- include('../components/inputs/switchField.ejs', {
+                        id: 'admin_tracking_links_never',
+                        checked: false
+                    }); %>
+
+                    <div class="text-sm text-muted-foreground">Expire never</div>
+                </div>
+
+                <button class="button button-hover button-primary shadow-2" id="admin_tracking_links_create">Create</button>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <%- include('../components/inputs/inputGroup.ejs', {
+                    type: 'text',
+                    label: 'Search Tracking Link',
+                    id: 'admin_tracking_links_search'
+                }); %>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-row">
+                            <div class="table-column text-left">Raferral</div>
+                            <div class="table-column text-left">User Id</div>
+                            <div class="table-column text-left">Name</div>
+                            <div class="table-column text-right">Action</div>
+                        </div>
+                    </div>
+
+                    <div class="table-body" id="admin_tracking_links">
+                        <% if(response.admin.settings.tracking_links.list.length > 0){ %>
+                            <% response.admin.settings.tracking_links.list.forEach(function(item){ %>
+                                <%- include('../components/tableAdminTrackingLinksRow.ejs', item); %>
+                            <% }); %>
+                        <% } else { %>
+                            <%- include('../components/emptyTable.ejs', {
+                                title: 'No data found'
+                            }); %>
+                        <% } %>
+                    </div>
+
+                    <div class="table-footer">
+                        <div class="flex items-center justify-center bg-secondary p-2">
+                            <%- include('../components/pageNavigator.ejs', {
+                                id: 'pagination_admin_tracking_links',
+                                page: response.admin.settings.tracking_links.page,
+                                pages: response.admin.settings.tracking_links.pages
+                            }); %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

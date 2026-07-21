@@ -1,0 +1,58 @@
+<div class="flex flex-col gap-2">
+    <div class="flex flex-row gap-1">
+        <%- include('../components/inputs/inputGroup.ejs', {
+            type: 'text',
+            label: 'Search User (userid, email, name, ip)',
+            id: 'admin_users_search'
+        }); %>
+
+        <div class="flex flex-row gap-1">
+            <%- include('../components/inputs/selectField.ejs', {
+                type: 'bottom',
+                label: 'Order by',
+                id: 'admin_users_order',
+                items: [
+                    { name: 'Register date', value: 0 },
+                    { name: 'Name A-Z', value: 1 },
+                    { name: 'Name Z-A', value: 2 },
+                    { name: 'Balance acending', value: 3 },
+                    { name: 'Balance descending', value: 4 },
+                    { name: 'Rank', value: 5 }
+                ]
+            }); %>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-row">
+                <div class="table-column text-left">User</div>
+                <div class="table-column text-left">User Id</div>
+                <div class="table-column text-left">Balance</div>
+                <div class="table-column text-left">Rank</div>
+                <div class="table-column text-left">Registed date</div>
+                <div class="table-column text-right">Action</div>
+            </div>
+        </div>
+        <div class="table-body" id="admin_users_list">
+            <% if(response.admin.users.list.length > 0){ %>
+                <% response.admin.users.list.forEach(function(item){ %>
+                    <%- include('../components/tableAdminUsersRow.ejs', item); %>
+                <% }); %>
+            <% } else { %>
+                <%- include('../components/emptyTable.ejs', {
+                    title: 'No data found'
+                }); %>
+            <% } %>
+        </div>
+        <div class="table-footer">
+            <div class="flex items-center justify-center bg-secondary p-2">
+                <%- include('../components/pageNavigator.ejs', {
+                    id: 'pagination_admin_users',
+                    page: response.admin.users.page,
+                    pages: response.admin.users.pages
+                }); %>
+            </div>
+        </div>
+    </div>
+</div>

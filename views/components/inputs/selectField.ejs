@@ -1,0 +1,47 @@
+<div class="select-field <%= type %> flex flex-col w-full <% if(typeof disabled !== 'undefined' && disabled) { %>disabled<% } %>">
+    <div class="select-wrapper flex flex-row items-center px-2 rounded-2 w-full transition duration-200 relative">
+        <div class="flex flex-1 flex-row items-center relative">
+            <% if(typeof label !== 'undefined'){ %>
+                <div class="select-label-wrapper flex flex-row items-center gap-1 bg-card text-sm px-2 py-1 rounded-1 transition duration-200">
+                    <% if(typeof labelIcon !== 'undefined'){ %><%- labelIcon %><% } %>
+
+                    <div class="select-label truncate"><%= label %></div>
+                </div>
+            <% } %>
+
+            <div class="select-trigger flex flex-row items-center gap-2 w-full">
+                <div class="select-value w-full truncate"><% if(typeof items !== 'undefined' && Array.isArray(items)){ %><% if(typeof selected !== 'undefined' && selected != null && selected >= 0 && selected < items.length){ %><%- items[selected].name %><% } else { %><%- items[0].name %><% } %><% } %></div>
+
+                <%- include('../icon.ejs', {
+                    icon: 'chevron-down',
+                    id: null,
+                    className: 'select-chevron size-2.5 transition duration-200'
+                }); %>
+
+                <input type="text" class="select-element w-full h-full <% if(typeof className !== 'undefined' && className != null){ %><%= className %><% } %>" <% if(typeof id !== 'undefined' && id != null) { %>id="<%= id %>"<% } %> <% if(typeof attributes !== 'undefined' && Array.isArray(attributes)){ %><%- attributes.map(a => a.name + '="' + a.value.toString().replace(/"/g, '&quot;') + '"').join(' ') %><% } %> value="<% if(typeof items !== 'undefined' && Array.isArray(items)){ %><% if(typeof selected !== 'undefined' && selected != null && selected >= 0 && selected < items.length){ %><%- items[selected].value %><% } else { %><%- items[0].value %><% } %><% } %>" readonly required>
+            </div>
+        </div>
+
+        <% if(typeof items !== 'undefined' && Array.isArray(items)){ %>
+            <div class="select-options flex flex-col rounded-2 transition duration-200">
+                <% items.forEach(function(item){ %>
+                    <div class="select-option flex flex-row items-center gap-2 px-2 <% if(typeof selected !== 'undefined' && selected != null && selected >= 0 && selected < items.length && items[selected] == item.value || items[0].value == item.value){ %>focus active<% } %>" value="<%= item.value %>">
+                        <div class="select-option-content truncate w-full"><%- item.name %></div>
+
+                        <%- include('../icon.ejs', {
+                            icon: 'check',
+                            id: null,
+                            className: 'select-option-checked size-2.5'
+                        }); %>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="select-subscript px-1">
+        <% if(typeof errors !== 'undefined' && Array.isArray(errors)){ %>
+            <% if(errors.includes('required')) { %><div class="error text-danger text-xs" data-error="required">This field is required</div><% } %>
+        <% } %>
+    </div>
+</div>

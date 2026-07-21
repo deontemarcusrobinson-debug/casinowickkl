@@ -1,0 +1,59 @@
+<div class="item table-row">
+    <a class="table-column text-left" href="<%= {
+        original: '/' + game.id,
+        casino: '/casino/slots/' + game.id
+    }[category] %>">
+        <div class="flex flex-row items-center gap-2">
+            <%- include('./icon.ejs', {
+                icon: {
+                    original: game.id,
+                    casino: 'casino'
+                }[category],
+                className: 'size-5'
+            }); %>
+
+            <div class="font-bold capitalize"><%= game.name %></div>
+        </div>
+    </a>
+
+    <div class="table-column text-left">
+        <%- include('./userField.ejs', { user }); %>
+    </div>
+
+    <div class="table-column text-left">
+        <div class="flex flex-row items-center justify-start gap-1">
+            <%- include('./icon.ejs', {
+                icon: 'diamond',
+                className: 'text-primary size-4'
+            }); %>
+
+            <span><%= amount %></span>
+        </div>
+    </div>
+
+    <div class="table-column text-left"><%= multiplier %>x</div>
+
+    <% if(winning > 0) { %>
+        <div class="table-column text-right success">
+            <div class="flex flex-row items-center justify-end gap-1">
+                <%- include('./icon.ejs', {
+                    icon: 'diamond',
+                    className: 'text-primary size-4'
+                }); %>
+
+                <span>+<%= winning %></span>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="table-column text-right">
+            <div class="flex flex-row items-center justify-end gap-1">
+                <%- include('./icon.ejs', {
+                    icon: 'diamond',
+                    className: 'text-primary size-4'
+                }); %>
+
+                <span><%= winning %></span>
+            </div>
+        </div>
+    <% } %>
+</div>

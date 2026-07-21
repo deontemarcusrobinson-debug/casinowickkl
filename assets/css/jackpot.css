@@ -1,0 +1,46 @@
+.jackpot-case {
+	height: 112px;
+    overflow: hidden;
+    background: var(--card);
+}
+
+.jackpot-case .group-reel {
+    transform: translate3d(0px, 0px, 0px);
+	position: absolute;
+    height: 80px;
+	width: auto;
+}
+
+.jackpot-case .reel-item {
+	height: 80px;
+    width: 90px;
+    padding: 0px 5px;
+}
+
+.jackpot-case .reel-item img {
+    border-radius: 6px;
+}
+
+.jackpot-case .pointer {
+	width: 3px;
+    background-color: var(--color-white);
+    height: 100%;
+    box-shadow: 0px 0px 15px var(--color-white);
+}
+
+.jackpot-grid-bets {
+	min-height: 60px;
+	display: grid;
+    gap: 0.5rem;
+    grid-auto-rows: 60px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+/* SKELETON */
+
+.jackpot-case .skeleton.reel-box {
+    height: 80px;
+    width: 100%;
+}
+
+/* END SKELETON */

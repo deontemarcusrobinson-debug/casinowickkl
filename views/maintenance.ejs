@@ -1,0 +1,17 @@
+<div class="flex flex-col gap-4 justify-center items-center size-full">
+    <img class="w-4/12 max-md:w-full" src="/img/logo.png">
+
+    <div class="mt-2 mb-2 text-2xl"><%= response.reason %></div>
+
+    <div class="tracking-wider px-4 py-2 border-y-2 border-card text-3xl">MAINTENANCE</div>
+
+    <div class="flex flex-row gap-2">
+        <a target="_blank" href="<%= app.links.discord_server %>"><div class="alt-login discord size-10 rounded-2 flex justify-center items-center"></div></a>
+        <a target="_blank" href="<%= app.links.twitter_page %>"><div class="alt-login twitter size-10 rounded-2 flex justify-center items-center"></div></a>
+        <a target="_blank" href="<%= app.links.steam_group %>"><div class="alt-login steam size-10 rounded-2 flex justify-center items-center"></div></a>
+    </div>
+
+    <% if(!user) { %>
+        <a href="/login?returnUrl=/<%= app.paths.join('/') %>"><button class="button button-hover button-accent shadow-2">Sign In</button></a>
+    <% } %>
+</div>

@@ -1,0 +1,31 @@
+<div class="table-row <%= { win: 'text-success', loss: 'text-danger' }[status] %>">
+    <div class="table-column text-left">#<%= id %></div>
+    <div class="table-column text-left capitalize"><%= difficulty %></div>
+    <div class="table-column text-left"><%= rows %></div>
+
+    <div class="table-column text-left">
+        <div class="flex flex-row items-center justify-start gap-1">
+            <%- include('./icon.ejs', {
+                icon: 'diamond',
+                id: null,
+                className: 'text-primary size-4'
+            }); %>
+
+            <span><%= amount %></span>
+        </div>
+    </div>
+
+    <div class="table-column text-left">
+        <div class="flex flex-row items-center justify-start gap-1">
+            <%- include('./icon.ejs', {
+                icon: 'diamond',
+                id: null,
+                className: 'text-primary size-4'
+            }); %>
+
+            <span><%= profit %></span>
+        </div>
+    </div>
+
+    <div class="table-column text-left"><%= date %></div>
+</div>

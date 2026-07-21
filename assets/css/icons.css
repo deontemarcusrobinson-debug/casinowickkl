@@ -1,0 +1,168 @@
+.icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+}
+
+.icon:not(.icon-color) {
+    background-color: currentColor;
+    mask-image: var(--icon-url);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    -webkit-mask-image: var(--icon-url);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+}
+
+.icon.icon-color {
+    background-image: var(--icon-url);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon-chevron-up { --icon-url: url(/img/icons/chevron-up.svg); }
+.icon-chevron-down { --icon-url: url(/img/icons/chevron-down.svg); }
+.icon-chevron-left { --icon-url: url(/img/icons/chevron-left.svg); }
+.icon-chevron-right { --icon-url: url(/img/icons/chevron-right.svg); }
+.icon-arraw-up { --icon-url: url(/img/icons/arraw-up.svg); }
+.icon-arraw-down { --icon-url: url(/img/icons/arraw-down.svg); }
+.icon-arraw-left { --icon-url: url(/img/icons/arraw-left.svg); }
+.icon-arraw-right { --icon-url: url(/img/icons/arraw-right.svg); }
+.icon-undo { --icon-url: url(/img/icons/undo.svg); }
+.icon-redo { --icon-url: url(/img/icons/redo.svg); }
+.icon-swap-horizontal-arrows { --icon-url: url(/img/icons/swap-horizontal-arrows.svg); }
+.icon-swap-vertical-arrows { --icon-url: url(/img/icons/swap-vertical-arrows.svg); }
+.icon-arrow-down-wide-narrow { --icon-url: url(/img/icons/arrow-down-wide-narrow.svg); }
+.icon-arrow-up-narrow-wide { --icon-url: url(/img/icons/arrow-up-narrow-wide.svg); }
+.icon-minimize { --icon-url: url(/img/icons/minimize.svg); }
+.icon-maximize { --icon-url: url(/img/icons/maximize.svg); }
+.icon-shuffle { --icon-url: url(/img/icons/shuffle.svg); }
+
+.icon-discord { --icon-url: url(/img/icons/discord.svg); }
+.icon-twitter { --icon-url: url(/img/icons/twitter.svg); }
+.icon-steam { --icon-url: url(/img/icons/steam.svg); }
+
+.icon-gamepad { --icon-url: url(/img/icons/gamepad.svg); }
+.icon-gift { --icon-url: url(/img/icons/gift.svg); }
+.icon-trophy { --icon-url: url(/img/icons/trophy.svg); }
+.icon-diamond { --icon-url: url(/img/icons/diamond.svg); }
+.icon-menu { --icon-url: url(/img/icons/menu.svg); }
+.icon-chat { --icon-url: url(/img/icons/chat.svg); }
+.icon-upload { --icon-url: url(/img/icons/upload.svg); }
+.icon-download { --icon-url: url(/img/icons/download.svg); }
+.icon-wallet { --icon-url: url(/img/icons/wallet.svg); }
+.icon-backpack { --icon-url: url(/img/icons/backpack.svg); }
+.icon-share { --icon-url: url(/img/icons/share.svg); }
+.icon-ticket { --icon-url: url(/img/icons/ticket.svg); }
+.icon-user { --icon-url: url(/img/icons/user.svg); }
+.icon-users { --icon-url: url(/img/icons/users.svg); }
+.icon-shield { --icon-url: url(/img/icons/shield.svg); }
+.icon-adjustments { --icon-url: url(/img/icons/adjustments.svg); }
+.icon-settings { --icon-url: url(/img/icons/settings.svg); }
+.icon-log-out { --icon-url: url(/img/icons/log-out.svg); }
+.icon-clock { --icon-url: url(/img/icons/clock.svg); }
+.icon-lock { --icon-url: url(/img/icons/lock.svg); }
+.icon-inbox { --icon-url: url(/img/icons/inbox.svg); }
+.icon-smartphone { --icon-url: url(/img/icons/smartphone.svg); }
+.icon-mail { --icon-url: url(/img/icons/mail.svg); }
+.icon-key { --icon-url: url(/img/icons/key.svg); }
+.icon-hand-coins { --icon-url: url(/img/icons/hand-coins.svg); }
+.icon-check-sm { --icon-url: url(/img/icons/check-sm.svg); }
+.icon-check { --icon-url: url(/img/icons/check.svg); }
+.icon-loader-circle { --icon-url: url(/img/icons/loader-circle.svg); }
+.icon-wrench { --icon-url: url(/img/icons/wrench.svg); }
+.icon-trash { --icon-url: url(/img/icons/trash.svg); }
+.icon-eye { --icon-url: url(/img/icons/eye.svg); }
+.icon-eye-off { --icon-url: url(/img/icons/eye-off.svg); }
+.icon-pencil { --icon-url: url(/img/icons/pencil.svg); }
+.icon-pause { --icon-url: url(/img/icons/pause.svg); }
+.icon-play { --icon-url: url(/img/icons/play.svg); }
+.icon-close { --icon-url: url(/img/icons/close.svg); }
+.icon-copy { --icon-url: url(/img/icons/copy.svg); }
+.icon-link { --icon-url: url(/img/icons/link.svg); }
+.icon-chart { --icon-url: url(/img/icons/chart.svg); }
+.icon-heart { --icon-url: url(/img/icons/heart.svg); }
+.icon-heart-o { --icon-url: url(/img/icons/heart-o.svg); }
+.icon-plus { --icon-url: url(/img/icons/plus.svg); }
+.icon-minus { --icon-url: url(/img/icons/minus.svg); }
+.icon-reply { --icon-url: url(/img/icons/reply.svg); }
+.icon-bell { --icon-url: url(/img/icons/bell.svg); }
+.icon-flag { --icon-url: url(/img/icons/flag.svg); }
+.icon-volume-up { --icon-url: url(/img/icons/volume-up.svg); }
+.icon-volume-off { --icon-url: url(/img/icons/volume-off.svg); }
+.icon-ellipsis-h { --icon-url: url(/img/icons/ellipsis-h.svg); }
+.icon-ellipsis-v { --icon-url: url(/img/icons/ellipsis-v.svg); }
+.icon-info { --icon-url: url(/img/icons/info.svg); }
+.icon-info-o { --icon-url: url(/img/icons/info-o.svg); }
+.icon-zap { --icon-url: url(/img/icons/zap.svg); }
+.icon-certificate { --icon-url: url(/img/icons/certificate.svg); }
+.icon-calendar { --icon-url: url(/img/icons/calendar.svg); }
+.icon-shopping-cart { --icon-url: url(/img/icons/shopping-cart.svg); }
+.icon-smile { --icon-url: url(/img/icons/smile.svg); }
+.icon-bookmark { --icon-url: url(/img/icons/bookmark.svg); }
+.icon-bookmark-o { --icon-url: url(/img/icons/bookmark-o.svg); }
+.icon-admin { --icon-url: url(/img/icons/admin.svg); }
+.icon-list { --icon-url: url(/img/icons/list.svg); }
+.icon-list-outdent { --icon-url: url(/img/icons/list-outdent.svg); }
+.icon-list-ordered { --icon-url: url(/img/icons/list-ordered.svg); }
+.icon-list-indent { --icon-url: url(/img/icons/list-indent.svg); }
+.icon-list-task { --icon-url: url(/img/icons/list-task.svg); }
+.icon-package { --icon-url: url(/img/icons/package.svg); }
+.icon-kind { --icon-url: url(/img/icons/kind.svg); }
+.icon-bot { --icon-url: url(/img/icons/bot.svg); }
+.icon-percent { --icon-url: url(/img/icons/percent.svg); }
+.icon-overview { --icon-url: url(/img/icons/overview.svg); }
+
+.icon-star { --icon-url: url(/img/icons/star.svg); }
+.icon-wheel { --icon-url: url(/img/icons/wheel.svg); }
+.icon-slots { --icon-url: url(/img/icons/slots.svg); }
+.icon-flame { --icon-url: url(/img/icons/flame.svg); }
+.icon-rocket { --icon-url: url(/img/icons/rocket.svg); }
+.icon-dices { --icon-url: url(/img/icons/dices.svg); }
+.icon-chess-pawn { --icon-url: url(/img/icons/chess-pawn.svg); }
+
+.icon-roulette { --icon-url: url(/img/icons/roulette.svg); }
+.icon-crash { --icon-url: url(/img/icons/crash.svg); }
+.icon-jackpot { --icon-url: url(/img/icons/jackpot.svg); }
+.icon-coinflip { --icon-url: url(/img/icons/coinflip.svg); }
+.icon-dice { --icon-url: url(/img/icons/dice.svg); }
+.icon-unboxing { --icon-url: url(/img/icons/unboxing.svg); }
+.icon-casebattle { --icon-url: url(/img/icons/casebattle.svg); }
+.icon-upgrader { --icon-url: url(/img/icons/upgrader.svg); }
+.icon-minesweeper { --icon-url: url(/img/icons/minesweeper.svg); }
+.icon-tower { --icon-url: url(/img/icons/tower.svg); }
+.icon-plinko { --icon-url: url(/img/icons/plinko.svg); }
+.icon-casino { --icon-url: url(/img/icons/casino.svg); }
+
+.icon-hat { --icon-url: url(/img/icons/hat.svg); }
+.icon-bomb { --icon-url: url(/img/icons/bomb.svg); }
+.icon-terrorist { --icon-url: url(/img/icons/terrorist.svg); }
+.icon-counter-terrorist { --icon-url: url(/img/icons/counter-terrorist.svg); }
+.icon-flashbang { --icon-url: url(/img/icons/flashbang.svg); }
+
+.icon-swords-1 { --icon-url: url(/img/icons/swords-1.svg); }
+.icon-swords-2 { --icon-url: url(/img/icons/swords-2.svg); }
+
+.icon-slider-left { --icon-url: url(/img/icons/slider-left.svg); }
+.icon-slider-right { --icon-url: url(/img/icons/slider-right.svg); }
+.icon-slider-between { --icon-url: url(/img/icons/slider-between.svg); }
+.icon-slider-outside { --icon-url: url(/img/icons/slider-outside.svg); }
+.icon-slider-double-between { --icon-url: url(/img/icons/slider-double-between.svg); }
+
+.icon-btc { --icon-url: url(/img/icons/btc.svg); }
+.icon-eth { --icon-url: url(/img/icons/eth.svg); }
+.icon-ltc { --icon-url: url(/img/icons/ltc.svg); }
+.icon-bch { --icon-url: url(/img/icons/bch.svg); }
+.icon-usdttrc20 { --icon-url: url(/img/icons/usdttrc20.svg); }
+.icon-usdterc20 { --icon-url: url(/img/icons/usdterc20.svg); }
+.icon-usdtbsc { --icon-url: url(/img/icons/usdtbsc.svg); }
+.icon-usdtsol { --icon-url: url(/img/icons/usdtsol.svg); }
+.icon-usdtmatic { --icon-url: url(/img/icons/usdtmatic.svg); }
+.icon-usdc { --icon-url: url(/img/icons/usdc.svg); }
+.icon-ton { --icon-url: url(/img/icons/ton.svg); }
+.icon-trx { --icon-url: url(/img/icons/trx.svg); }
+.icon-doge { --icon-url: url(/img/icons/doge.svg); }
+.icon-xrp { --icon-url: url(/img/icons/xrp.svg); }
+.icon-bnbbsc { --icon-url: url(/img/icons/bnbbsc.svg); }
+.icon-sol { --icon-url: url(/img/icons/sol.svg); }
+.icon-shibbsc { --icon-url: url(/img/icons/shibbsc.svg); }

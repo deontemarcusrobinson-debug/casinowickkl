@@ -1,0 +1,19 @@
+CREATE TABLE IF NOT EXISTS `rain_bets` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `userid` VARCHAR(36) BINARY NOT NULL,
+    `tickets` TINYINT UNSIGNED NOT NULL,
+    `rainid` BIGINT UNSIGNED NOT NULL,
+    `time` BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `IX_rain_bets_rainid` (`rainid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `rain_bets` CHARACTER SET=utf8mb4, COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `rain_bets` CHANGE COLUMN `id` `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `rain_bets` CHANGE COLUMN `userid` `userid` VARCHAR(36) BINARY NOT NULL;
+ALTER TABLE `rain_bets` CHANGE COLUMN `tickets` `tickets` TINYINT UNSIGNED NOT NULL;
+ALTER TABLE `rain_bets` CHANGE COLUMN `rainid` `rainid` BIGINT UNSIGNED NOT NULL;
+ALTER TABLE `rain_bets` CHANGE COLUMN `time` `time` BIGINT UNSIGNED NOT NULL;
+
+CREATE INDEX IF NOT EXISTS `IX_rain_bets_rainid` ON `rain_bets` (`rainid`) USING BTREE;

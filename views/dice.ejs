@@ -1,0 +1,131 @@
+<div class="bet-container flex justify-center">
+	<div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2">
+		<%- include('./components/inputs/inputGroup.ejs', {
+			type: 'text',
+			label: 'Bet Amount',
+			labelIcon: include('./components/icon.ejs', {
+				icon: 'diamond',
+				className: 'text-primary transition duration-200'
+			}),
+			id: 'betamount_dice',
+			value: '1.00',
+			attributes: [
+				{ name: 'data-amount', value: 'dice' },
+				{ name: 'inputmode', value: 'decimal' }
+			],
+			addons: [			{
+				addon: '<div class="flex flex-wrap flex-row justify-end gap-1">' +
+					'<button class="button button-hover button-accent betshort_action" data-game="dice" data-action="half">1/2</button>' +
+					'<button class="button button-hover button-accent betshort_action" data-game="dice" data-action="double">x2</button>' +
+					'<button class="button button-hover button-accent betshort_action" data-game="dice" data-action="max">Max</button>' +
+				'</div>',
+				align: 'end'
+			}],
+			errors: [ 'required', 'number', 'greater', 'lesser' ]
+		}); %>
+
+		<div class="bet-cashout bg-secondary rounded-2 border-2 border-card flex flex-row justify-between items-center gap-2 px-4 py-2 disabled">
+			<div class="flex flex-row items-center justify-center gap-1">
+				<%- include('./components/icon.ejs', {
+					icon: 'diamond',
+					className: 'text-primary size-4'
+				}); %>
+
+				<span>Bet</span>
+			</div>
+
+			<div class="flex flex-col items-end justify-center gap-1">
+				<span class="amount" id="dice_cashout_amount">0.00</span>
+
+				<div class="profit">
+					<span data-type="negative">-</span>
+					<span data-type="positive">+</span>
+
+					<span class="positive" id="dice_cashout_profit">0.00</span>
+				</div>
+			</div>
+		</div>
+
+		<button class="button button-hover button-primary shadow-2 large w-full" id="dice_bet">Place Bet</button>
+	</div>
+
+	<div class="flex justify-center flex-col gap-4 bg-card bg-opacity-50 rounded-2">
+		<div class="dice-container flex flex-col">
+			<div class="dice-roll flex justify-center items-center">
+				<div class="dice-case flex flex-row" id="dice_case">
+					<% for(var i = 0; i < 4; i++){ %>
+						<div class="dice-reel flex flex-col" id="dice_spinner" data-id="<%= i %>">
+							<% for(var j = 0; j < 4; j++){ %>
+								<div class="flex flex-col">
+									<% for(var k = 0; k <= 9; k++){ %>
+										<div class="reel-item flex justify-center items-center"><div class="reel-content flex justify-center items-center"><%= k %></div></div>
+									<% } %>
+								</div>
+							<% } %>
+						</div>
+					<% } %>
+
+					<div class="shadow vertically shadow-top"></div>
+					<div class="shadow vertically shadow-bottom"></div>
+				</div>
+			</div>
+
+			<div class="dice-slider flex justify-center items-center">
+				<div class="relative w-full">
+					<div class="pointer hidden" id="dice_pointer"><div class="item"><div class="content">0.00</div></div></div>
+
+					<div class="chance">
+						<input type="range" id="dice_chanceslider" min="0.01" max="100" step="0.01" value="47.50">
+					</div>
+
+					<div class="bar flex flex-row justify-between gap-2">
+						<div class="item flex flex-row justify-center items-center">0</div>
+						<div class="item flex flex-row justify-center items-center">25</div>
+						<div class="item flex flex-row justify-center items-center">50</div>
+						<div class="item flex flex-row justify-center items-center">75</div>
+						<div class="item flex flex-row justify-center items-center">100</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="dice-select flex flex-col gap-4 justify-end items-center">
+				<div class="flex flex-row gap-2">
+					<button class="dice-mode button button-hover button-accent shadow-2 flex flex-row items-center justify-center active" data-mode="under">
+						<%- include('./components/icon.ejs', {
+							icon: 'slider-left',
+							className: 'text-muted-foreground h-6 w-17'
+						}); %>
+					</button>
+
+					<button class="dice-mode button button-hover button-accent shadow-2 flex flex-row items-center justify-center" data-mode="over">
+						<%- include('./components/icon.ejs', {
+							icon: 'slider-right',
+							className: 'text-muted-foreground h-6 w-17'
+						}); %>
+					</button>
+				</div>
+
+				<div class="bg-secondary rounded-2 border-2 border-card flex flex-row max-md:flex-col gap-2 max-md:gap-4 items-center w-full px-4 pt-4 pb-2">
+					<%- include('./components/inputs/inputGroup.ejs', {
+                        type: 'text',
+                        label: 'Multiplier',
+                        id: 'dice_multiplier',
+                        value: '2.00',
+                        readonly: true
+                    }); %>
+
+                    <%- include('./components/inputs/inputGroup.ejs', {
+                        type: 'text',
+                        label: 'Win Chance',
+                        id: 'dice_chanceinput',
+                        value: '47.50',
+						attributes: [
+							{ name: 'inputmode', value: 'decimal' }
+						],
+                        errors: [ 'required', 'number' ]
+                    }); %>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

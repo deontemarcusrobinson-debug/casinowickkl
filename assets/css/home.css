@@ -1,0 +1,327 @@
+/* CARDS */
+
+.home-container .welcome-card, .home-container .carousel-card {
+    height: 240px;
+}
+
+@media (max-width: 768px){
+    .home-container .welcome-card {
+        height: 220px;
+    }
+
+    .home-container .carousel-card {
+        height: 160px;
+    }
+
+    .home-container .carousel-card .carousel .content .list .item {
+        padding: 1.5rem;
+    }
+
+    .home-container .carousel-card .carousel .content .list .item .title {
+        font-size: 1.25rem;
+    }
+
+    .home-container .carousel-card .carousel .content .list .item .description {
+        font-size: 0.75rem;
+    }
+}
+
+@media (min-width: 768px){
+    .home-container .welcome-card {
+        background: radial-gradient(circle at 100% 70%, color-mix(in oklab, var(--primary) 30%, transparent) 0%, #00000000 70%), url(../img/welcome.png) no-repeat 100% 50%;
+        background-size: contain;
+    }
+}
+
+@media (max-width: 768px){
+    .home-container .welcome-card {
+        background-image: radial-gradient(circle at 50% 150%, color-mix(in oklab, var(--primary) 30%, transparent) 0%, #00000000 70%);
+    }
+}
+
+.home-container .welcome-card .info {
+    padding-left: 1.5rem;
+}
+
+@media (max-width: 768px){
+    .home-container .welcome-card .info {
+        padding-right: 1.5rem;
+    }
+}
+
+.home-container .welcome-card .info .avatar {
+    height: 56px;
+    width: 56px;
+}
+
+.home-container .welcome-card .info .progress-container {
+	height: 10px;
+    min-height: 10px;
+}
+
+.home-container .welcome-card .video {
+    width: 240px;
+    position: relative;
+    top: -44px;
+    overflow: hidden;
+    height: calc(100% + 44px);
+    -webkit-filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.7));
+    filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.7));
+}
+
+.home-container .welcome-card .image {
+    width: 300px;
+    position: relative;
+    top: -10px;
+    overflow: hidden;
+    height: calc(100% + 10px);
+    -webkit-filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.7));
+    filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.7));
+}
+
+@media (max-width: 768px){
+    .home-container .welcome-card .video, .home-container .welcome-card .image {
+        display: none;
+    }
+}
+
+.home-container .welcome-card .video video {
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    width: auto;
+    max-width: none;
+    transform: translate(-60px, 0%);
+    object-fit: contain;
+}
+
+.home-container .welcome-card .image img {
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    transform: translate(0px, 0%);
+}
+
+.home-container .carousel-card .carousel .content .list .item .badge {
+    box-shadow: 0 10px 15px -3px color-mix(in oklab, var(--primary) 50%, transparent), 0 4px 6px -4px color-mix(in oklab, var(--primary) 50%, transparent);
+}
+
+@media (max-width: 768px){
+    .home-container .carousel-card .carousel .content .list .item .badge {
+        display: none;
+    }
+}
+
+/* END CARDS */
+
+/* GAMES */
+
+.home-games {
+	width: 100%;
+	display: grid;
+    gap: 0.5rem;
+	grid-auto-rows: 160px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+@media (max-width: 768px){
+    .home-games {
+        grid-auto-rows: 120px;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+}
+
+.home-games .item {
+	height: 160px;
+    width: 100%;
+    position: relative;
+    top: 0px;
+    border-radius: 0.5rem;
+    border: solid 2px var(--secondary);
+    background: var(--card);
+    overflow: hidden;
+}
+
+@media (max-width: 768px){
+    .home-games .item {
+        height: 120px;
+    }
+}
+
+.home-games .item.disabled {
+    pointer-events: unset !important;
+	opacity: 1 !important;
+}
+
+.home-games .item.disabled .image img {
+    filter: grayscale(0.9);
+}
+
+.home-games .item:hover {
+    top: -4px;
+}
+
+.home-games .item:hover .image {
+    filter: blur(4px);
+    top: -10px;
+    bottom: -10px;
+}
+
+.home-games .item:hover > .name, .home-games .item:hover > .description {
+    filter: blur(4px);
+}
+
+.home-games .item:not(:hover) > .info {
+    opacity: 0;
+}
+
+.home-games .item:hover .info .play {
+    scale: 1.2;
+}
+
+.home-games .item .info {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 1;
+    opacity: 1;
+}
+
+.home-games .item .info .rtp {
+    position: absolute;
+	left: 10px;
+	top: 10px;
+}
+
+.home-games .item .info .favorite {
+    position: absolute;
+	right: 10px;
+	top: 10px;
+    font-size: 14px;
+}
+
+.home-games .item .info .favorite.active {
+    color: var(--color-danger);
+}
+
+.home-games .item .info .play {
+    position: absolute;
+	transform: translateY(-15%);
+    background: #ff55483d; /* color */
+    color: #ff5548; /* color */
+    height: 42px;
+    width: 42px;
+    border-radius: 50%;
+}
+
+@media (max-width: 768px){
+    .home-games .item .info .play {
+        transform: translateY(-15%);
+        height: 32px;
+        width: 32px;
+    }
+}
+
+.home-games .item .info .name {
+    position: absolute;
+	bottom: 10px;
+    left: 10px;
+    right: 10px;
+}
+
+.home-games .item .info .description {
+    position: absolute;
+	top: 40%;
+    left: 10px;
+    right: 10px;
+}
+
+.home-games .item .image {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+.home-games .item .image img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: center center;
+}
+
+.home-games .item > .name {
+	position: absolute;
+	bottom: 25px;
+	left: 20px;
+    z-index: 1;
+}
+
+.home-games .item > .description {
+	position: absolute;
+	bottom: 10px;
+	left: 20px;
+    z-index: 1;
+}
+
+/* END GAMES */
+
+/* PROVIDERS */
+
+.home-providers {
+	width: 100%;
+	display: grid;
+    gap: 0.5rem;
+	grid-auto-rows: 80px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+@media (max-width: 768px){
+    .home-providers {
+        grid-auto-rows: 120px;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+}
+
+.home-providers .item {
+	height: 80px;
+    width: 100%;
+    position: relative;
+    top: 0px;
+    border-radius: 0.5rem;
+    border: solid 2px var(--secondary);
+    background: var(--card);
+    overflow: hidden;
+}
+
+@media (max-width: 768px){
+    .home-providers .item {
+        height: 60px;
+    }
+}
+
+.home-providers .item:hover {
+    scale: 1.05;
+    border: solid 2px var(--card);
+    background: var(--accent);
+}
+
+.home-providers .item .image {
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+}
+
+.home-providers .item .image img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    object-position: center center;
+}
+
+/* END PROVIDERS */

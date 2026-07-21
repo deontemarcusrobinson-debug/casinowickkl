@@ -1,0 +1,10 @@
+<div class="item bg-card rounded-2 flex flex-row gap-2 items-center px-4 py-2 w-full" data-userid="<%= user.userid %>">
+    <%- include('./userAvatar.ejs', { user, size: 'size-10' }); %>
+
+    <div class="flex flex-col gap-1 justify-center w-full overflow-hidden">
+        <div class="text-base truncate"><%= user.name %></div>
+        <div class="text-xs truncate"><%= time %></div>
+    </div>
+
+    <button class="chat_send_command button button-hover button-primary shadow-2" data-command="/unignore <%= user.userid %>">Unignore</button>
+</div>

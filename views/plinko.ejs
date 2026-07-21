@@ -1,0 +1,117 @@
+<div class="bet-container flex justify-center">
+	<div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2">
+		<%- include('./components/inputs/inputGroup.ejs', {
+			type: 'text',
+			label: 'Bet Amount',
+			labelIcon: include('./components/icon.ejs', {
+				icon: 'diamond',
+				className: 'text-primary transition duration-200'
+			}),
+			id: 'betamount_plinko',
+			value: '1.00',
+			attributes: [
+				{ name: 'data-amount', value: 'plinko' },
+				{ name: 'inputmode', value: 'decimal' }
+			],
+			addons: [			{
+				addon: '<div class="flex flex-wrap flex-row justify-end gap-1">' +
+					'<button class="button button-hover button-accent betshort_action" data-game="plinko" data-action="half">1/2</button>' +
+					'<button class="button button-hover button-accent betshort_action" data-game="plinko" data-action="double">x2</button>' +
+					'<button class="button button-hover button-accent betshort_action" data-game="plinko" data-action="max">Max</button>' +
+				'</div>',
+				align: 'end'
+			}],
+			errors: [ 'required', 'number', 'greater', 'lesser' ]
+		}); %>
+
+		<%- include('./components/inputs/selectField.ejs', {
+            type: 'bottom',
+            label: 'Difficulty',
+            id: 'plinko_difficulty',
+            selected: 1,
+            items: [
+                { name: 'Easy', value: 'easy' },
+                { name: 'Medium', value: 'medium' },
+                { name: 'Hard', value: 'hard' }
+            ]
+        }); %>
+
+        <%- include('./components/inputs/selectField.ejs', {
+            type: 'bottom',
+            label: 'Rows',
+            id: 'plinko_rows_amount',
+            selected: 6,
+            items: [
+                { name: '8', value: 8 },
+                { name: '9', value: 9 },
+                { name: '10', value: 10 },
+                { name: '11', value: 11 },
+                { name: '12', value: 12 },
+                { name: '13', value: 13 },
+                { name: '14', value: 14 },
+                { name: '15', value: 15 },
+                { name: '16', value: 16 }
+            ]
+		}); %>
+
+		<div class="bet-cashout bg-secondary rounded-2 border-2 border-card flex flex-row justify-between items-center gap-2 px-4 py-2 disabled">
+			<div class="flex flex-row items-center justify-center gap-1">
+				<%- include('./components/icon.ejs', {
+					icon: 'diamond',
+					className: 'text-primary size-4'
+				}); %>
+
+				<span>Bet</span>
+			</div>
+
+			<div class="flex flex-col items-end justify-center gap-1">
+				<span class="amount" id="plinko_cashout_amount">0.00</span>
+
+				<div class="profit">
+					<span data-type="negative">-</span>
+					<span data-type="positive">+</span>
+
+					<span class="positive" id="plinko_cashout_profit">0.00</span>
+				</div>
+			</div>
+		</div>
+
+		<button class="button button-hover button-primary shadow-2 large w-full" id="plinko_bet">Place Bet</button>
+	</div>
+
+	<div class="flex items-center justify-center flex-col gap-4 bg-card bg-opacity-50 rounded-2">
+		<div class="plinko-container flex flex-col items-center justify-center rows-14" id="plinko_container">
+			<div class="flex flex-col items-center w-full relative">
+				<div class="plinko-balls" id="plinko_balls"></div>
+
+				<div class="plinko-rows flex flex-col justify-between" id="plinko_rows">
+				<% for(var i = 2; i < 16; i++){ %>
+					<div class="line flex flex-row justify-center">
+					<% for(var j = 0; j <= i; j++){ %>
+						<div class="bar"></div>
+					<% } %>
+					</div>
+				<% } %>
+				</div>
+			</div>
+
+			<div class="plinko-multipliers flex flex-row gap-2" id="plinko_multipliers">
+				<div class="item flex justify-center items-center" data-rarity="7">58x</div>
+				<div class="item flex justify-center items-center" data-rarity="6">15x</div>
+				<div class="item flex justify-center items-center" data-rarity="5">7x</div>
+				<div class="item flex justify-center items-center" data-rarity="4">4x</div>
+				<div class="item flex justify-center items-center" data-rarity="3">1.9x</div>
+				<div class="item flex justify-center items-center" data-rarity="2">1x</div>
+				<div class="item flex justify-center items-center" data-rarity="1">0.5x</div>
+				<div class="item flex justify-center items-center" data-rarity="0">0.2x</div>
+				<div class="item flex justify-center items-center" data-rarity="1">0.5x</div>
+				<div class="item flex justify-center items-center" data-rarity="2">1x</div>
+				<div class="item flex justify-center items-center" data-rarity="3">1.9x</div>
+				<div class="item flex justify-center items-center" data-rarity="4">4x</div>
+				<div class="item flex justify-center items-center" data-rarity="5">7x</div>
+				<div class="item flex justify-center items-center" data-rarity="6">15x</div>
+				<div class="item flex justify-center items-center" data-rarity="7">58x</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,156 @@
+<div class="header">
+    <a href="/" class="logo flex justify-center items-center px-3 py-2 w-full">
+        <img src="/img/logo.png">
+    </a>
+
+    <div class="navigation flex flex-col">
+        <div class="bottom flex flex-row items-center justify-between p-3">
+            <%- include('../components/breadcrumbTrail.ejs', {
+                items: breadcrumb
+            }); %>
+
+            <div class="flex flex-row justify-center gap-2 h-full">
+                <% if(user) { %>
+                    <div class="user flex flex-row items-center justify-center gap-4 bg-card shadow-2 rounded-1 p-1 pr-3 h-full relative pointer">
+                        <div class="flex flex-row items-center justify-center gap-2 h-full">
+                            <img class="avatar" src="<%= user.avatar %>">
+
+                            <div class="name flex flex-col justify-center gap-1">
+                                <div class="flex flex-row items-center gap-1">
+                                    <div class="text-primary" id="level_count">0</div>
+                                    <div class="truncate"><%= user.name %></div>
+                                </div>
+
+                                <div class="progress-container">
+                                    <div class="progress-bar transition duration-200 ease-linear" id="level_bar" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <%- include('../components/icon.ejs', {
+                            icon: 'chevron-down',
+                            className: 'text-muted-foreground size-3 transition duration-200'
+                        }); %>
+
+                        <div class="select transition duration-200">
+                            <div class="list flex flex-col bg-secondary border-2 border-card rounded-2">
+                                <% if(settings.allowed.admin.includes(user.userid)) { %>
+                                    <a class="h-full" href="/admin" target="_blank">
+                                        <div class="item flex flex-row items-center gap-2 text-success">
+                                            <%- include('../components/icon.ejs', {
+                                                icon: 'adjustments',
+                                                className: 'size-4'
+                                            }); %>
+
+                                            <span>Admin Panel</span>
+                                        </div>
+                                    </a>
+                                <% } %>
+
+                                <a class="h-full" href="/account">
+                                    <div class="item flex flex-row items-center gap-2 text-muted-foreground">
+                                        <%- include('../components/icon.ejs', {
+                                            icon: 'user',
+                                            className: 'size-4'
+                                        }); %>
+
+                                        <span>Account</span>
+                                    </div>
+                                </a>
+
+                                <a class="h-full" href="/affiliates">
+                                    <div class="item flex flex-row items-center gap-2 text-muted-foreground">
+                                        <%- include('../components/icon.ejs', {
+                                            icon: 'share',
+                                            className: 'size-4'
+                                        }); %>
+
+                                        <span>Affiliates</span>
+                                    </div>
+                                </a>
+
+                                <a class="h-full" href="/account/games">
+                                    <div class="item flex flex-row items-center gap-2 text-muted-foreground">
+                                        <%- include('../components/icon.ejs', {
+                                            icon: 'clock',
+                                            className: 'size-4'
+                                        }); %>
+
+                                        <span>Games History</span>
+                                    </div>
+                                </a>
+
+                                <a class="h-full" href="/account/deposits">
+                                    <div class="item flex flex-row items-center gap-2 text-muted-foreground">
+                                        <%- include('../components/icon.ejs', {
+                                            icon: 'swap-horizontal-arrows',
+                                            className: 'size-4'
+                                        }); %>
+
+                                        <span>Balance History</span>
+                                    </div>
+                                </a>
+
+                                <a class="h-full" href="/account/settings">
+                                    <div class="item flex flex-row items-center gap-2 text-muted-foreground">
+                                        <%- include('../components/icon.ejs', {
+                                            icon: 'settings',
+                                            className: 'size-4'
+                                        }); %>
+
+                                        <span>Settings</span>
+                                    </div>
+                                </a>
+
+                                <a class="h-full" href="/account/security">
+                                    <div class="item flex flex-row items-center gap-2 text-muted-foreground">
+                                        <%- include('../components/icon.ejs', {
+                                            icon: 'lock',
+                                            className: 'size-4'
+                                        }); %>
+
+                                        <span>Security</span>
+                                    </div>
+                                </a>
+
+                                <div class="item flex flex-row items-center gap-2 text-danger border-t-2 border-card" data-modal="show" data-id="#modal_auth_logout">
+                                    <%- include('../components/icon.ejs', {
+                                            icon: 'log-out',
+                                            className: 'size-4'
+                                        }); %>
+
+                                    <span>Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <a class="h-full" href="/login?returnUrl=/<%= app.paths.join('/') %>">
+                        <button type="button" class="button button-hover button-card shadow-2 h-full flex justify-center items-center">Sign In</button>
+                    </a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="header mobile flex flex-row justify-between gap-2 px-4 py-2">
+    <div class="flex flex-row items-center justify-center gap-2 h-full">
+        <a href="/" class="logo flex justify-start items-center h-full">
+            <img class="h-full" src="/img/logo_mini.png">
+        </a>
+
+        <%- include('../components/breadcrumbTrail.ejs', {
+            items: breadcrumb
+        }); %>
+    </div>
+
+    <div class="navigation flex flex-row items-center justify-end gap-2 h-full">
+        <button class="button button-hover" data-pullout="admin">
+            <%- include('../components/icon.ejs', {
+                icon: 'menu',
+                className: 'size-4.5'
+            }); %>
+        </button>
+    </div>
+</div>

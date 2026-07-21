@@ -1,0 +1,35 @@
+<div class="table-row relative">
+    <div class="table-column text-left pointer" data-copy="text" data-text="<%= code %>"><%= code %></div>
+    <div class="table-column text-left pointer" data-copy="text" data-text="<%= referral %>"><%= referral %></div>
+    <div class="table-column text-left"><%= uses %></div>
+    <div class="table-column text-left">
+        <div class="flex flex-row items-center justify-start gap-1">
+            <%- include('./icon.ejs', {
+                icon: 'diamond',
+                id: null,
+                className: 'text-primary size-4'
+            }); %>
+
+            <span><%= amount %></span>
+        </div>
+    </div>
+
+    <div class="table-column">
+        <div class="flex flex-row items-center justify-end">
+            <%- include('./overflowMenu.ejs', {
+                items: [
+                    {
+                        link: false,
+                        destructive: true,
+                        label: 'Remove deposit bonus code',
+                        icon: 'trash',
+                        className: 'admin_deposit_bonuses_remove',
+                        attributes: [
+                            { name: 'data-id', value: id }
+                        ]
+                    }
+                ]
+            }); %>
+        </div>
+    </div>
+</div>

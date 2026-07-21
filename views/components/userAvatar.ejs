@@ -1,0 +1,13 @@
+<div class="avatar-field rounded-full <% if(typeof className !== 'undefined' && className != null){ %><%= className %><% } %> <% if(!user.anonymous){ %><%= [ 'tier-steel', 'tier-bronze', 'tier-silver', 'tier-gold', 'tier-diamond' ][Math.floor(user.level / 25)] %><% } %> relative">
+    <img class="avatar <%= size %> rounded-full" src="<%= user.avatar %>">
+
+    <% if(!user.anonymous){ %>
+        <div class="level sup sup-left flex justify-center items-center border-2 border-secondary rounded-full"><%= user.level %></div>
+    <% } %>
+
+    <% if(typeof features !== 'undefined' && Array.isArray(features)){ %>
+        <% features.forEach(function(item){ %>
+            <%- item %>
+        <% }); %>
+    <% } %>
+</div>

@@ -1,0 +1,17 @@
+<div class="pagination-content flex flex-row gap-2" id="<%= id %>" data-page="<%= page %>">
+    <button class="button pagination-item flex items-center justify-center" data-page="1">«</button>
+
+    <div class="flex flex-row gap-1">
+        <% var imin = page - 3; %>
+        <% var imax = page + 3; %>
+
+        <% var min = Math.max(1, imin - (imax > pages ? imax - pages : 0)); %>
+        <% var max = Math.min(pages, imax + (imin < 1 ? 1 - imin : 0)); %>
+
+        <% for(var i = min; i <= max; i++){ %>
+            <button class="button pagination-item flex items-center justify-center <% if(page == i) { %>active<% } %>" data-page="<%= i %>"><%= i %></button>
+        <% } %>
+    </div>
+
+    <button class="button pagination-item flex items-center justify-center" data-page="<%= pages %>">»</button>
+</div>

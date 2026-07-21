@@ -1,0 +1,100 @@
+<div class="mobile-navigation items-center bg-secondary border-t-2 border-card p-2 w-full">
+    <div class="item flex flex-col gap-2 items-center justify-center text-muted-foreground transition duration-200" data-pullout="chat">
+        <%- include('../components/icon.ejs', {
+            icon: 'chat',
+            className: 'size-4'
+        }); %>
+
+        <span class="text-xs">Chat</span>
+    </div>
+
+    <a class="item <% if(page == 'leaderboard'){ %>active<% } %> flex flex-col gap-2 items-center justify-center text-muted-foreground transition duration-200" href="/leaderboard">
+        <%- include('../components/icon.ejs', {
+            icon: 'trophy',
+            className: 'size-4'
+        }); %>
+
+        <span class="text-xs">Leaderboard</span>
+    </a>
+
+    <div class="item text-muted-foreground transition duration-200">
+        <div class="flex flex-col gap-2 items-center justify-center">
+            <%- include('../components/icon.ejs', {
+                icon: 'gamepad',
+                className: 'size-4'
+            }); %>
+
+            <span class="text-xs">Games</span>
+        </div>
+
+        <div class="select transition duration-200">
+            <div class="list flex flex-col bg-secondary border-2 border-card rounded-2">
+                <% settings.games.classic.forEach(function(item){ %>
+                    <a class="relative <% if(!item.enable && !account.permissions.play_disabled){ %>disabled<% } %>" href="/<%= item.game %>">
+                        <div class="item <%= item.game %> text-foreground flex flex-row items-center gap-2 transition duration-200">
+                            <%- include('../components/icon.ejs', {
+                                icon: item.game,
+                                className: 'size-5'
+                            }); %>
+
+                            <div class="flex flex-row items-center justify-between gap-2 w-full overflow-hidden">
+                                <div class="flex flex-col justify-center gap-1 truncate">
+                                    <span class="text-xs font-bold"><%= item.name %></span>
+                                    <span class="text-2xs text-muted-foreground truncate"><%= item.description %></span>
+                                </div>
+
+                                <% if(item.hot){ %>
+                                    <div class="bg-danger bg-opacity-10 border-1 border-danger rounded-1 px-2 py-1 text-xs text-danger font-bold">Hot</div>
+                                <% } else { %>
+                                    <div class="info bg-danger bg-opacity-10 border-1 border-danger rounded-1 px-2 py-1 text-xs text-danger font-bold">Disabled</div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </a>
+                <% }); %>
+
+                <% settings.games.original.forEach(function(item){ %>
+                    <a class="<% if(!item.enable && !account.permissions.play_disabled){ %>disabled<% } %>" href="/<%= item.game %>">
+                        <div class="item flex flex-row items-center gap-2">
+                            <%- include('../components/icon.ejs', {
+                                icon: item.game,
+                                className: 'size-5'
+                            }); %>
+
+                            <div class="flex flex-row items-center justify-between gap-2 w-full overflow-hidden">
+                                <div class="flex flex-col justify-center gap-1 truncate">
+                                    <span class="text-xs font-bold"><%= item.name %></span>
+                                    <span class="text-2xs text-muted-foreground truncate"><%= item.description %></span>
+                                </div>
+
+                                <% if(item.hot){ %>
+                                    <div class="bg-danger bg-opacity-10 border-1 border-danger rounded-1 px-2 py-1 text-xs text-danger font-bold">Hot</div>
+                                <% } else { %>
+                                    <div class="info bg-danger bg-opacity-10 border-1 border-danger rounded-1 px-2 py-1 text-xs text-danger font-bold">Disabled</div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </a>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+
+    <a class="item <% if(page == 'rewards'){ %>active<% } %> flex flex-col gap-2 items-center justify-center text-muted-foreground transition duration-200" href="/rewards">
+        <%- include('../components/icon.ejs', {
+            icon: 'gift',
+            className: 'size-4'
+        }); %>
+
+        <span class="text-xs">Rewards</span>
+    </a>
+
+    <div class="item flex flex-col gap-2 items-center justify-center text-muted-foreground transition duration-200" data-pullout="menu">
+        <%- include('../components/icon.ejs', {
+            icon: 'menu',
+            className: 'size-4'
+        }); %>
+
+        <span class="text-xs">Menu</span>
+    </div>
+</div>

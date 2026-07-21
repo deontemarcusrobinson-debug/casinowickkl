@@ -1,0 +1,27 @@
+<div class="roulette-jackpot flex flex-col gap-4 justify-center items-center" id="roulette_jackpot">
+    <div class="flex flex-row gap-2 justify-center items-center" id="roulette_jackpot_greens">
+        <% for(var i = 1; i <= 3; i++) { %>
+            <div class="item shadow-2 flex row items-center <% if(greens >= i) { %>active<% } %>" data-green="<%= i %>">
+                <%- include('./icon.ejs', {
+                    icon: 'hat',
+                    className: 'opacity-70 text-foreground h-8/12 w-full'
+                }); %>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="roulette-jackpot-info flex flex-row items-center justify-center gap-2">
+        <%- include('./icon.ejs', {
+            icon: 'diamond',
+            className: 'text-primary size-6'
+        }); %>
+
+        <span class="amount" id="roulette_jackpot_total"><%= amount %></span>
+
+        <%- include('./icon.ejs', {
+            icon: 'info',
+            id: 'roulette_jackpot_history',
+            className: 'text-muted-foreground size-5 pointer'
+        }); %>
+    </div>
+</div>

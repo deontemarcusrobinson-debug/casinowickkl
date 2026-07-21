@@ -1,0 +1,31 @@
+<div class="file-field relative w-full <% if(typeof disabled !== 'undefined' && disabled) { %>disabled<% } %>">
+    <div class="file-wrapper flex flex-col items-center justify-center rounded-2 p-2 transition duration-200 w-full">
+        <input type="file" class="file-element w-full h-full <% if(typeof className !== 'undefined' && className != null){ %><%= className %><% } %>" <% if(typeof id !== 'undefined' && id != null) { %>id="<%= id %>"<% } %> <% if(typeof attributes !== 'undefined' && Array.isArray(attributes)){ %><%- attributes.map(a => a.name + '="' + a.value.toString().replace(/"/g, '&quot;') + '"').join(' ') %><% } %> <% if(typeof accept !== 'undefined') { %>accept="<%= accept %>"<% } %>>
+
+        <div class="file-empty flex flex-col items-center justify-center gap-4 transition duration-200 w-full h-full">
+            <%- include('../icon.ejs', {
+                icon: 'upload',
+                id: null,
+                className: 'file-empty-icon text-muted-foreground size-9 transition duration-200'
+            }); %>
+
+            <% if(typeof title !== 'undefined' && typeof subtitle !== 'undefined') { %>
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <% if(typeof title !== 'undefined') { %>
+                        <div class="file-empty-title text-sm font-bold"><%- title %></div>
+                    <% } %>
+
+                    <% if(typeof subtitle !== 'undefined') { %>
+                        <div class="file-empty-subtitle text-2xs text-muted-foreground"><%= subtitle %></div>
+                    <% } %>
+                </div>
+            <% } else if(typeof title !== 'undefined') { %>
+                <div class="file-empty-title text-sm font-bold"><%- title %></div>
+            <% } else if(typeof subtitle !== 'undefined') { %>
+                <div class="file-empty-subtitle text-2xs text-muted-foreground"><%= subtitle %></div>
+            <% } %>
+        </div>
+
+        <img class="file-cover rounded-2 w-full h-full transition duration-200 <% if(typeof preview !== 'undefined' && preview != null) { %>active<% } %>" src="<% if(typeof preview !== 'undefined' && preview != null) { %><%= preview %><% } %>">
+    </div>
+</div>

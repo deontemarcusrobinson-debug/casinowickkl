@@ -1,0 +1,18 @@
+<div class="table-row <% if(amount < 0){ %>text-danger<% } else { %>text-success<% } %>">
+    <div class="table-column text-left">#<%= id %></div>
+    <div class="table-column text-left capitalize"><%= transaction.split('_').join(' ') %></div>
+
+    <div class="table-column text-left">
+        <div class="flex flex-row items-center justify-start gap-1">
+            <%- include('./icon.ejs', {
+                icon: 'diamond',
+                id: null,
+                className: 'text-primary size-4'
+            }); %>
+
+            <span><%= amount %></span>
+        </div>
+    </div>
+
+    <div class="table-column text-left"><%= date %></div>
+</div>

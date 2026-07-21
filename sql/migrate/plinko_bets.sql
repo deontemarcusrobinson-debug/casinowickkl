@@ -1,0 +1,39 @@
+CREATE TABLE IF NOT EXISTS `plinko_bets` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `userid` VARCHAR(36) BINARY NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `avatar` VARCHAR(2048) NOT NULL,
+    `xp` BIGINT UNSIGNED NOT NULL,
+    `amount` DECIMAL(32,2) UNSIGNED NOT NULL,
+    `difficulty` VARCHAR(32) NOT NULL,
+    `rows` TINYINT UNSIGNED NOT NULL,
+    `multiplier` DECIMAL(32,2) UNSIGNED NOT NULL,
+    `roll` VARCHAR(16) NOT NULL,
+    `server_seedid` BIGINT UNSIGNED NOT NULL,
+    `client_seedid` BIGINT UNSIGNED NOT NULL,
+    `nonce` BIGINT UNSIGNED NOT NULL,
+    `time` BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `IX_plinko_bets_userid` (`userid`) USING BTREE,
+    INDEX `IX_plinko_bets_time` (`time`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `plinko_bets` CHARACTER SET=utf8mb4, COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `plinko_bets` CHANGE COLUMN `id` `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `plinko_bets` CHANGE COLUMN `userid` `userid` VARCHAR(36) BINARY NOT NULL;
+ALTER TABLE `plinko_bets` CHANGE COLUMN `name` `name` VARCHAR(255) NOT NULL;
+ALTER TABLE `plinko_bets` CHANGE COLUMN `avatar` `avatar` VARCHAR(2048) NOT NULL;
+ALTER TABLE `plinko_bets` CHANGE COLUMN `xp` `xp` BIGINT UNSIGNED NOT NULL;
+ALTER TABLE `plinko_bets` CHANGE COLUMN `amount` `amount` DECIMAL(32,2) UNSIGNED NOT NULL;
+ALTER TABLE `plinko_bets` CHANGE COLUMN `difficulty` `difficulty` VARCHAR(32) NOT NULL;
+ALTER TABLE `plinko_bets` CHANGE COLUMN `rows` `rows` TINYINT UNSIGNED NOT NULL;
+ALTER TABLE `plinko_bets` CHANGE COLUMN `multiplier` `multiplier` DECIMAL(32,2) UNSIGNED NOT NULL;
+ALTER TABLE `plinko_bets` CHANGE COLUMN `roll` `roll` VARCHAR(16) NOT NULL;
+ALTER TABLE `plinko_bets` CHANGE COLUMN `server_seedid` `server_seedid` BIGINT UNSIGNED NOT NULL;
+ALTER TABLE `plinko_bets` CHANGE COLUMN `client_seedid` `client_seedid` BIGINT UNSIGNED NOT NULL;
+ALTER TABLE `plinko_bets` CHANGE COLUMN `nonce` `nonce` BIGINT UNSIGNED NOT NULL;
+ALTER TABLE `plinko_bets` CHANGE COLUMN `time` `time` BIGINT UNSIGNED NOT NULL;
+
+CREATE INDEX IF NOT EXISTS `IX_plinko_bets_userid` ON `plinko_bets` (`userid`) USING BTREE;
+CREATE INDEX IF NOT EXISTS `IX_plinko_bets_time` ON `plinko_bets` (`time`) USING BTREE;

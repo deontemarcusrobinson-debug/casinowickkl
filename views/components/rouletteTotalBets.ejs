@@ -1,0 +1,12 @@
+<div class="roulette-betstotal flex items-center justify-between gap-2">
+    <div><span class="count"><%= count %></span> Bets</div>
+
+    <div class="flex flex-row items-center justify-center gap-1">
+        <%- include('./icon.ejs', {
+            icon: 'diamond',
+            className: 'size-4'
+        }); %>
+
+        <span class="amount"><%= amount %></span>
+    </div>
+</div>

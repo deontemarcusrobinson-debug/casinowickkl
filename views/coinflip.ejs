@@ -1,0 +1,59 @@
+<div class="flex flex-col gap-2">
+	<div class="flex flex-row max-md:flex-col items-center gap-4 bg-secondary bg-opacity-50 border-b-2 border-secondary">
+		<div class="flex flex-col gap-2 w-8/12 max-md:w-full">
+			<%- include('./components/inputs/inputGroup.ejs', {
+				type: 'text',
+				label: 'Bet Amount',
+				labelIcon: include('./components/icon.ejs', {
+					icon: 'diamond',
+					className: 'text-primary transition duration-200'
+				}),
+				id: 'betamount_coinflip',
+				value: '1.00',
+				attributes: [
+					{ name: 'data-amount', value: 'coinflip' },
+					{ name: 'inputmode', value: 'decimal' }
+				],
+				addons: [			{
+					addon: '<div class="flex flex-wrap flex-row justify-end gap-1">' +
+						'<button class="button button-hover button-accent betshort_action" data-game="coinflip" data-action="clear">Clear</button>' +
+						'<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="coinflip" data-action="1.00">+1.00</button>' +
+						'<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="coinflip" data-action="10.00">+10.00</button>' +
+						'<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="coinflip" data-action="100.00">+100.00</button>' +
+						'<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="coinflip" data-action="half">1/2</button>' +
+						'<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="coinflip" data-action="double">x2</button>' +
+						'<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="coinflip" data-action="max">Max</button>' +
+					'</div>',
+					align: 'end'
+				}],
+				errors: [ 'required', 'number', 'greater', 'lesser' ]
+			}); %>
+
+			<div class="flex flex-wrap flex-row gap-1 md:hidden">
+				<button class="button button-hover button-accent betshort_action flex-1" data-game="coinflip" data-action="1.00">+1.00</button>
+				<button class="button button-hover button-accent betshort_action flex-1" data-game="coinflip" data-action="10.00">+10.00</button>
+				<button class="button button-hover button-accent betshort_action flex-1" data-game="coinflip" data-action="100.00">+100.00</button>
+				<button class="button button-hover button-accent betshort_action flex-1" data-game="coinflip" data-action="half">1/2</button>
+				<button class="button button-hover button-accent betshort_action flex-1" data-game="coinflip" data-action="double">x2</button>
+				<button class="button button-hover button-accent betshort_action flex-1" data-game="coinflip" data-action="max">Max</button>
+			</div>
+		</div>
+
+		<div class="w-4/12 max-md:w-full">
+			<div class="flex flex-row items-center justify-between gap-2">
+				<div class="flex items-center justify-between gap-4 m-auto">
+					<img class="size-10 rounded-full transition duration-500 coinflip-select active" src="/img/coinflip/coin0.png" data-position="0">
+					<img class="size-10 rounded-full transition duration-500 coinflip-select" src="/img/coinflip/coin1.png" data-position="1">
+				</div>
+
+				<button class="button button-hover button-primary shadow-2" id="coinflip_create">Create Game</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="coinflip-grid gap-2" id="coinflip_betlist">
+		<% for(var i = 0; i < 5; i++){ %>
+            <%- include('./components/coinflipSlotSkeleton.ejs'); %>
+        <% } %>
+	</div>
+</div>

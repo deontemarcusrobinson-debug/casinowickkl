@@ -1,0 +1,96 @@
+<div class="flex flex-col gap-2">
+    <div class="flex flex-row max-md:flex-col gap-2 w-full">
+        <% response.admin.gamebots.games.forEach(function(item){ %>
+            <label class="flex flex-col items-start gap-2 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full pointer">
+                <div class="flex flex-row items-center justify-between gap-2 w-full">
+                    <div class="text-left font-bold text-base"><%= item.name %> Game Bots</div>
+
+                    <%- include('../components/inputs/switchField.ejs', {
+                        className: 'admin_switch_settings',
+                        attributes: [
+                            { name: 'data-settings', value: 'games_bots_enable_' + item.game }
+                        ],
+                        checked: item.enable
+                    }); %>
+                </div>
+
+                <div class="text-sm text-muted-foreground">If this is enabled, all users can call bots on <%= item.name %> Game.</div>
+            </label>
+        <% }); %>
+    </div>
+
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Create Game Bot</div>
+
+            <div class="text-muted-foreground">Set up an automated bot that can join games.</div>
+        </div>
+
+        <%- include('../components/inputs/inputGroup.ejs', {
+            type: 'text',
+            label: 'Bot Name',
+            id: 'admin_gamebots_name',
+            errors: [ 'required' ],
+            features: [
+                '<button class="button button-hover button-primary shadow-2" id="admin_gamebots_create">Create</button>'
+            ]
+        }); %>
+    </div>
+
+    <div class="flex flex-col gap-2 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-row gap-1">
+            <%- include('../components/inputs/inputGroup.ejs', {
+                type: 'text',
+                label: 'Search Bot (userid, username, name)',
+                id: 'admin_gamebots_search'
+            }); %>
+
+            <div class="flex flex-row gap-1">
+                <%- include('../components/inputs/selectField.ejs', {
+                    type: 'bottom',
+                    label: 'Order by',
+                    id: 'admin_gamebots_order',
+                    items: [
+                        { name: 'Create date', value: 0 },
+                        { name: 'Name A-Z', value: 1 },
+                        { name: 'Name Z-A', value: 2 },
+                        { name: 'Price acending', value: 3 },
+                        { name: 'Price descending', value: 4 }
+                    ]
+                }); %>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-row">
+                    <div class="table-column text-left">User</div>
+                    <div class="table-column text-left">User Id</div>
+                    <div class="table-column text-left">Balance</div>
+                    <div class="table-column text-left">Created date</div>
+                    <div class="table-column text-right">Action</div>
+                </div>
+            </div>
+            <div class="table-body" id="admin_gamebots">
+                <% if(response.admin.gamebots.bots.list.length > 0){ %>
+                    <% response.admin.gamebots.bots.list.forEach(function(item){ %>
+                        <%- include('../components/tableAdminGamebotsRow.ejs', item); %>
+                    <% }); %>
+                <% } else { %>
+                    <%- include('../components/emptyTable.ejs', {
+                        title: 'No data found'
+                    }); %>
+                <% } %>
+            </div>
+            <div class="table-footer">
+                <div class="flex items-center justify-center bg-secondary p-2">
+                    <%- include('../components/pageNavigator.ejs', {
+                        id: 'pagination_admin_gamebots',
+                        page: response.admin.gamebots.bots.page,
+                        pages: response.admin.gamebots.bots.pages
+                    }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

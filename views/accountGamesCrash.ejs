@@ -1,0 +1,179 @@
+<div class="flex flex-col gap-2">
+	<div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card pt-8 pb-4 px-4">
+                <div class="flex flex-col gap-2 items-center">
+                    <div class="avatar-field tier-<%= response.account.user.level.tier %>">
+                        <img class="avatar size-32 rounded-full" src="<%= response.account.user.avatar %>">
+                    </div>
+
+                    <div class="flex justify-center gap-2 font-bold text-xl">
+                        <div class="capitalize chat-link-<%= response.account.user.rank %>"><%= response.account.user.rank %></div>
+
+                        <div class="truncate"><%= response.account.user.name %></div>
+                    </div>
+
+                    <div class="level-bar flex items-center gap-1">
+                        <div class="font-bold">Lvl. <%= Math.min(response.account.user.level.level + 1, 100) - 1 %></div>
+
+                        <div class="progress-container rounded-1">
+                            <% var style = 'style="width: ' + response.account.user.level.progress + '%;"'; %>
+
+                            <div class="progress-bar transition duration-200 ease-linear rounded-1" <%- style %>></div>
+                            <div class="progress-content flex flex-row justify-center items-center gap-1 font-bold">
+                                <span><%= response.account.user.level.have %></span>
+                                <span>/</span>
+                                <span><%= response.account.user.level.next %></span>
+                            </div>
+                        </div>
+
+                        <div class="font-bold"><%= Math.min(response.account.user.level.level + 1, 100) %></div>
+                    </div>
+                </div>
+
+                <div class="flex flex-row max-md:flex-col gap-2 items-center justify-between">
+                    <div class="text-muted-foreground">Member since <%= response.account.user.created %></div>
+                    <div><span class="text-muted-foreground">User ID:</span> <%= response.account.user.userid %></div>
+                </div>
+            </div>
+
+            <div class="flex flex-row max-md:flex-col gap-2">
+                <div class="flex flex-col items-center gap-1 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+                    <div class="text-muted-foreground font-bold">Deposited</div>
+                    <div class="flex flex-row items-center justify-center gap-1 text-primary">
+                        <%- include('./components/icon.ejs', {
+                            icon: 'diamond',
+                            className: 'size-5'
+                        }); %>
+
+                        <span class="text-xl"><%= response.account.stats.deposited %></span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center gap-1 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+                    <div class="text-muted-foreground font-bold">Withdrawn</div>
+                    <div class="flex flex-row items-center justify-center gap-1 text-primary">
+                        <%- include('./components/icon.ejs', {
+                            icon: 'diamond',
+                            className: 'size-5'
+                        }); %>
+
+                        <span class="text-xl"><%= response.account.stats.withdrawn %></span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center gap-1 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+                    <div class="text-muted-foreground font-bold">Wagered</div>
+                    <div class="flex flex-row items-center justify-center gap-1 text-primary">
+                        <%- include('./components/icon.ejs', {
+                            icon: 'diamond',
+                            className: 'size-5'
+                        }); %>
+
+                        <span class="text-xl"><%= response.account.stats.wagered %></span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center gap-1 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+                    <div class="text-muted-foreground font-bold">Profit</div>
+                    <div class="flex flex-row items-center justify-center gap-1 text-primary">
+                        <%- include('./components/icon.ejs', {
+                            icon: 'diamond',
+                            className: 'size-5'
+                        }); %>
+
+                        <span class="text-xl"><%= response.account.stats.profit %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <%- include('./components/tabsMenu.ejs', {
+            type: 'top',
+            items: [
+                {
+                    active: false,
+                    label: 'Settings',
+                    href: '/account/settings'
+                },
+                {
+                    active: false,
+                    label: 'Balance History',
+                    href: '/account/deposits'
+                },
+                {
+                    active: true,
+                    label: 'Games History',
+                    href: '/account/games'
+                },
+                {
+                    active: false,
+                    label: 'Transactions History',
+                    href: '/account/transactions'
+                },
+                {
+                    active: false,
+                    label: 'Self Exclusion',
+                    href: '/account/exclusion'
+                },
+                {
+                    active: false,
+                    label: 'Security',
+                    href: '/account/security'
+                }
+            ]
+        }); %>
+
+        <div class="flex flex-row max-md:flex-col gap-4">
+            <%- include('./components/tabsMenu.ejs', {
+                type: 'left',
+                items: [
+                    ...settings.games.original.map(a => ({
+                        active: response.account.games.game == a.game,
+                        label: a.name,
+                        href: '/account/games/' + a.game
+                    })),
+                    ...settings.games.classic.map(a => ({
+                        active: response.account.games.game == a.game,
+                        label: a.name,
+                        href: '/account/games/' + a.game
+                    }))
+                ]
+            }); %>
+
+            <div class="table-container w-full">
+                <div class="table-header">
+                    <div class="table-row">
+                        <div class="table-column text-left">Id</div>
+                        <div class="table-column text-left">Multiplier</div>
+                        <div class="table-column text-left">Amount</div>
+                        <div class="table-column text-left">Profit</div>
+                        <div class="table-column text-left">Date</div>
+                    </div>
+                </div>
+
+                <div class="table-body" id="account_crash_history">
+                    <% if(response.account.games.list.length > 0){ %>
+                        <% response.account.games.list.forEach(function(item){ %>
+                            <%- include('./components/tableAccountCrashHistoryRow.ejs', item); %>
+                        <% }); %>
+                    <% } else { %>
+                        <%- include('./components/emptyTable.ejs', {
+                            title: 'No data found'
+                        }); %>
+                    <% } %>
+                </div>
+
+                <div class="table-footer">
+                    <div class="flex items-center justify-center bg-secondary p-2">
+                        <%- include('./components/pageNavigator.ejs', {
+							id: 'pagination_account_crash_history',
+							page: response.account.games.page,
+							pages: response.account.games.pages
+						}); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

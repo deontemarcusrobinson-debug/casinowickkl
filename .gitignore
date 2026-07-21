@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Secrets & local env
+.env
+.env.local
+.env.*.local
+
+# Logs & runtime
+logs/
+*.log
+npm-debug.log*
+errors/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# SSL private material (keep placeholders if needed)
+ssl/*.key
+ssl/*.pem
+ssl/*.crt
+!ssl/.gitkeep
+
+# Optional local tooling
+.railway/
+.tmp/
+coverage/

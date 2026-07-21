@@ -1,0 +1,77 @@
+<div class="flex flex-col items-center">
+	<div class="rewards-container flex flex-col gap-4 w-full">
+        <div class="rewards-header flex flex-row max-md:flex-col items-center gap-6 bg-card bg-opacity-50 border-2 border-card rounded-1 px-20">
+			<div class="flex flex-col gap-4 py-8">
+                <div class="flex flex-col gap-2">
+                    <div class="text-2xl font-bold text-success">Redeem Code</div>
+                    <div class="text-sm text-muted-foreground">Redeem an affiliate code to earn <span class="font-bold"><%= response.rewards.referral.amount %> coins</span></div>
+                </div>
+
+                <%- include('./components/inputs/inputGroup.ejs', {
+                    type: 'text',
+                    label: 'Affiliate Code',
+                    id: 'rewards_referral_code',
+                    value: response.rewards.referral.redeemed ? response.rewards.referral.name.toUpperCase() : null,
+                    errors: [ 'minimum_6_characters', 'only_letters_numbers' ],
+                    addons: [{
+                        addon: response.rewards.referral.redeemed ?
+                            '<button class="button button-hover disabled button-success shadow-2 w-full" id="rewards_redeem_referral">Redeem Code</button>' :
+                            '<button class="button button-hover button-success shadow-2 w-full" id="rewards_redeem_referral">Redeem Code</button>',
+                        align: 'end'
+                    }]
+                }); %>
+		    </div>
+
+            <div class="rewards-header-background flex flex-1 flex-row items-center justify-center">
+                <img class="image" src="/img/rewards/redeem.png">
+            </div>
+		</div>
+
+		<div class="rewards-tabs flex flex-row max-md:flex-col gap-4">
+
+            <a class="item active tasks flex flex-col justify-center gap-2 rounded-1 transition duration-200" href="/rewards/tasks">
+                <div class="name text-xl font-bold">Tasks</div>
+                <div class="description text-xs">Unlock free rewards by completing tasks</div>
+            </a>
+        </div>
+
+        <div class="flex flex-col gap-4">
+			<div class="text-xl font-bold">Tasks</div>
+
+            <div class="rewards-tasks">
+                <% Object.values(response.rewards.tasks).forEach(function(item){ %>
+                    <div class="item flex flex-col gap-4 justify-between bg-card bg-opacity-50 rounded-2 border-2 border-card p-4">
+                        <div class="font-bold text-lg"><%= item.title %></div>
+
+                        <div class="flex flex-row gap-4">
+                            <div class="image <%= item.id %> flex justify-center items-center rounded-4"></div>
+
+                            <div class="flex flex-col gap-2 justify-between w-full">
+                                <div class="font-bold"><%= item.description %></div>
+
+                                <div class="flex flex-row gap-2 items-center justify-between bg-success bg-opacity-10 rounded-1 p-2">
+                                    <div class="font-bold">Reward</div>
+
+                                    <div class="price flex flex-row items-center gap-1">
+                                        <%- include('./components/icon.ejs', {
+                                            icon: 'diamond',
+                                            className: 'text-primary size-4'
+                                        }); %>
+
+                                        <span class="font-bold"><%= item.amount %></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <% if(item.completed){ %>
+                            <button class="button button-hover button-primary shadow-2 disabled w-full">Completed</button>
+                        <% } else { %>
+                            <button class="button button-hover button-primary shadow-2 w-full" id="rewards_claim_task" data-task="<%= item.id %>">Claim Reward</button>
+                        <% } %>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+</div>

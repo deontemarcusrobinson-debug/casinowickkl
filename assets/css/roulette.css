@@ -1,0 +1,187 @@
+.roulette-case {
+	height: 112px;
+	overflow: hidden;
+	background: var(--card);
+}
+
+.roulette-case .group-reel {
+	transform: translate3d(0px, 0px, 0px);
+	position: absolute;
+	height: 86px;
+	width: auto;
+}
+
+.roulette-case .reel-item {
+	height: 86px;
+    width: 90px;
+	padding: 0px 5px;
+	border-radius: 6px;
+	opacity: 1;
+}
+
+.roulette-case .reel-item.loss {
+	opacity: 0.5;
+}
+
+.roulette-case .reel-item.won {
+	height: 96px;
+    width: 90px;
+	padding: 0px 0px;
+}
+
+.roulette-case .reel-item .reel-content {
+	height: 100%;
+	width: 100%;
+	font-size: 20px;
+    font-weight: 400;
+    color: var(--foreground);
+	border-radius: 8px;
+}
+
+.roulette-case .reel-item.red .reel-content {
+    background-color: #ce4141; /* color */
+}
+
+.roulette-case .reel-item.green .reel-content {
+    background-color: #4ca04b; /* color */
+}
+
+.roulette-case .reel-item.black .reel-content {
+    background-color: #424750; /* color */
+}
+
+.roulette-history .item {
+	height: 40px;
+    width: 40px;
+	border-radius: 4px;
+}
+
+.roulette-history .item.red {
+    background-color: #ce4141; /* color */
+}
+
+.roulette-history .item.green {
+    background-color: #4ca04b; /* color */
+}
+
+.roulette-history .item.black {
+    background-color: #424750; /* color */
+}
+
+.roulette-history .item:not(.red):not(.black).bait {
+    background-color: var(--primary);
+}
+
+.roulette-case .pointer {
+	width: 3px;
+    background-color: var(--color-white);
+    height: 100%;
+    box-shadow: 0px 0px 15px var(--color-white);
+}
+
+#roulette_panel_red .roulette-bet {
+	background-color: #ce4141 !important; /* color */
+}
+
+#roulette_panel_red {
+	color: #ce4141; /* color */
+}
+
+#roulette_panel_green .roulette-bet {
+	background-color: #4ca04b !important; /* color */
+}
+
+#roulette_panel_green {
+	color: #4ca04b; /* color */
+}
+
+#roulette_panel_black .roulette-bet {
+	background-color: #424750 !important; /* color */
+}
+
+#roulette_panel_black {
+	color: #9d9d9d; /* color */
+}
+
+#roulette_panel_bait .roulette-bet {
+	background-color: var(--primary) !important;
+}
+
+#roulette_panel_bait {
+	color: var(--primary);
+}
+
+.roulette-betitem.stats-panel {
+	height: 50px;
+}
+
+.roulette-grid {
+	display: -ms-grid;
+    display: grid;
+	grid-template-columns: calc(40% - 10px) calc(20% - 10px) calc(40% - 10px);
+}
+
+#roulette_jackpot_greens .item {
+	height: 50px;
+    width: 50px;
+	border-radius: 4px;
+	background-color: #424750; /* color */
+}
+
+#roulette_jackpot_greens .item.active {
+	background-color: #4ca04b !important; /* color */
+}
+
+.roulette-jackpot {
+	filter: drop-shadow(0rem 5rem 10rem var(--color-success));
+}
+
+.roulette-jackpot-info .amount {
+	color: var(--color-success);
+	font-size: 26px;
+    font-weight: bold;
+    letter-spacing: 4px;
+}
+
+@media (max-width: 768px){
+	.roulette-grid {
+		grid-template-columns: 100% !important;
+	}
+
+	.roulette-grid .roulette-jackpot {
+		margin-top: 10px;
+		grid-row-start: 3;
+	}
+	.roulette-grid .roulette-tab {
+		-webkit-box-align: flex-start;
+		-ms-flex-align: flex-start;
+		align-items: flex-start;
+	}
+}
+
+/* SKELETON */
+
+.roulette-history .skeleton.item-box {
+    height: 40px;
+    width: 40px;
+    border-radius: 4px;
+}
+
+.roulette-jackpot .skeleton.item-box {
+    height: 50px;
+    width: 50px;
+    border-radius: 4px;
+}
+
+.roulette-jackpot .skeleton.amount-box {
+    height: 26px;
+    width: 150px;
+    border-radius: 4px;
+}
+
+.roulette-case .skeleton.reel-box {
+    height: 86px;
+    width: 100%;
+}
+
+/* END SKELETON */

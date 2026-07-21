@@ -1,0 +1,11 @@
+<div class="overflow-menu p-1 pointer">
+    <%- include('./icon.ejs', {
+        icon: 'ellipsis-h',
+        id: null,
+        className: 'text-muted-foreground size-3.5'
+    }); %>
+
+    <div class="overflow-menu-select transition duration-200">
+        <%- include('./overflowMenuPopover.ejs', { items }); %>
+    </div>
+</div>

@@ -1,0 +1,390 @@
+<div class="header">
+    <a href="/" class="logo flex justify-center items-center px-3 py-2 w-full">
+        <img src="/img/logo.png">
+    </a>
+
+    <div class="navigation flex flex-col">
+        <div class="top bg-background flex flex-row items-center justify-between px-4 py-2">
+            <div class="flex flex-row gap-4">
+                <a href="/affiliates" class="text-xs text-muted-foreground font-bold">Affiliates</a>
+                <a href="/fair" class="text-xs text-muted-foreground font-bold">Provably Fair</a>
+                <a href="/support" class="text-xs text-muted-foreground font-bold">Support</a>
+                <div class="text-xs text-muted-foreground font-bold pointer" data-modal="show" data-id="#modal_bonus_code">Bonus Code</div>
+            </div>
+
+            <div class="flex flex-row gap-4">
+                <a class="text-muted-foreground" href="<%= app.links.discord_server %>" target="_blank">
+                    <%- include('../components/icon.ejs', {
+                        icon: 'discord',
+                        className: 'size-3.5'
+                    }); %>
+                </a>
+
+                <a class="text-muted-foreground" href="<%= app.links.twitter_page %>" target="_blank">
+                    <%- include('../components/icon.ejs', {
+                        icon: 'twitter',
+                        className: 'size-3.5'
+                    }); %>
+                </a>
+
+                <a class="text-muted-foreground" href="<%= app.links.steam_group %>" target="_blank">
+                    <%- include('../components/icon.ejs', {
+                        icon: 'steam',
+                        className: 'size-3.5'
+                    }); %>
+                </a>
+            </div>
+        </div>
+
+        <div class="bottom flex flex-row items-center justify-between p-3">
+            <div class="flex flex-row justify-center gap-1 h-full">
+                <div class="games pointer">
+                    <button type="button" class="button p-2 h-full flex flex-row gap-2 items-center justify-center text-muted-foreground transition duration-200">
+                        <%- include('../components/icon.ejs', {
+                            icon: 'gamepad',
+                            className: 'size-5 transition duration-200'
+                        }); %>
+
+                        <span class="text-sm">Games</span>
+
+                        <%- include('../components/icon.ejs', {
+                            icon: 'chevron-down',
+                            className: 'size-3 transition duration-200'
+                        }); %>
+                    </button>
+
+                    <div class="select transition duration-200">
+                        <div class="list flex flex-col bg-secondary border-2 border-card rounded-2">
+                            <% settings.games.classic.forEach(function(item){ %>
+                                <a class="relative <% if(!item.enable && !account.permissions.play_disabled){ %>disabled<% } %>" href="/<%= item.game %>">
+                                    <div class="item <%= item.game %> text-foreground flex flex-row items-center gap-2 transition duration-200">
+                                        <%- include('../components/icon.ejs', {
+                                            icon: item.game,
+                                            className: 'size-5'
+                                        }); %>
+
+                                        <div class="flex flex-row items-center justify-between gap-2 w-full overflow-hidden">
+                                            <div class="flex flex-col justify-center gap-1 truncate">
+                                                <span class="text-xs font-bold"><%= item.name %></span>
+                                                <span class="text-2xs text-muted-foreground truncate"><%= item.description %></span>
+                                            </div>
+
+                                            <% if(item.hot){ %>
+                                                <div class="bg-danger bg-opacity-10 border-1 border-danger rounded-1 px-2 py-1 text-xs text-danger font-bold">Hot</div>
+                                            <% } else { %>
+                                                <div class="info bg-danger bg-opacity-10 border-1 border-danger rounded-1 px-2 py-1 text-xs text-danger font-bold">Disabled</div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </a>
+                            <% }); %>
+
+                            <% settings.games.original.forEach(function(item){ %>
+                                <a class="<% if(!item.enable && !account.permissions.play_disabled){ %>disabled<% } %>" href="/<%= item.game %>">
+                                    <div class="item flex flex-row items-center gap-2">
+                                        <%- include('../components/icon.ejs', {
+                                            icon: item.game,
+                                            className: 'size-5'
+                                        }); %>
+
+                                        <div class="flex flex-row items-center justify-between gap-2 w-full overflow-hidden">
+                                            <div class="flex flex-col justify-center gap-1 truncate">
+                                                <span class="text-xs font-bold"><%= item.name %></span>
+                                                <span class="text-2xs text-muted-foreground truncate"><%= item.description %></span>
+                                            </div>
+
+                                            <% if(item.hot){ %>
+                                                <div class="bg-danger bg-opacity-10 border-1 border-danger rounded-1 px-2 py-1 text-xs text-danger font-bold">Hot</div>
+                                            <% } else { %>
+                                                <div class="info bg-danger bg-opacity-10 border-1 border-danger rounded-1 px-2 py-1 text-xs text-danger font-bold">Disabled</div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </a>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+
+                <a class="h-full" href="/rewards">
+                    <button type="button" class="rewards <% if(page == 'rewards') { %>active<% } %> button p-2 h-full flex flex-row gap-2 items-center justify-center text-muted-foreground transition duration-200">
+                        <%- include('../components/icon.ejs', {
+                            icon: 'gift',
+                            className: 'size-5 transition duration-200'
+                        }); %>
+
+                        <span class="text-sm">Rewards</span>
+                    </button>
+                </a>
+
+                <a class="h-full" href="/leaderboard">
+                    <button type="button" class="leaderboard <% if(page == 'leaderboard') { %>active<% } %> button p-2 h-full flex flex-row gap-2 items-center justify-center text-muted-foreground transition duration-200">
+                        <%- include('../components/icon.ejs', {
+                            icon: 'trophy',
+                            className: 'size-5 transition duration-200'
+                        }); %>
+
+                        <span class="text-sm">Leaderboard</span>
+                    </button>
+                </a>
+            </div>
+
+            <% if(user){ %>
+                <div class="balances bg-card shadow-2 rounded-1 py-2 pl-4 pr-3 flex flex-row gap-2 items-center justify-center relative pointer h-full">
+                    <% if(page == 'casino' && app.paths.length > 2){ %>
+                        <div class="flex flex-row items-center justify-center gap-2">
+                            <%- include('../components/icon.ejs', {
+                                icon: 'diamond',
+                                className: 'text-primary size-5'
+                            }); %>
+
+                            <span class="amount">In play</span>
+                        </div>
+                    <% } else { %>
+                        <div class="balance flex flex-row items-center justify-center gap-2" data-type="total">
+                            <%- include('../components/icon.ejs', {
+                                icon: 'diamond',
+                                className: 'text-primary size-5'
+                            }); %>
+
+                            <span class="amount">0.00</span>
+                        </div>
+
+                        <%- include('../components/icon.ejs', {
+                            icon: 'chevron-down',
+                            className: 'text-muted-foreground size-3 transition duration-200'
+                        }); %>
+
+                        <div class="select transition duration-200">
+                            <div class="list flex flex-col bg-secondary border-2 border-card rounded-2">
+                                <div class="balance flex flex-row items-center justify-between gap-2 px-4 py-2 w-full" data-type="main" data-balance="0.00">
+                                    <div class="text-sm font-bold text-muted-foreground">Main</div>
+
+                                    <div class="flex flex-row items-center justify-center gap-1">
+                                        <%- include('../components/icon.ejs', {
+                                            icon: 'diamond',
+                                            className: 'text-primary size-5'
+                                        }); %>
+
+                                        <span class="amount">0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
+
+            <div class="flex flex-row justify-center gap-2 h-full">
+                <div class="flex flex-row justify-center gap-2 h-full">
+                    <a class="h-full" href="/deposit">
+                        <button type="button" class="button button-hover button-success shadow-2 p-2 h-full flex flex-row gap-2 items-center justify-center">
+                            <%- include('../components/icon.ejs', {
+                                icon: 'wallet',
+                                className: 'size-5'
+                            }); %>
+
+                            <span class="text-sm">Deposit</span>
+                        </button>
+                    </a>
+
+                    <a class="h-full" href="/withdraw">
+                        <button type="button" class="button button-hover button-card shadow-2 p-2 h-full flex flex-row gap-2 items-center justify-center">
+                            <%- include('../components/icon.ejs', {
+                                icon: 'upload',
+                                className: 'size-5'
+                            }); %>
+
+                            <span class="text-sm">Withdraw</span>
+                        </button>
+                    </a>
+                </div>
+
+                <div class="flex flex-row justify-center gap-2 h-full pl-2 border-l-2 border-accent">
+                    <% if(user) { %>
+
+                        <div class="user flex flex-row items-center justify-center gap-4 bg-card shadow-2 rounded-1 p-1 pr-3 h-full relative pointer">
+                            <div class="flex flex-row items-center justify-center gap-2 h-full">
+                                <img class="avatar" src="<%= user.avatar %>">
+
+                                <div class="name flex flex-col justify-center gap-1">
+                                    <div class="flex flex-row items-center gap-1">
+                                        <div class="text-primary" id="level_count">0</div>
+                                        <div class="truncate"><%= user.name %></div>
+                                    </div>
+
+                                    <div class="progress-container">
+                                        <div class="progress-bar transition duration-200 ease-linear" id="level_bar" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <%- include('../components/icon.ejs', {
+                                icon: 'chevron-down',
+                                className: 'text-muted-foreground size-3 transition duration-200'
+                            }); %>
+
+                            <div class="select transition duration-200">
+                                <div class="list flex flex-col bg-secondary border-2 border-card rounded-2">
+                                    <% if(settings.allowed.admin.includes(user.userid)) { %>
+                                        <a class="h-full" href="/admin" target="_blank">
+                                            <div class="item flex flex-row items-center gap-2 text-success">
+                                                <%- include('../components/icon.ejs', {
+                                                    icon: 'adjustments',
+                                                    className: 'size-4'
+                                                }); %>
+
+                                                <span>Admin Panel</span>
+                                            </div>
+                                        </a>
+                                    <% } %>
+
+                                    <a class="h-full" href="/account">
+                                        <div class="item flex flex-row items-center gap-2 text-muted-foreground">
+                                            <%- include('../components/icon.ejs', {
+                                                icon: 'user',
+                                                className: 'size-4'
+                                            }); %>
+
+                                            <span>Account</span>
+                                        </div>
+                                    </a>
+
+                                    <a class="h-full" href="/affiliates">
+                                        <div class="item flex flex-row items-center gap-2 text-muted-foreground">
+                                            <%- include('../components/icon.ejs', {
+                                                icon: 'share',
+                                                className: 'size-4'
+                                            }); %>
+
+                                            <span>Affiliates</span>
+                                        </div>
+                                    </a>
+
+                                    <a class="h-full" href="/account/games">
+                                        <div class="item flex flex-row items-center gap-2 text-muted-foreground">
+                                            <%- include('../components/icon.ejs', {
+                                                icon: 'clock',
+                                                className: 'size-4'
+                                            }); %>
+
+                                            <span>Games History</span>
+                                        </div>
+                                    </a>
+
+                                    <a class="h-full" href="/account/deposits">
+                                        <div class="item flex flex-row items-center gap-2 text-muted-foreground">
+                                            <%- include('../components/icon.ejs', {
+                                                icon: 'swap-horizontal-arrows',
+                                                className: 'size-4'
+                                            }); %>
+
+                                            <span>Balance History</span>
+                                        </div>
+                                    </a>
+
+                                    <a class="h-full" href="/account/settings">
+                                        <div class="item flex flex-row items-center gap-2 text-muted-foreground">
+                                            <%- include('../components/icon.ejs', {
+                                                icon: 'settings',
+                                                className: 'size-4'
+                                            }); %>
+
+                                            <span>Settings</span>
+                                        </div>
+                                    </a>
+
+                                    <a class="h-full" href="/account/security">
+                                        <div class="item flex flex-row items-center gap-2 text-muted-foreground">
+                                            <%- include('../components/icon.ejs', {
+                                                icon: 'lock',
+                                                className: 'size-4'
+                                            }); %>
+
+                                            <span>Security</span>
+                                        </div>
+                                    </a>
+
+                                    <div class="item flex flex-row items-center gap-2 text-danger border-t-2 border-card" data-modal="show" data-id="#modal_auth_logout">
+                                        <%- include('../components/icon.ejs', {
+                                                icon: 'log-out',
+                                                className: 'size-4'
+                                            }); %>
+
+                                        <span>Logout</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <a class="h-full" href="/login?returnUrl=/<%= app.paths.join('/') %>">
+                            <button type="button" class="button button-hover button-card shadow-2 h-full flex justify-center items-center">Sign In</button>
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="header mobile flex flex-row justify-between gap-2 px-4 py-2">
+    <a href="/" class="logo flex justify-start items-center h-full">
+        <img class="h-full" src="/img/logo_mini.png">
+    </a>
+
+    <div class="navigation flex flex-row items-center justify-end gap-2 h-full">
+        <% if(user) { %>
+            <div class="balances bg-card shadow-2 rounded-1 py-2 pl-4 pr-3 flex flex-row gap-2 items-center justify-center relative pointer h-full">
+                <% if(page == 'casino' && app.paths.length > 2){ %>
+                    <div class="flex flex-row items-center justify-center gap-2">
+                        <%- include('../components/icon.ejs', {
+                            icon: 'diamond',
+                            className: 'text-primary size-5'
+                        }); %>
+
+                        <span class="amount">In play</span>
+                    </div>
+                <% } else { %>
+                    <div class="balance flex flex-row items-center justify-center gap-2 h-full" data-type="total">
+                        <%- include('../components/icon.ejs', {
+                            icon: 'diamond',
+                            className: 'text-primary size-5'
+                        }); %>
+
+                        <span class="amount">0.00</span>
+                    </div>
+
+                    <%- include('../components/icon.ejs', {
+                        icon: 'chevron-down',
+                        className: 'text-muted-foreground size-3 transition duration-200'
+                    }); %>
+
+                    <div class="select transition duration-200">
+                        <div class="list flex flex-col bg-secondary border-2 border-card rounded-2">
+                            <div class="balance flex flex-row items-center justify-between gap-2 px-4 py-2 w-full" data-type="main" data-balance="0.00">
+                                <div class="text-sm font-bold text-muted-foreground">Main</div>
+
+                                <div class="flex flex-row items-center justify-center gap-1">
+                                    <%- include('../components/icon.ejs', {
+                                        icon: 'diamond',
+                                        className: 'text-primary size-5'
+                                    }); %>
+
+                                    <span class="amount">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+
+            <a class="user flex flex-row items-center justify-center pl-2 border-l-2 border-accent h-full" href="/account">
+                <img class="avatar" src="<%= user.avatar %>">
+            </a>
+        <% } else { %>
+            <a class="h-full" href="/login?returnUrl=/<%= app.paths.join('/') %>">
+                <button type="button" class="button button-hover button-card shadow-2 h-full flex justify-center items-center">Sign In</button>
+            </a>
+        <% } %>
+    </div>
+</div>

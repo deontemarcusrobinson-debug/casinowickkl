@@ -1,0 +1,35 @@
+<div class="table-row relative">
+    <div class="table-column text-left">
+        <%- include('./userField.ejs', { user }); %>
+    </div>
+
+    <div class="table-column text-left pointer" data-copy="text" data-text="<%= user.userid %>"><%= user.userid %></div>
+    <div class="table-column text-left pointer" data-copy="text" data-text="<%= code %>"><%= code %></div>
+    <div class="table-column text-left">
+        <div class="flex flex-row items-center justify-start gap-1">
+            <%- include('./icon.ejs', {
+                icon: 'diamond',
+                className: 'text-primary size-4'
+            }); %>
+
+            <span><%= earnings %></span>
+        </div>
+    </div>
+    <div class="table-column text-left"><%= created %></div>
+
+    <div class="table-column">
+        <div class="flex flex-row items-center justify-end">
+            <%- include('./overflowMenu.ejs', {
+                items: [
+                    {
+                        link: true,
+                        destructive: false,
+                        label: 'View referral',
+                        icon: 'eye',
+                        href: '/admin/referrals/' + user.userid
+                    }
+                ]
+            }); %>
+        </div>
+    </div>
+</div>

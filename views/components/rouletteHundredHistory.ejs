@@ -1,0 +1,27 @@
+<div class="flex flex-row items-center gap-2">
+    <div class="item <%= color %> shadow-2 flex row items-center">
+        <% if(color == 'bait'){ %>
+            <%- include('./icon.ejs', {
+                icon: 'flashbang',
+                className: 'opacity-70 text-foreground h-8/12 w-full'
+            }); %>
+        <% } else if(color == 'red'){ %>
+            <%- include('./icon.ejs', {
+                icon: 'counter-terrorist',
+                className: 'opacity-70 text-foreground h-8/12 w-full'
+            }); %>
+        <% } else if(color == 'black'){ %>
+            <%- include('./icon.ejs', {
+                icon: 'terrorist',
+                className: 'opacity-70 text-foreground h-8/12 w-full'
+            }); %>
+        <% } else if(color == 'green'){ %>
+            <%- include('./icon.ejs', {
+                icon: 'hat',
+                className: 'opacity-70 text-foreground h-8/12 w-full'
+            }); %>
+        <% } %>
+    </div>
+
+    <div class="text-lg font-bold" id="roulette_hundred_<%= color %>"><%= count %></div>
+</div>

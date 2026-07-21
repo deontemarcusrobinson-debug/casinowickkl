@@ -1,0 +1,114 @@
+<div class="flex flex-1 flex-col gap-4">
+	<div class="casino-banner">
+        <div class="slot flex flex-col items-start gap-2">
+            <div class="title font-bold text-danger">Slots & Live Casino</div>
+            <div class="description">Start Your Winning Journey!</div>
+        </div>
+    </div>
+
+    <div class="flex flex-1 flex-col gap-6">
+        <%- include('./components/tabsMenu.ejs', {
+            type: 'top',
+            items: [
+                {
+                    active: false,
+                    label: 'Lobby',
+                    href: '/casino/lobby'
+                },
+                {
+                    active: true,
+                    label: 'Slots',
+                    href: '/casino/slots'
+                },
+                {
+                    active: false,
+                    label: 'Live Games',
+                    href: '/casino/live'
+                },
+                {
+                    active: false,
+                    label: 'Recent Games',
+                    href: '/casino/recent'
+                },
+                {
+                    active: false,
+                    label: 'Favorites',
+                    href: '/casino/favorites'
+                },
+                {
+                    active: false,
+                    label: 'Providers',
+                    href: '/casino/providers'
+                }
+            ]
+        }); %>
+
+        <div class="flex flex-1 flex-col gap-2">
+            <div class="flex flex-row max-md:flex-col gap-1 max-md:gap-4">
+                <%- include('./components/inputs/inputGroup.ejs', {
+                    type: 'text',
+                    label: 'Search Game',
+                    id: 'casino_slots_games_search'
+                }); %>
+
+                <div class="flex flex-row gap-1">
+                    <%- include('./components/inputs/selectField.ejs', {
+                        type: 'bottom',
+                        label: 'Order by',
+                        id: 'casino_slots_games_order',
+                        items: [
+                            { name: 'Popularity', value: 0 },
+                            { name: 'Amount Won', value: 1 },
+                            { name: 'Name A-Z', value: 2 },
+                            { name: 'Name Z-A', value: 3 }
+                        ]
+                    }); %>
+
+                    <%- include('./components/inputs/selectField.ejs', {
+                        type: 'bottom',
+                        label: 'Provider',
+                        id: 'casino_slots_games_provider',
+                        items: [
+                            { name: 'All Providers', value: 'all' },
+                            ...response.casino.providers.map(a => ({
+                                name: a.name,
+                                value: a.id
+                            }))
+                        ]
+                    }); %>
+                </div>
+            </div>
+
+            <div class="flex flex-row items-center gap-2">
+                <%- include('./components/icon.ejs', {
+                    icon: 'slots',
+                    className: 'size-6'
+                }); %>
+
+                <span class="text-lg font-bold">Slots</span>
+            </div>
+
+            <div class="flex flex-col flex-1 gap-2">
+                <div class="casino-games flex-1 h-full" id="casino_slots_games">
+                    <% if(response.casino.slots.list.length > 0){ %>
+                        <% response.casino.slots.list.forEach(function(item){ %>
+                            <%- include('./components/casinoGame.ejs', item); %>
+                        <% }); %>
+                    <% } else { %>
+                        <%- include('./components/emptyState.ejs', {
+                            title: 'No games found'
+                        }); %>
+                    <% } %>
+                </div>
+
+                <div class="flex items-center justify-center bg-secondary p-2 border-t-2 border-card">
+                    <%- include('./components/pageStepper.ejs', {
+                        id: 'pagination_casino_slots_games',
+                        page: response.casino.slots.page,
+                        pages: response.casino.slots.pages
+                    }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

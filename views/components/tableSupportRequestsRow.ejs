@@ -1,0 +1,13 @@
+<div class="table-row">
+    <div class="table-column text-left">
+        <a class="underline" href="/support/requests/<%= id %>"><%= subject %></a>
+    </div>
+    <div class="table-column text-left"><%= { 0: 'General / Others', 1: 'Bug report', 2: 'Trade offer issue', 3: 'Improvements / Ideas', 4: 'Marketing / Partnership', 5: 'Ranking up' }[department] %></div>
+    <div class="table-column text-left"><%= created %></div>
+    <div class="table-column text-left"><%= updated %></div>
+    <div class="table-column">
+        <div class="flex flex-row justify-end">
+            <div class="<%= [ { 0: 'bg-success bg-opacity-50', 1: 'bg-success bg-opacity-50', 2: 'bg-warning bg-opacity-50' }[status], 'bg-info bg-opacity-50' ][closed] %> p-1 rounded-1"><%= [ { 0: 'Opened', 1: 'Opened', 2: 'Awaiting your reply' }[status], 'Solved' ][closed] %></div>
+        </div>
+    </div>
+</div>

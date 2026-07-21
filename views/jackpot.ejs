@@ -1,0 +1,93 @@
+<div class="flex flex-col gap-4">
+	<div class="progress-container meter small w-full">
+		<div class="progress-bar transition duration-1000 ease-linear" id="jackpot_counter" style="width: 100%"></div>
+		<div class="progress-content grid grid-cols-3 items-center gap-2 px-2">
+			<div class="text-left text-xs pointer font-bold fair-results" id="fair_jackpot_results" data-fair="{}">Provably fair</div>
+			<div class="text-center" id="jackpot_timer">Waiting for players...</div>
+		</div>
+	</div>
+
+	<%- include('./components/jackpotCaseSkeleton.ejs'); %>
+
+	<div class="flex flex-col gap-4">
+		<div class="flex flex-row max-md:flex-col gap-1 max-md:gap-4">
+            <div class="flex flex-col gap-2 w-full">
+                <%- include('./components/inputs/inputGroup.ejs', {
+                    type: 'text',
+                    label: 'Bet Amount',
+                    labelIcon: include('./components/icon.ejs', {
+                        icon: 'diamond',
+                        className: 'text-primary transition duration-200'
+                    }),
+                    id: 'betamount_jackpot',
+                    value: '1.00',
+                    attributes: [
+                        { name: 'data-amount', value: 'jackpot' },
+					    { name: 'inputmode', value: 'decimal' }
+                    ],
+                    addons: [			{
+                        addon: '<div class="flex flex-wrap flex-row justify-end gap-1">' +
+                            '<button class="button button-hover button-accent betshort_action" data-game="jackpot" data-action="clear">Clear</button>' +
+                            '<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="jackpot" data-action="1.00">+1.00</button>' +
+                            '<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="jackpot" data-action="10.00">+10.00</button>' +
+                            '<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="jackpot" data-action="100.00">+100.00</button>' +
+                            '<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="jackpot" data-action="half">1/2</button>' +
+                            '<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="jackpot" data-action="double">x2</button>' +
+                            '<button class="button button-hover button-accent betshort_action max-md:hidden" data-game="jackpot" data-action="max">Max</button>' +
+                            '<button class="button button-hover button-primary shadow-2 ml-1" id="jackpot_bet">Join</button>' +
+                        '</div>',
+                        align: 'end'
+                    }],
+                    errors: [ 'required', 'number', 'greater', 'lesser' ]
+                }); %>
+
+                <div class="flex flex-wrap flex-row gap-1 md:hidden">
+                    <button class="button button-hover button-accent betshort_action flex-1" data-game="jackpot" data-action="1.00">+1.00</button>
+                    <button class="button button-hover button-accent betshort_action flex-1" data-game="jackpot" data-action="10.00">+10.00</button>
+                    <button class="button button-hover button-accent betshort_action flex-1" data-game="jackpot" data-action="100.00">+100.00</button>
+                    <button class="button button-hover button-accent betshort_action flex-1" data-game="jackpot" data-action="half">1/2</button>
+                    <button class="button button-hover button-accent betshort_action flex-1" data-game="jackpot" data-action="double">x2</button>
+                    <button class="button button-hover button-accent betshort_action flex-1" data-game="jackpot" data-action="max">Max</button>
+                </div>
+            </div>
+
+            <div class="flex flex-row gap-1">
+                <div class="bg-card flex flex-row gap-4 items-center border-2 border-secondary rounded-2 px-4 py-2 w-full">
+                    <%- include('./components/icon.ejs', {
+                        icon: 'diamond',
+                        className: 'text-primary size-8'
+                    }); %>
+
+                    <div class="flex flex-col justify-center gap-1">
+                        <div class="text-base text-nowrap font-bold" id="jackpot_total">0.00</div>
+                        <div class="text-sm text-muted-foreground text-nowrap">Total amount</div>
+                    </div>
+                </div>
+
+                <div class="bg-card flex flex-row gap-4 items-center border-2 border-secondary rounded-2 px-4 py-2 w-full">
+                    <%- include('./components/icon.ejs', {
+                        icon: 'percent',
+                        className: 'text-primary size-8'
+                    }); %>
+
+                    <div class="flex flex-col justify-center gap-1">
+                        <div class="text-base text-nowrap font-bold" id="jackpot_mychange">0.00</div>
+                        <div class="text-sm text-muted-foreground text-nowrap">Your chance</div>
+                    </div>
+                </div>
+			</div>
+		</div>
+
+		<div class="jackpot-grid-bets bg-card rounded-1 p-1" id="jackpot_betlist">
+			<% for(var i = 0; i < 3; i++){ %>
+                <%- include('./components/jackpotBetSkeleton.ejs'); %>
+            <% } %>
+		</div>
+
+		<div class="flex flex-col gap-2" id="jackpot_histories">
+            <% for(var i = 0; i < 3; i++){ %>
+                <%- include('./components/jackpotHistorySkeleton.ejs'); %>
+            <% } %>
+        </div>
+	</div>
+</div>

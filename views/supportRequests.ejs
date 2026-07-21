@@ -1,0 +1,70 @@
+<div class="flex flex-col gap-4">
+    <div class="flex flex-row justify-start w-full">
+        <a href="/support">
+            <button class="button button-hover button-accent shadow-2 flex flex-row gap-2 items-center justify-center">
+                <%- include('./components/icon.ejs', {
+                    icon: 'undo',
+                    className: 'size-3.5'
+                }); %>
+
+                <span>Back</span>
+            </button>
+        </a>
+    </div>
+
+    <div class="flex flex-col gap-2">
+        <div class="flex flex-row gap-1">
+            <%- include('./components/inputs/inputGroup.ejs', {
+                type: 'text',
+                label: 'Search Request',
+                id: 'support_search'
+            }); %>
+
+            <div class="flex flex-row gap-1">
+                <%- include('./components/inputs/selectField.ejs', {
+                    type: 'bottom',
+                    label: 'Status',
+                    id: 'support_filter_status',
+                    items: [
+                        { name: 'Any', value: 0 },
+                        { name: 'Opened', value: 1 },
+                        { name: 'Awaiting your reply', value: 2 },
+                        { name: 'Solved', value: 3 }
+                    ]
+                }); %>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-row">
+                    <div class="table-column text-left">Subject</div>
+                    <div class="table-column text-left">Department</div>
+                    <div class="table-column text-left">Created</div>
+                    <div class="table-column text-left">Last Activity</div>
+                    <div class="table-column text-right">Status</div>
+                </div>
+            </div>
+            <div class="table-body" id="support_requests">
+                <% if(response.support.requests.list.length > 0){ %>
+                    <% response.support.requests.list.forEach(function(item){ %>
+                        <%- include('./components/tableSupportRequestsRow.ejs', item); %>
+                    <% }); %>
+                <% } else { %>
+                    <%- include('./components/emptyTable.ejs', {
+                        title: 'No requests found'
+                    }); %>
+                <% } %>
+            </div>
+            <div class="table-footer">
+                <div class="flex items-center justify-center bg-secondary p-2">
+                    <%- include('./components/pageNavigator.ejs', {
+                        id: 'pagination_support_requests',
+                        page: response.support.requests.page,
+                        pages: response.support.requests.pages
+                    }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

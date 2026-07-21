@@ -1,0 +1,109 @@
+<div class="bet-container flex justify-center">
+	<div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2">
+		<%- include('./components/inputs/inputGroup.ejs', {
+			type: 'text',
+			label: 'Bet Amount',
+			labelIcon: include('./components/icon.ejs', {
+				icon: 'diamond',
+				className: 'text-primary transition duration-200'
+			}),
+			id: 'betamount_minesweeper',
+			value: '1.00',
+			attributes: [
+				{ name: 'data-amount', value: 'minesweeper' },
+				{ name: 'inputmode', value: 'decimal' }
+			],
+			addons: [			{
+				addon: '<div class="flex flex-wrap flex-row justify-end gap-1">' +
+					'<button class="button button-hover button-accent betshort_action" data-game="minesweeper" data-action="half">1/2</button>' +
+					'<button class="button button-hover button-accent betshort_action" data-game="minesweeper" data-action="double">x2</button>' +
+					'<button class="button button-hover button-accent betshort_action" data-game="minesweeper" data-action="max">Max</button>' +
+				'</div>',
+				align: 'end'
+			}],
+			errors: [ 'required', 'number', 'greater', 'lesser' ]
+		}); %>
+
+		<%- include('./components/inputs/inputGroup.ejs', {
+            type: 'text',
+            label: 'Bombs Amount',
+            id: 'bombsamount_minesweeper',
+            value: '5',
+			attributes: [
+				{ name: 'inputmode', value: 'numeric' }
+			],
+            errors: [ 'required', 'number' ],
+			addons: [{
+				addon: '<div class="flex flex-wrap flex-row justify-end gap-1">' +
+					'<button class="button button-hover button-accent changeshort_action" data-id="#bombsamount_minesweeper" data-fixed="false" data-action="-1">-1</button>' +
+					'<button class="button button-hover button-accent changeshort_action" data-id="#bombsamount_minesweeper" data-fixed="false" data-action="1">+1</button>' +
+				'</div>',
+				align: 'end'
+			}]
+        }); %>
+
+		<div class="flex flex-row gap-2">
+			<button class="button button-hover button-accent minesweeper-bombsamount w-full" data-amount="1">1</button>
+			<button class="button button-hover button-accent minesweeper-bombsamount w-full" data-amount="3">3</button>
+			<button class="button button-hover button-accent minesweeper-bombsamount w-full active" data-amount="5">5</button>
+			<button class="button button-hover button-accent minesweeper-bombsamount w-full" data-amount="10">10</button>
+			<button class="button button-hover button-accent minesweeper-bombsamount w-full" data-amount="24">24</button>
+		</div>
+
+		<div class="bet-cashout bg-secondary rounded-2 border-2 border-card flex flex-row justify-between items-center gap-2 px-4 py-2 disabled">
+			<div class="flex flex-row items-center justify-center gap-1">
+				<%- include('./components/icon.ejs', {
+					icon: 'diamond',
+					className: 'text-primary size-4'
+				}); %>
+
+				<span>Cashout</span>
+			</div>
+
+			<div class="flex flex-col items-end justify-center gap-1">
+				<span class="amount" id="minesweeper_cashout_amount">0.00</span>
+
+				<div class="profit">
+					<span data-type="negative">-</span>
+					<span data-type="positive">+</span>
+
+					<span class="positive" id="minesweeper_cashout_profit">0.00</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="flex justify-center items-center">
+			<button class="button button-hover button-primary shadow-2 large w-full" id="minesweeper_bet">Place Bet</button>
+			<button class="button button-hover button-success shadow-2 large w-full hidden" id="minesweeper_cashout">Cashout</button>
+		</div>
+	</div>
+
+	<div class="flex justify-center items-center flex-col gap-4 bg-card bg-opacity-50 rounded-2">
+        <div class="minesweeper-wrapper flex justify-center items-center">
+            <div class="minesweeper-container flex justify-center items-center">
+                <div class="minesweeper-grid" id="minesweeper_bombs">
+                    <% for(var i = 0; i < 25; i++) { %>
+                    	<div class="item flex justify-center items-center rounded-2 w-full h-full relative transition duration-200 disabled" data-bomb="<%= i %>">
+							<%- include('./components/icon.ejs', {
+								icon: 'hat',
+								className: 'text-muted-foreground h-8/12 w-full transition duration-200'
+							}); %>
+
+							<%- include('./components/icon.ejs', {
+								icon: 'diamond',
+								className: 'text-foreground h-8/12 w-full transition duration-200'
+							}); %>
+
+							<%- include('./components/icon.ejs', {
+								icon: 'bomb',
+								className: 'text-foreground h-8/12 w-full transition duration-200'
+							}); %>
+
+							<div class="multiplier text-xs"></div>
+						</div>
+                    <% } %>
+                </div>
+            </div>
+		</div>
+	</div>
+</div>

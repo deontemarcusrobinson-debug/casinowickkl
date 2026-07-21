@@ -1,0 +1,16 @@
+<div class="flex flex-row items-center gap-2">
+    <% items.forEach(function(item, index){ %>
+        <% if(index < items.length - 1){ %>
+            <a class="underline" href="/admin/<%= items.slice(0, index + 1).map(a => a.page).join('/') %>">
+                <div class="font-bold text-sm"><%= item.name %></div>
+            </a>
+
+            <%- include('./icon.ejs', {
+                icon: 'chevron-right',
+                className: 'text-muted-foreground size-2.5'
+            }); %>
+        <% } else { %>
+            <div class="font-bold text-sm"><%= item.name %></div>
+        <% } %>
+    <% }); %>
+</div>

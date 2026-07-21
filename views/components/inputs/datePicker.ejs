@@ -1,0 +1,61 @@
+<%
+    function pad(s, n) {
+        return String(s).padStart(n, '0');
+    }
+
+    function toISO(d) {
+        return d.getFullYear() + '-' + pad(d.getMonth() + 1, 2) + '-' + pad(d.getDate(), 2);
+    }
+%>
+
+<div class="date-picker flex flex-col w-full <% if(typeof disabled !== 'undefined' && disabled) { %>disabled<% } %>">
+    <div class="date-wrapper flex flex-row items-center px-2 rounded-2 w-full transition duration-200 relative">
+        <div class="date-trigger flex flex-row items-center justify-between gap-2 w-full">
+            <div class="flex flex-1 flex-row items-center relative">
+                <% if(typeof label !== 'undefined'){ %>
+                    <div class="date-label-wrapper flex flex-row items-center gap-1 bg-card text-sm px-2 py-1 rounded-1 transition duration-200">
+                        <% if(typeof labelIcon !== 'undefined'){ %><%- labelIcon %><% } %>
+
+                        <div class="date-label truncate"><%= label %></div>
+                    </div>
+                <% } %>
+
+                <div class="flex flex-1 flex-row items-center">
+                    <div class="date-icon flex flex-row items-center">
+                        <%- include('../icon.ejs', {
+                            icon: 'calendar',
+                            id: null,
+                            className: 'size-3.5'
+                        }); %>
+                    </div>
+
+                    <div class="date-placeholder w-full truncate"><% if(typeof selected !== 'undefined' && selected != null){ %><%= [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ][new Date(selected).getMonth()].slice(0,3) + ' ' + new Date(selected).getDate() + ', ' + new Date(selected).getFullYear() %><% } %></div>
+                </div>
+            </div>
+
+            <%- include('../icon.ejs', {
+                icon: 'chevron-down',
+                id: null,
+                className: 'date-chevron size-2.5 transition duration-200'
+            }); %>
+        </div>
+
+        <input type="text" class="date-element w-full h-full <% if(typeof className !== 'undefined' && className != null){ %><%= className %><% } %>" <% if(typeof id !== 'undefined' && id != null) { %>id="<%= id %>"<% } %> <% if(typeof attributes !== 'undefined' && Array.isArray(attributes)){ %><%- attributes.map(a => a.name + '="' + a.value.toString().replace(/"/g, '&quot;') + '"').join(' ') %><% } %> <% if(typeof selected !== 'undefined' && selected != null) { %>value="<%= toISO(new Date(selected)) %>"<% } %>>
+
+        <div class="date-calendar transition duration-200 w-min max-md:w-full">
+            <%- include('./calendarField.ejs', {
+                id: null,
+                className: null,
+                attributes: null,
+                disabled: null,
+                selected: typeof selected !== 'undefined' && selected != null ? selected : null
+            }); %>
+        </div>
+    </div>
+
+    <div class="date-subscript px-1">
+        <% if(typeof errors !== 'undefined' && Array.isArray(errors)){ %>
+            <% if(errors.includes('required')) { %><div class="error text-danger text-xs" data-error="required">This field is required</div><% } %>
+        <% } %>
+    </div>
+</div>

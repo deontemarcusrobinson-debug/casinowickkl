@@ -1,0 +1,111 @@
+.minesweeper-wrapper {
+	height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+.minesweeper-container {
+	aspect-ratio: 1;
+    height: 100%;
+}
+
+.minesweeper-grid {
+	display: grid;
+	grid-gap: 0.75rem;
+	grid-template-columns: repeat(5, calc((100% - 4 * 0.75rem) / 5));
+	grid-template-rows: repeat(5, calc((100% - 4 * 0.75rem) / 5));
+    aspect-ratio: 1;
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.minesweeper-grid .item .multiplier {
+    font-weight: bold;
+	color: var(--foreground);
+	position: absolute;
+	bottom: 4%;
+	right: 8%;
+}
+
+.minesweeper-grid .item {
+	overflow: hidden;
+	background: var(--accent);
+	box-shadow: 0px 0.25rem color-mix(in oklab, var(--accent) 50%, transparent);
+	cursor: pointer;
+	top: 0px;
+}
+
+.minesweeper-grid .item:not(.danger):not(.success):hover {
+	top: -4px;
+}
+
+.minesweeper-grid .item:not(.danger):not(.success):hover .icon {
+	height: 70%;
+}
+
+.minesweeper-grid .item.danger {
+	background: var(--color-danger);
+	box-shadow: 0px 0.25rem color-mix(in oklab, var(--color-danger) 50%, transparent);
+}
+
+.minesweeper-grid .item.success {
+	background: var(--color-success);
+	box-shadow: 0px 0.25rem color-mix(in oklab, var(--color-success) 50%, transparent);
+}
+
+.minesweeper-grid .item.danger,
+.minesweeper-grid .item.success {
+	-webkit-animation: minesweeper-hit 200ms ease-in forwards;
+	-moz-animation: minesweeper-hit 200ms ease-in forwards;
+	-o-animation: minesweeper-hit 200ms ease-in forwards;
+	animation: minesweeper-hit 200ms ease-in forwards;
+}
+
+@keyframes minesweeper-hit {
+	0% { scale: 1; }
+	50% { scale: 1.1; }
+	100% { scale: 1; }
+}
+
+@-webkit-keyframes minesweeper-hit {
+	0% { scale: 1; }
+	50% { scale: 1.1; }
+	100% { scale: 1; }
+}
+
+.minesweeper-grid .item.danger .icon:nth-child(1),
+.minesweeper-grid .item.success .icon:nth-child(1) {
+	display: none;
+}
+
+.minesweeper-grid .item:not(.success) .icon:nth-child(2) {
+	display: none;
+}
+
+.minesweeper-grid .item:not(.danger) .icon:nth-child(3) {
+	display: none;
+}
+
+@media (min-width: 768px){
+	.minesweeper-container {
+		max-height: 80%;
+		max-width: 100%;
+	}
+}
+
+@media (max-width: 768px) {
+	.minesweeper-wrapper {
+        flex-grow: 1;
+	}
+
+    .minesweeper-container {
+		max-height: 100%;
+		max-width: 100%;
+        flex-grow: 1;
+	}
+
+	.minesweeper-grid .item .multiplier {
+		font-size: 8px;
+	}
+}

@@ -1,0 +1,3 @@
+{
+    "ignore": [ "package-lock.json", "package.json", "cache.json", "gulpfile.js", "manifest.json", "settings.json", "public/**/*.js", "assets/**/*.js", "scripts/*.js" ]
+}

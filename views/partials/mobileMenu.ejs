@@ -1,0 +1,143 @@
+<div class="pullout right h-full transition duration-500" data-id="menu">
+    <div class="pullout-content flex flex-col bg-secondary border-l-1 border-card h-full">
+        <div class="menu flex flex-col size-full overflow-auto">
+            <div class="flex flex-col gap-4 p-2">
+                <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 p-4">
+                    <div class="font-bold">Games</div>
+
+                    <div class="list flex flex-row flex-wrap gap-2">
+                        <% settings.games.classic.forEach(function(item){ %>
+                            <a class="item <% if(page == item.game){ %>active<% } %> <% if(!item.enable && !account.permissions.play_disabled){ %>disabled<% } %> flex flex-1 flex-row items-center gap-2 bg-accent bg-opacity-20 border-1 border-accent text-muted-foreground rounded-1 px-4 py-2" href="/<%= item.game %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: item.game,
+                                    className: 'size-4 transition duration-200'
+                                }); %>
+
+                                <span class="text-sm truncate"><%= item.name %></span>
+                            </a>
+                        <% }); %>
+                    </div>
+
+                    <div class="list flex flex-row flex-wrap gap-2">
+                        <% settings.games.original.forEach(function(item){ %>
+                            <a class="item <% if(page == item.game){ %>active<% } %> <% if(!item.enable && !account.permissions.play_disabled){ %>disabled<% } %> flex flex-1 flex-row items-center gap-2 bg-accent bg-opacity-20 border-1 border-accent text-muted-foreground rounded-1 px-4 py-2" href="/<%= item.game %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: item.game,
+                                    className: 'size-4 transition duration-200'
+                                }); %>
+
+                                <span class="text-sm truncate"><%= item.name %></span>
+                            </a>
+                        <% }); %>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 p-4">
+                    <div class="font-bold">Rewards</div>
+
+                    <div class="list flex flex-row flex-wrap gap-2">
+                        <a class="item <% if(page == 'rewards'){ %>active<% } %> flex flex-1 flex-row items-center gap-2 bg-accent bg-opacity-20 border-1 border-accent text-muted-foreground rounded-1 px-4 py-2" href="/rewards">
+                            <%- include('../components/icon.ejs', {
+                                icon: 'gift',
+                                className: 'size-4 transition duration-200'
+                            }); %>
+
+                            <span class="text-sm truncate">Rewards</span>
+                        </a>
+
+                        <div class="item flex flex-1 flex-row items-center gap-2 bg-accent bg-opacity-20 border-1 border-accent text-muted-foreground rounded-1 px-4 py-2" data-modal="show" data-id="#modal_bonus_code">
+                            <%- include('../components/icon.ejs', {
+                                icon: 'ticket',
+                                className: 'size-4 transition duration-200'
+                            }); %>
+
+                            <span class="text-sm truncate">Bonus Code</span>
+                        </div>
+
+                        <a class="item <% if(page == 'leaderboard'){ %>active<% } %> flex flex-1 flex-row items-center gap-2 bg-accent bg-opacity-20 border-1 border-accent text-muted-foreground rounded-1 px-4 py-2" href="/leaderboard">
+                            <%- include('../components/icon.ejs', {
+                                icon: 'trophy',
+                                className: 'size-4 transition duration-200'
+                            }); %>
+
+                            <span class="text-sm truncate">Leaderboard</span>
+                        </a>
+
+                        <a class="item <% if(page == 'withdraw'){ %>active<% } %> flex flex-1 flex-row items-center gap-2 bg-accent bg-opacity-20 border-1 border-accent text-muted-foreground rounded-1 px-4 py-2" href="/withdraw">
+                            <%- include('../components/icon.ejs', {
+                                icon: 'upload',
+                                className: 'size-4 transition duration-200'
+                            }); %>
+
+                            <span class="text-sm truncate">Withdraw</span>
+                        </a>
+
+                        <a class="item <% if(page == 'affiliates'){ %>active<% } %> flex flex-1 flex-row items-center gap-2 bg-accent bg-opacity-20 border-1 border-accent text-muted-foreground rounded-1 px-4 py-2" href="/affiliates">
+                            <%- include('../components/icon.ejs', {
+                                icon: 'share',
+                                className: 'size-4 transition duration-200'
+                            }); %>
+
+                            <span class="text-sm truncate">Affiliates</span>
+                        </a>
+                    </div>
+                </div>
+
+                <% if(user) { %>
+                    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 p-4">
+                        <div class="font-bold">Account</div>
+
+                        <div class="list flex flex-row flex-wrap gap-2">
+                            <a class="item <% if(page == 'account'){ %>active<% } %> flex flex-1 flex-row items-center gap-2 bg-accent bg-opacity-20 border-1 border-accent text-muted-foreground rounded-1 px-4 py-2" href="/account">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'user',
+                                    className: 'size-4 transition duration-200'
+                                }); %>
+
+                                <span class="text-sm truncate">Account</span>
+                            </a>
+
+                            <a class="item <% if(page == 'deposit'){ %>active<% } %> flex flex-1 flex-row items-center gap-2 bg-accent bg-opacity-20 border-1 border-accent text-muted-foreground rounded-1 px-4 py-2" href="/deposit">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'wallet',
+                                    className: 'size-4 transition duration-200'
+                                }); %>
+
+                                <span class="text-sm truncate">Deposit</span>
+                            </a>
+
+                            <a class="item <% if(page == 'fair'){ %>active<% } %> flex flex-1 flex-row items-center gap-2 bg-accent bg-opacity-20 border-1 border-accent text-muted-foreground rounded-1 px-4 py-2" href="/fair">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'shield',
+                                    className: 'size-4 transition duration-200'
+                                }); %>
+
+                                <span class="text-sm truncate">Provably Fair</span>
+                            </a>
+
+                            <% if(user && settings.allowed.admin.includes(user.userid)) { %>
+                                <a class="item admin <% if(page == 'admin'){ %>active<% } %> flex flex-1 flex-row items-center gap-2 bg-success bg-opacity-10 border-1 border-success text-success rounded-1 px-4 py-2" href="/admin" target="_blank">
+                                    <%- include('../components/icon.ejs', {
+                                        icon: 'adjustments',
+                                        className: 'size-4 transition duration-200'
+                                    }); %>
+
+                                    <span class="text-sm truncate">Admin Panel</span>
+                                </a>
+                            <% } %>
+
+                            <div class="item logout flex flex-1 flex-row items-center gap-2 bg-danger bg-opacity-10 border-1 border-danger text-danger rounded-1 px-4 py-2" data-modal="show" data-id="#modal_auth_logout">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'log-out',
+                                    className: 'size-4 transition duration-200'
+                                }); %>
+
+                                <span class="text-sm truncate">Logout</span>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>

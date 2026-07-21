@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS `users_history` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `userid` VARCHAR(36) BINARY NOT NULL,
+    `change` VARCHAR(32) NOT NULL,
+    `value` VARCHAR(2048) NOT NULL,
+    `time` BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `users_history` CHARACTER SET=utf8mb4, COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `users_history` CHANGE COLUMN `id` `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `users_history` CHANGE COLUMN `userid` `userid` VARCHAR(36) BINARY NOT NULL;
+ALTER TABLE `users_history` CHANGE COLUMN `change` `change` VARCHAR(32) NOT NULL;
+ALTER TABLE `users_history` CHANGE COLUMN `value` `value` VARCHAR(2048) NOT NULL;
+ALTER TABLE `users_history` CHANGE COLUMN `time` `time` BIGINT UNSIGNED NOT NULL;

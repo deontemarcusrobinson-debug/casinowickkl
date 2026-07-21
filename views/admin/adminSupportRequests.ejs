@@ -1,0 +1,72 @@
+<div class="flex flex-col gap-2">
+    <div class="flex flex-row max-md:flex-col gap-1 max-md:gap-4">
+        <%- include('../components/inputs/inputGroup.ejs', {
+            type: 'text',
+            label: 'Search Request',
+            id: 'admin_support_search'
+        }); %>
+
+        <div class="flex flex-row gap-1">
+            <%- include('../components/inputs/selectField.ejs', {
+                type: 'bottom',
+                label: 'Status',
+                id: 'admin_support_filter_status',
+                items: [
+                    { name: 'Any', value: 0 },
+                    { name: 'Opened', value: 1 },
+                    { name: 'Unsolved', value: 2 },
+                    { name: 'Answered', value: 3 },
+                    { name: 'Solved', value: 4 }
+                ]
+            }); %>
+
+            <%- include('../components/inputs/selectField.ejs', {
+                type: 'bottom',
+                label: 'Department',
+                id: 'admin_support_filter_department',
+                items: [
+                    { name: 'Any', value: 0 },
+                    { name: 'General / Others', value: 1 },
+                    { name: 'Bug report', value: 2 },
+                    { name: 'Trade offer issue', value: 3 },
+                    { name: 'Improvements / Ideas', value: 4 },
+                    { name: 'Marketing / Partnership', value: 5 },
+                    { name: 'Ranking up', value: 6 }
+                ]
+            }); %>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-row">
+                <div class="table-column text-left">Subject</div>
+                <div class="table-column text-left">Department</div>
+                <div class="table-column text-left">Created</div>
+                <div class="table-column text-left">Last Activity</div>
+                <div class="table-column text-left">Assigned To</div>
+                <div class="table-column text-right">Status</div>
+            </div>
+        </div>
+        <div class="table-body" id="admin_support_requests">
+            <% if(response.admin.support.requests.list.length > 0){ %>
+                <% response.admin.support.requests.list.forEach(function(item){ %>
+                    <%- include('../components/tableAdminSupportRequestsRow.ejs', item); %>
+                <% }); %>
+            <% } else { %>
+                <%- include('../components/emptyTable.ejs', {
+                    title: 'No requests found'
+                }); %>
+            <% } %>
+        </div>
+        <div class="table-footer">
+            <div class="flex items-center justify-center bg-secondary p-2">
+                <%- include('../components/pageNavigator.ejs', {
+                    id: 'pagination_admin_support_requests',
+                    page: response.admin.support.requests.page,
+                    pages: response.admin.support.requests.pages
+                }); %>
+            </div>
+        </div>
+    </div>
+</div>

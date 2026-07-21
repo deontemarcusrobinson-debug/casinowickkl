@@ -1,0 +1,49 @@
+<div class="table-row relative">
+    <div class="table-column text-left">#<%= id %></div>
+
+    <div class="table-column text-left">
+        <%- include('./userField.ejs', { user }); %>
+    </div>
+
+    <div class="table-column text-left"><%= amount %></div>
+    <div class="table-column text-left uppercase"><%= currency %></div>
+    <div class="table-column text-left"><%= date %></div>
+
+    <div class="table-column">
+        <div class="flex flex-row items-center justify-end">
+            <%- include('./overflowMenu.ejs', {
+                items: [
+                    {
+                        link: true,
+                        destructive: false,
+                        label: 'View user',
+                        icon: 'eye',
+                        href: '/admin/users/' + user.userid
+                    },
+                    {
+                        link: false,
+                        destructive: false,
+                        label: 'Confirm withdraw',
+                        icon: 'check',
+                        className: 'admin_trades_confirm',
+                        attributes: [
+                            { name: 'data-method', value: 'crypto' },
+                            { name: 'data-trade', value: id }
+                        ]
+                    },
+                    {
+                        link: false,
+                        destructive: true,
+                        label: 'Cancel withdraw',
+                        icon: 'close',
+                        className: 'admin_trades_cancel',
+                        attributes: [
+                            { name: 'data-method', value: 'crypto' },
+                            { name: 'data-trade', value: id }
+                        ]
+                    }
+                ]
+            }); %>
+        </div>
+    </div>
+</div>

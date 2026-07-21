@@ -1,0 +1,105 @@
+<div class="bet-container flex justify-center">
+	<div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2">
+		<%- include('./components/inputs/inputGroup.ejs', {
+			type: 'text',
+			label: 'Bet Amount',
+			labelIcon: include('./components/icon.ejs', {
+				icon: 'diamond',
+				className: 'text-primary transition duration-200'
+			}),
+			id: 'betamount_crash',
+			value: '1.00',
+			attributes: [
+				{ name: 'data-amount', value: 'crash' },
+				{ name: 'inputmode', value: 'decimal' }
+			],
+			addons: [			{
+				addon: '<div class="flex flex-wrap flex-row justify-end gap-1">' +
+					'<button class="button button-hover button-accent betshort_action" data-game="crash" data-action="half">1/2</button>' +
+					'<button class="button button-hover button-accent betshort_action" data-game="crash" data-action="double">x2</button>' +
+					'<button class="button button-hover button-accent betshort_action" data-game="crash" data-action="max">Max</button>' +
+				'</div>',
+				align: 'end'
+			}],
+			errors: [ 'required', 'number', 'greater', 'lesser' ]
+		}); %>
+
+        <%- include('./components/inputs/inputGroup.ejs', {
+            type: 'text',
+            label: 'Auto Cashout (0 = disabled)',
+            id: 'betauto_crash',
+            value: '2.00',
+			attributes: [
+				{ name: 'inputmode', value: 'decimal' }
+			],
+            errors: [ 'required', 'number' ],
+			addons: [{
+				addon: '<div class="flex flex-wrap flex-row justify-end gap-1">' +
+					'<button class="button button-hover button-accent changeshort_action" data-id="#betauto_crash" data-fixed="true" data-action="-1.00">-1.00</button>' +
+					'<button class="button button-hover button-accent changeshort_action" data-id="#betauto_crash" data-fixed="true" data-action="1.00">+1.00</button>' +
+				'</div>',
+				align: 'end'
+			}]
+        }); %>
+
+		<div class="bet-cashout bg-secondary rounded-2 border-2 border-card flex flex-row justify-between items-center gap-2 px-4 py-2 disabled">
+			<div class="flex flex-row items-center justify-center gap-1">
+				<%- include('./components/icon.ejs', {
+					icon: 'diamond',
+					className: 'text-primary size-4'
+				}); %>
+
+				<span>Cashout</span>
+			</div>
+
+			<div class="flex flex-col items-end justify-center gap-1">
+				<span class="amount" id="crash_cashout_amount">0.00</span>
+
+				<div class="profit">
+					<span data-type="negative">-</span>
+					<span data-type="positive">+</span>
+
+					<span class="positive" id="crash_cashout_profit">0.00</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="flex justify-center items-center">
+			<button class="button button-hover button-primary shadow-2 large w-full" id="crash_bet">Place Bet</button>
+			<button class="button button-hover button-success shadow-2 large w-full hidden" id="crash_cashout">Cashout</button>
+		</div>
+
+		<div class="table-container h-full">
+			<div class="table-header">
+				<div class="table-row">
+					<div class="table-column text-left">User</div>
+					<div class="table-column text-left">@</div>
+					<div class="table-column text-left">Bet</div>
+					<div class="table-column text-left">Profit</div>
+				</div>
+			</div>
+
+			<div class="table-body bg-card h-full" id="crash_betlist">
+				<% for(var i = 0; i < 3; i++){ %>
+                    <%- include('./components/crashBetSkeleton.ejs'); %>
+                <% } %>
+			</div>
+		</div>
+	</div>
+
+	<div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2">
+		<div class="flex flex-row justify-between items-center gap-2">
+			<div class="crash-history flex flex-row gap-1" id="crash_history">
+                <% for(var i = 0; i < 20; i++){ %>
+                    <%- include('./components/crashHistorySkeleton.ejs'); %>
+                <% } %>
+            </div>
+
+			<button class="button button-hover button-accent shadow-2" data-modal="show" data-id="#modal_fair_crash">Provably fair</button>
+		</div>
+
+		<%- include('./components/crashGraphSkeleton.ejs'); %>
+
+    	<script nonce="<%= nonce %>" type="text/javascript" src="/js/graph.<%= manifest.graph_js_version %>.js"></script>
+	</div>
+</div>

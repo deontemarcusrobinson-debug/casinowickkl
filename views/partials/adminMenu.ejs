@@ -1,0 +1,200 @@
+<div class="slider left flex flex-row items-center justify-center bg-card border-1 border-l-0 border-accent p-3 pointer" data-pullout="admin">
+    <%- include('../components/icon.ejs', {
+        icon: 'menu',
+        className: 'text-muted-foreground size-4'
+    }); %>
+</div>
+
+<div class="pullout left h-full transition duration-500" data-id="admin">
+    <div class="pullout-content flex flex-col bg-secondary border-r-1 border-card h-full">
+        <div class="flex flex-col size-full overflow-auto">
+            <div class="flex flex-col gap-6 py-2 px-4">
+                <div class="flex flex-col gap-2">
+                    <div class="text-sm text-muted-foreground font-bold">Overview</div>
+
+                    <div class="flex flex-col gap-1">
+                        <a href="/admin/dashboard">
+                            <div class="item text-base flex flex-row items-center gap-2 rounded-2 p-2 <% if(app.paths[1] == 'dashboard') { %>active<% } %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'overview',
+                                    className: 'size-4'
+                                }); %>
+
+                                <span>Dashboard</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <div class="text-sm text-muted-foreground font-bold">User Management</div>
+
+                    <div class="flex flex-col gap-1">
+                        <a href="/admin/users">
+                            <div class="item text-base flex flex-row items-center gap-2 rounded-2 p-2 <% if(app.paths[1] == 'users') { %>active<% } %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'users',
+                                    className: 'size-4'
+                                }); %>
+
+                                <span>Users</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <div class="text-sm text-muted-foreground font-bold">Payments</div>
+
+                    <div class="flex flex-col gap-1">
+                        <a href="/admin/payments">
+                            <div class="item text-base flex flex-row items-center gap-2 rounded-2 p-2 <% if(app.paths[1] == 'payments') { %>active<% } %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'swap-horizontal-arrows',
+                                    className: 'size-4'
+                                }); %>
+
+                                <span>Payments</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <div class="text-sm text-muted-foreground font-bold">Store</div>
+
+                    <div class="flex flex-col gap-1">
+                        <a href="/admin/paypal">
+                            <div class="item text-base flex flex-row items-center gap-2 rounded-2 p-2 <% if(app.paths[1] == 'paypal') { %>active<% } %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'wallet',
+                                    className: 'size-4'
+                                }); %>
+
+                                <span>Connect PayPal</span>
+                            </div>
+                        </a>
+
+                        <a href="/admin/invoices">
+                            <div class="item text-base flex flex-row items-center gap-2 rounded-2 p-2 <% if(app.paths[1] == 'invoices') { %>active<% } %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'inbox',
+                                    className: 'size-4'
+                                }); %>
+
+                                <span>Customer In Game Invoices</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <div class="text-sm text-muted-foreground font-bold">Games</div>
+
+                    <div class="flex flex-col gap-1">
+                        <a href="/admin/games">
+                            <div class="item text-base flex flex-row items-center gap-2 rounded-2 p-2 <% if(app.paths[1] == 'games') { %>active<% } %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'kind',
+                                    className: 'size-4'
+                                }); %>
+
+                                <span>Games</span>
+                            </div>
+                        </a>
+
+                        <a href="/admin/gamebots">
+                            <div class="item text-base flex flex-row items-center gap-2 rounded-2 p-2 <% if(app.paths[1] == 'gamebots') { %>active<% } %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'bot',
+                                    className: 'size-4'
+                                }); %>
+
+                                <span>Game Bots</span>
+                            </div>
+                            </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <div class="text-sm text-muted-foreground font-bold">Rewards</div>
+
+                    <div class="flex flex-col gap-1">
+                        <a href="/admin/bonuscodes">
+                            <div class="item text-base flex flex-row items-center gap-2 rounded-2 p-2 <% if(app.paths[1] == 'bonuscodes') { %>active<% } %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'percent',
+                                    className: 'size-4'
+                                }); %>
+
+                                <span>Bonus Codes</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <div class="text-sm text-muted-foreground font-bold">Affiliates</div>
+
+                    <div class="flex flex-col gap-1">
+                        <a href="/admin/referrals">
+                            <div class="item text-base flex flex-row items-center gap-2 rounded-2 p-2 <% if(app.paths[1] == 'referrals') { %>active<% } %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'share',
+                                    className: 'size-4'
+                                }); %>
+
+                                <span>Referrals</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <div class="text-sm text-muted-foreground font-bold">Support</div>
+
+                    <div class="flex flex-col gap-1">
+                        <a href="/admin/support">
+                            <div class="item text-base flex flex-row items-center gap-2 rounded-2 p-2 <% if(app.paths[1] == 'support') { %>active<% } %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'ticket',
+                                    className: 'size-4'
+                                }); %>
+
+                                <span>Support Requests</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <div class="text-sm text-muted-foreground font-bold">System</div>
+
+                    <div class="flex flex-col gap-1">
+                        <a href="/admin/authentication">
+                            <div class="item text-base flex flex-row items-center gap-2 rounded-2 p-2 <% if(app.paths[1] == 'authentication') { %>active<% } %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'lock',
+                                    className: 'size-4'
+                                }); %>
+
+                                <span>Authentication</span>
+                            </div>
+                        </a>
+
+                        <a href="/admin/settings">
+                            <div class="item text-base flex flex-row items-center gap-2 rounded-2 p-2 <% if(app.paths[1] == 'settings') { %>active<% } %>">
+                                <%- include('../components/icon.ejs', {
+                                    icon: 'admin',
+                                    className: 'size-4'
+                                }); %>
+
+                                <span>Settings</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

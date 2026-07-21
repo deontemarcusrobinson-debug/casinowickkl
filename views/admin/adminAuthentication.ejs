@@ -1,0 +1,25 @@
+<div class="flex flex-col gap-2">
+    <div class="flex flex-col items-start gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Alt Logins</div>
+
+            <div class="text-muted-foreground">Toggle to enable or disable the alternative login methods.</div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <% response.admin.links.forEach(function(item){ %>
+                <div class="flex flex-row items-center gap-2">
+                    <%- include('../components/inputs/switchField.ejs', {
+                        className: 'admin_switch_settings',
+                        attributes: [
+                            { name: 'data-settings', value: 'server_auth_' + item.provider + '_enable' }
+                        ],
+                        checked: item.enable
+                    }); %>
+
+                    <div class="text-sm text-muted-foreground"><%= item.name %> Login</div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+</div>

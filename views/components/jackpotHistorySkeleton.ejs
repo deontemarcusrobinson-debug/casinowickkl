@@ -1,0 +1,12 @@
+<div class="jackpot_historyitem bg-card flex flex-col gap-1 rounded-1 p-1">
+    <div class="flex justify-between items-center gap-2 p-2" style="background: #BBBBD240;">
+        <div class="skeleton skeleton-card text-large-box"></div>
+        <div class="bg-secondary py-1 px-2 rounded-1 pointer font-bold">Provably Fair</div>
+    </div>
+
+    <div class="jackpot-grid-bets bg-card rounded-1" id="jackpot_betlist">
+        <% for(var i = 0; i < 3; i++){ %>
+            <%- include('./jackpotBetSkeleton.ejs'); %>
+        <% } %>
+    </div>
+</div>

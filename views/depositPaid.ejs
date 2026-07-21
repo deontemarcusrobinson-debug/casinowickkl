@@ -1,0 +1,46 @@
+<div class="flex flex-col items-center gap-4">
+    <div class="flex flex-col gap-4 w-6/12 max-md:w-full bg-card bg-opacity-50 rounded-2 border-2 border-primary p-6 text-center">
+        <div class="flex items-center justify-center size-16 rounded-full bg-primary bg-opacity-20 mx-auto">
+            <%- include('./components/icon.ejs', {
+                icon: 'check',
+                className: 'text-primary size-8'
+            }); %>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <div class="text-2xl font-bold text-primary">Payment successful</div>
+            <div class="text-sm text-muted-foreground">
+                Your payment was verified with PayPal on our servers. Coins have been added to your balance.
+            </div>
+        </div>
+
+        <% if(response.deposit.verified){ %>
+            <div class="text-xs font-bold text-primary">Verified by PayPal Orders API</div>
+        <% } %>
+
+        <div class="flex flex-col gap-1 bg-secondary border-1 border-card rounded-2 p-4">
+            <div class="text-xs text-muted-foreground uppercase tracking-wide">Amount paid</div>
+            <div class="flex flex-row items-center justify-center gap-2">
+                <%- include('./components/icon.ejs', {
+                    icon: 'diamond',
+                    className: 'text-primary size-6'
+                }); %>
+                <span class="text-3xl font-bold"><%= Number(response.deposit.amount || 0).toFixed(2) %></span>
+            </div>
+            <div class="text-xs text-muted-foreground"><%= String(response.deposit.currency || 'usd').toUpperCase() %> · PayPal</div>
+        </div>
+
+        <% if(response.deposit.order_id){ %>
+            <div class="text-xs text-muted-foreground">Order <%= response.deposit.order_id %></div>
+        <% } %>
+
+        <div class="flex flex-row flex-wrap gap-2 justify-center">
+            <a href="/">
+                <button type="button" class="button button-hover button-primary shadow-2 large">Continue playing</button>
+            </a>
+            <a href="/deposit">
+                <button type="button" class="button button-hover button-card shadow-2 large">Make another deposit</button>
+            </a>
+        </div>
+    </div>
+</div>

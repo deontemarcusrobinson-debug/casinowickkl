@@ -1,0 +1,18 @@
+﻿GOLDWITCH — FULL UPLOAD (IMPORTANT)
+
+Your last GitHub upload ONLY had root files (app.js, package.json…).
+That is why Render crashed: missing lib/, views/, public/, services/, etc.
+
+HOW TO UPLOAD CORRECTLY
+1. Delete EVERYTHING currently in the GitHub repo (or make a new empty repo).
+2. On your PC open: C:\Users\User\Downloads\goldwitch-render
+3. Select ALL folders AND files inside (Ctrl+A).
+4. Drag them into GitHub → Add file → Upload files.
+5. You MUST see folders on GitHub: lib, views, public, services, config, routes, sql, docker, …
+6. On Render → Settings → set:
+   Build Command: npm install --omit=dev
+   Start Command: npm start
+7. Redeploy.
+
+OR use the zip: C:\Users\User\Downloads\goldwitch-render.zip
+(Unzip first, then upload the unzipped folders — do not upload the zip as the only file.)

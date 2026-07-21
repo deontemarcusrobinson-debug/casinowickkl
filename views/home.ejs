@@ -1,0 +1,320 @@
+<div class="home-container flex flex-col justify-center gap-8">
+    <div class="flex flex-row max-md:flex-col gap-4">
+        <% if(user){ %>
+            <div class="welcome-card bg-card flex flex-row gap-8 rounded-2 relative w-full">
+                <div class="info flex flex-1 flex-col justify-center gap-4">
+                    <div class="flex flex-row items-center gap-2">
+                        <img class="avatar rounded-full" src="<%= response.home.user.avatar %>">
+
+                        <div class="flex flex-col gap-1">
+                            <div class="text-sm text-muted-foreground truncate">Welcome Back</div>
+                            <div class="text-xl font-bold truncate"><%= response.home.user.name %></div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-2 w-full">
+                        <div class="flex flex-row items-center justify-between gap-2">
+                            <span class="text-xs font-bold">Lvl. <%= Math.min(response.home.user.level.level + 1, 100) - 1 %></span>
+                            <span class="text-xs font-bold">Lvl. <%= Math.min(response.home.user.level.level + 1, 100) %></span>
+                        </div>
+
+                        <div class="progress-container flex-1 rounded-2">
+                            <% var style = 'style="width: ' + response.home.user.level.progress + '%;"'; %>
+
+                            <div class="progress-bar transition duration-200 ease-linear rounded-1" <%- style %>></div>
+                        </div>
+
+                        <div class="flex flex-row items-center gap-1 text-2xs text-muted-foreground w-full">
+                            <span>XP</span>
+                            <span><%= response.home.user.level.have %></span>
+                            <span>/</span>
+                            <span><%= response.home.user.level.next %></span>
+                        </div>
+                    </div>
+
+                    <a href="/rewards"><button class="button button-hover button-success shadow-2">Explore Rewards</button></a>
+                </div>
+
+                <div class="video">
+                    <video id="welcome_character_video" autoplay muted loop playsinline preload="auto" disablepictureinpicture>
+                        <source type="video/webm" src="/videos/character.webm">
+                    </video>
+                </div>
+                <script nonce="<%= nonce %>">
+                    (function () {
+                        var v = document.getElementById('welcome_character_video');
+                        if (!v) return;
+                        v.muted = true;
+                        v.playsInline = true;
+                        var tryPlay = function () {
+                            var p = v.play();
+                            if (p && typeof p.catch === 'function') p.catch(function () {});
+                        };
+                        tryPlay();
+                        v.addEventListener('loadeddata', tryPlay);
+                        document.addEventListener('visibilitychange', function () {
+                            if (!document.hidden) tryPlay();
+                        });
+                    })();
+                </script>
+            </div>
+        <% } else { %>
+            <div class="welcome-card bg-card flex flex-row gap-8 rounded-2 relative w-full">
+                <div class="info flex flex-1 flex-col justify-center gap-4">
+                    <div class="text-3xl font-bold">Welcome to <span class="text-primary"><%= app.abbreviation %></span></div>
+
+                    <div class="text-sm text-muted-foreground">Ready to be part of the best casino website? Dive in and start playing our games today!</div>
+
+                    <a href="/login"><button class="button button-hover button-success shadow-2">Sign In</button></a>
+                </div>
+
+                <div class="image">
+                    <img src="/img/character.png">
+                </div>
+            </div>
+        <% } %>
+
+        <div class="carousel-card rounded-2 w-full">
+            <div class="carousel rounded-2 h-full">
+                <div class="content h-full w-full">
+                    <div class="action flex flex-row gap-2 bg-secondary p-2 rounded-4">
+                        <div class="item active rounded-full transition duration-200" data-page="crypto"></div>
+                        <div class="item rounded-full transition duration-200" data-page="affiliates"></div>
+                        <div class="item rounded-full transition duration-200" data-page="discord"></div>
+                    </div>
+
+                    <div class="list h-full w-full">
+                        <a class="item px-8 py-6 active" href="/deposit" data-page="crypto">
+                            <img src="/img/carousel/crypto.jpg">
+
+                            <div class="flex flex-col items-start gap-6">
+                                <div class="badge badge-primary text-xs font-bold uppercase px-4 py-2 rounded-1">Crypto Deposits</div>
+
+                                <div class="flex flex-col gap-1">
+                                    <div class="title text-4xl font-bold uppercase">No fiat?</div>
+                                    <div class="title text-4xl font-bold uppercase">No problem</div>
+                                </div>
+
+                                <div class="description text-sm text-muted-foreground font-bold">We are offering more than <span class="text-foreground font-bold">10+</span> crypto currencies as our deposit method.</div>
+                            </div>
+                        </a>
+
+                        <a class="item px-8 py-6" href="/affiliates" data-page="affiliates">
+                            <img src="/img/carousel/affiliates.jpg">
+
+                            <div class="flex flex-col items-start gap-6">
+                                <div class="badge badge-primary text-xs font-bold uppercase px-4 py-2 rounded-1">Affiliates</div>
+
+                                <div class="flex flex-col gap-1">
+                                    <div class="title text-3xl font-bold uppercase">Playing big?</div>
+                                    <div class="title text-3xl font-bold uppercase">Get rewarded big</div>
+                                </div>
+
+                                <div class="description text-sm text-muted-foreground font-bold">We give up to <span class="text-foreground font-bold"><%= response.home.affiliates.earnings.wager %>% earnings</span> of your friends bets and up to <span class="text-foreground font-bold"><%= response.home.affiliates.earnings.deposit %>% earnings</span> of your friends deposits!</div>
+                            </div>
+                        </a>
+
+                        <a class="item px-8 py-6" href="<%= app.links.discord_server %>" data-page="discord">
+                            <img src="/img/carousel/discord.jpg">
+
+                            <div class="flex flex-col items-start gap-6">
+                                <div class="badge badge-primary text-xs font-bold uppercase px-4 py-2 rounded-1">Join our Discord</div>
+
+                                <div class="flex flex-col gap-1">
+                                    <div class="title text-2xl font-bold uppercase">Not in our Discord?</div>
+                                    <div class="title text-2xl font-bold uppercase">Join the party!</div>
+                                </div>
+
+                                <div class="description text-sm text-muted-foreground font-bold">Giveaways, exclusive perks, news, don't miss the best and be part of the full experience!</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<div class="flex flex-col gap-8">
+        <% if(user && response.home.games.recent.length > 0){ %>
+            <div class="section flex flex-col gap-2">
+                <div class="flex flex-row justify-between items-center gap-2">
+                    <div class="flex flex-col gap-1">
+                        <div class="text-lg font-bold">Recent Games</div>
+                        <div class="text-xs text-muted-foreground">Play again your favorite games!</div>
+                    </div>
+
+                    <div class="flex flex-row items-center gap-1">
+                        <button class="action button button-hover button-accent shadow-2" data-type="left">
+                            <%- include('./components/icon.ejs', {
+                                icon: 'chevron-left',
+                                className: 'size-3'
+                            }); %>
+                        </button>
+
+                        <button class="action button button-hover button-accent shadow-2" data-type="right">
+                            <%- include('./components/icon.ejs', {
+                                icon: 'chevron-right',
+                                className: 'size-3'
+                            }); %>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="swiper">
+                    <div class="home-games list flex flex-row transition duration-500">
+                        <% response.home.games.recent.forEach(function(item){ %>
+                            <% if(item.category == 'casino') { %>
+                                <%- include('./components/homeCasinoGame.ejs', { ...item, ...{
+                                    enable: item.enable && (settings.games.classic.find(a => a.game == 'casino').enable || account.permissions.play_disabled)
+                                } }); %>
+                            <% } else %>
+                            <% if(item.category == 'original') { %>
+                                <%- include('./components/homeOriginalGame.ejs', { ...item, ...{
+                                    enable: item.enable || account.permissions.play_disabled
+                                } }); %>
+                            <% } %>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+
+        <div class="section flex flex-col gap-2">
+            <div class="flex flex-row justify-between items-center gap-2">
+                <div class="flex flex-col gap-1">
+                    <div class="text-lg font-bold">Slots</div>
+                    <div class="text-xs text-muted-foreground">Enjoy slot games at the comforts of your home!</div>
+                </div>
+
+                <div class="flex flex-row items-center gap-2">
+                    <% if(settings.games.classic.find(a => a.game == 'casino').enable || account.permissions.play_disabled){ %>
+                        <a href="/casino/slots"><button class="button button-hover button-accent shadow-2">View All</button></a>
+                    <% } %>
+
+                    <div class="flex flex-row items-center gap-1">
+                        <button class="action button button-hover button-accent shadow-2" data-type="left">
+                            <%- include('./components/icon.ejs', {
+                                icon: 'chevron-left',
+                                className: 'size-3'
+                            }); %>
+                        </button>
+
+                        <button class="action button button-hover button-accent shadow-2" data-type="right">
+                            <%- include('./components/icon.ejs', {
+                                icon: 'chevron-right',
+                                className: 'size-3'
+                            }); %>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="swiper">
+                <div class="home-games list flex flex-row transition duration-500">
+                    <% response.home.games.slots.forEach(function(item){ %>
+                        <%- include('./components/homeCasinoGame.ejs', { ...item, ...{
+                            enable: item.enable && (settings.games.classic.find(a => a.game == 'casino').enable || account.permissions.play_disabled)
+                        } }); %>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+
+        <div class="section flex flex-col gap-2">
+            <div class="flex flex-row justify-between items-center gap-2">
+                <div class="flex flex-col gap-1">
+                    <div class="text-lg font-bold">Live Games</div>
+                    <div class="text-xs text-muted-foreground">Enjoy live games at the comforts of your home!</div>
+                </div>
+
+                <div class="flex flex-row items-center gap-2">
+                    <% if(settings.games.classic.find(a => a.game == 'casino').enable || account.permissions.play_disabled){ %>
+                        <a href="/casino/live"><button class="button button-hover button-accent shadow-2">View All</button></a>
+                    <% } %>
+
+                    <div class="flex flex-row items-center gap-1">
+                        <button class="action button button-hover button-accent shadow-2" data-type="left">
+                            <%- include('./components/icon.ejs', {
+                                icon: 'chevron-left',
+                                className: 'size-3'
+                            }); %>
+                        </button>
+
+                        <button class="action button button-hover button-accent shadow-2" data-type="right">
+                            <%- include('./components/icon.ejs', {
+                                icon: 'chevron-right',
+                                className: 'size-3'
+                            }); %>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="swiper">
+                <div class="home-games list flex flex-row transition duration-500">
+                    <% response.home.games.live.forEach(function(item){ %>
+                        <%- include('./components/homeCasinoGame.ejs', { ...item, ...{
+                            enable: item.enable && (settings.games.classic.find(a => a.game == 'casino').enable || account.permissions.play_disabled)
+                        } }); %>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+
+        <div class="section flex flex-col gap-2">
+            <div class="flex flex-row justify-start items-center gap-2">
+                <div class="flex flex-col gap-1">
+                    <div class="text-lg font-bold">Originals</div>
+                    <div class="text-xs text-muted-foreground">Play one of our original games!</div>
+                </div>
+            </div>
+
+            <div class="home-games">
+                <% response.home.games.original.forEach(function(item){ %>
+                    <%- include('./components/homeOriginalGame.ejs', { ...item, ...{
+                        enable: item.enable || account.permissions.play_disabled
+                    } }); %>
+                <% }); %>
+            </div>
+        </div>
+
+        <div class="section flex flex-col gap-2">
+            <div class="flex flex-row justify-between items-center gap-2">
+                <div class="flex flex-col gap-1">
+                    <div class="text-lg font-bold">Providers</div>
+                    <div class="text-xs text-muted-foreground">Explore our vast collection of thrilling casino games from renowned providers!</div>
+                </div>
+
+                <div class="flex flex-row items-center gap-2">
+                    <% if(settings.games.classic.find(a => a.game == 'casino').enable || account.permissions.play_disabled){ %>
+                        <a href="/casino/providers"><button class="button button-hover button-accent shadow-2">View All</button></a>
+                    <% } %>
+
+                    <div class="flex flex-row items-center gap-1">
+                        <button class="action button button-hover button-accent shadow-2" data-type="left">
+                            <%- include('./components/icon.ejs', {
+                                icon: 'chevron-left',
+                                className: 'size-3'
+                            }); %>
+                        </button>
+
+                        <button class="action button button-hover button-accent shadow-2" data-type="right">
+                            <%- include('./components/icon.ejs', {
+                                icon: 'chevron-right',
+                                className: 'size-3'
+                            }); %>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="swiper">
+                <div class="home-providers list flex flex-row transition duration-500">
+                    <% response.home.providers.forEach(function(item){ %>
+                        <%- include('./components/homeCasinoProvider.ejs', item); %>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+	</div>
+</div>

@@ -1,0 +1,198 @@
+.dice-container {
+	width: 100%;
+	height: 100%;
+	gap: 20px;
+}
+
+.dice-container .dice-slider .chance {
+	background: var(--secondary);
+	border: solid 2px var(--card);
+    border-radius: 24px;
+    padding: 20px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+.dice-container .dice-slider .chance input {
+	width: 100%;
+    height: 10px;
+    background-color: var(--color-danger);
+    background-image: linear-gradient(var(--color-success), var(--color-success));
+    background-size: 50% 100%;
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.dice-container .dice-slider .chance input::-webkit-slider-runnable-track {
+    box-shadow: none;
+    border: none;
+    background: transparent;
+    -webkit-appearance: none;
+}
+
+.dice-container .dice-slider .chance input::-moz-range-track {
+    box-shadow: none;
+    border: none;
+    background: transparent;
+}
+
+.dice-container .dice-slider .chance input::-webkit-slider-thumb {
+    width: 30px;
+    height: 30px;
+    background: var(--card);
+    -webkit-appearance: none;
+	transform: rotateZ(45deg);
+	border-radius: 6px;
+}
+
+.dice-container .dice-slider .bar{
+	position: absolute;
+	top: calc(100% + 10px);
+	left: 0px;
+	right: 0px;
+	margin: 0px 24px;
+}
+
+.dice-container .dice-slider .bar .item:before{
+	content: "";
+	width: 0px;
+	height: 0px;
+	border: solid 8px var(--card);
+	border-radius: 50%;
+	position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translate(-50%);
+	z-index: -1;
+}
+
+.dice-container .dice-slider .bar .item{
+	position: relative;
+	font-weight: bold;
+	font-size: 14px;
+	width: 0;
+}
+
+.dice-container .dice-slider .pointer{
+	position: absolute;
+	bottom: calc(100% + 10px);
+	left: 0px;
+	right: 0px;
+	margin: 0px 24px;
+}
+
+.dice-container .dice-slider .pointer .item{
+    position: absolute;
+	width: 0px;
+    height: 40px;
+    left: 0%;
+    bottom: 0px;
+    transition: 200ms all;
+}
+
+.dice-container .dice-slider .pointer .content{
+	position: absolute;
+    left: 50%;
+    transform: translate(-50%);
+    border-radius: 8px;
+    background: var(--card);
+    padding: 10px 20px;
+	font-weight: bold;
+	font-size: 16px;
+}
+
+.dice-container .dice-slider .pointer .content:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    width: 20px;
+    height: 10px;
+    bottom: -5px;
+    left: 50%;
+    transform: translate(-50%);
+    background: var(--card);
+    border-radius: 12px;
+}
+
+.dice-case {
+	height: 100%;
+    position: relative;
+    overflow: hidden;
+	gap: 20px;
+}
+
+.dice-reel {
+	transform: translate3d(0px, calc(-110px * 10 + 180px / 2 - 110px / 2), 0px);
+}
+
+.dice-reel .reel-item {
+	padding: 5px 0px;
+}
+
+.dice-reel .reel-content {
+	width: 100%;
+	height: 100%;
+	border-radius: 6px;
+	background: var(--muted-foreground);
+	color: var(--secondary);
+	font-size: 32px;
+	font-weight: bold;
+}
+
+.dice-case .shadow.shadow-top {
+    top: 0px;
+	background: linear-gradient(to top, transparent 0%, var(--secondary) 100%);
+	height: 40%;
+}
+
+.dice-case .shadow.shadow-bottom {
+    bottom: 0px;
+    background: linear-gradient(to top, var(--secondary) 0%, transparent 100%);
+	height: 40%;
+}
+
+@media (min-width: 768px){
+	.dice-container .dice-roll, .dice-container .dice-select {
+		height: calc((100% - 2 * 20px) * 0.4);
+		width: 100%;
+	}
+
+	.dice-container .dice-slider {
+		height: calc((100% - 2 * 20px) * 0.2);
+		width: 100%;
+		padding: 0px 40px;
+	}
+
+	.dice-case {
+		max-height: 180px;
+	}
+
+	.dice-reel .reel-item {
+		width: 100px;
+		height: 110px;
+	}
+}
+
+@media (max-width: 768px){
+	.dice-container {
+		gap: 60px;
+	}
+
+	.dice-case {
+		max-height: 120px;
+		width: 100%;
+	}
+
+	.dice-reel {
+		width: 100%;
+	}
+
+	.dice-reel .reel-item {
+		width: 100%;
+		height: 80px;
+	}
+}

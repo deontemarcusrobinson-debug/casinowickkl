@@ -1,0 +1,43 @@
+<div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Customer In Game Invoices</div>
+
+            <div class="text-muted-foreground">Invoices created when a customer buys an in-game item. Each record shows the customer, the digital product and the amount paid.</div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-row">
+                        <div class="table-column text-left">Invoice</div>
+                        <div class="table-column text-left">Customer</div>
+                        <div class="table-column text-left">Product</div>
+                        <div class="table-column text-left">Amount</div>
+                        <div class="table-column text-left">Status</div>
+                        <div class="table-column text-right">Date</div>
+                    </div>
+                </div>
+
+                <div class="table-body" id="admin_invoices">
+                    <% if(response.admin.invoices.invoices.list.length > 0){ %>
+                        <% response.admin.invoices.invoices.list.forEach(function(item){ %>
+                            <div class="table-row">
+                                <div class="table-column text-left">#<%= item.id %></div>
+                                <div class="table-column text-left"><%= item.customer %></div>
+                                <div class="table-column text-left"><%= item.product %></div>
+                                <div class="table-column text-left"><%= item.amount %> <%= item.currency %></div>
+                                <div class="table-column text-left"><%= item.status %></div>
+                                <div class="table-column text-right"><%= item.time %></div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <%- include('../components/emptyTable.ejs', {
+                            title: 'No invoices yet'
+                        }); %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

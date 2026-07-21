@@ -1,0 +1,316 @@
+<div class="flex flex-col gap-2">
+    <label class="flex flex-col items-start gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full pointer">
+        <div class="flex flex-row items-center justify-between gap-2 w-full">
+            <div class="text-left font-bold text-base">Payments</div>
+
+            <%- include('../components/inputs/switchField.ejs', {
+                className: 'admin_switch_settings',
+                attributes: [
+                    { name: 'data-settings', value: 'payments_status' }
+                ],
+                checked: response.admin.payments.status
+            }); %>
+        </div>
+
+        <div class="text-sm text-muted-foreground">Enable or disable all deposits and withdrawals methods on the website.</div>
+    </label>
+
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Manual Deposit</div>
+
+            <div class="text-muted-foreground">Manually add funds to a user's balance.</div>
+        </div>
+
+        <div class="flex flex-row max-md:flex-col gap-1 max-md:gap-4 items-start w-full">
+            <%- include('../components/inputs/inputGroup.ejs', {
+                type: 'text',
+                label: 'User Id',
+                id: 'admin_manual_deposit_userid',
+                errors: [ 'required' ]
+            }); %>
+
+            <div class="flex flex-row gap-1 items-start max-md:w-full">
+                <%- include('../components/inputs/inputGroup.ejs', {
+                    type: 'text',
+                    label: 'Amount',
+                    id: 'admin_manual_deposit_amount',
+                    attributes: [
+                        { name: 'data-amount', value: 'deposit_manual' }
+                    ],
+                    value: '10.00',
+                    errors: [ 'required', 'number', 'greater', 'lesser' ]
+                }); %>
+
+                <button class="button button-hover button-primary shadow-2 mt-1" id="admin_manual_deposit_create">Deposit</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Manual Withdrawal</div>
+
+            <div class="text-muted-foreground">Manually process a withdrawal by deducting funds from a user's balance.</div>
+        </div>
+
+        <div class="flex flex-row max-md:flex-col gap-1 max-md:gap-4 items-start w-full">
+            <%- include('../components/inputs/inputGroup.ejs', {
+                type: 'text',
+                label: 'User Id',
+                id: 'admin_manual_withdrawal_userid',
+                errors: [ 'required' ]
+            }); %>
+
+            <div class="flex flex-row gap-1 items-start max-md:w-full">
+                <%- include('../components/inputs/inputGroup.ejs', {
+                    type: 'text',
+                    label: 'Amount',
+                    id: 'admin_manual_withdrawal_amount',
+                    attributes: [
+                        { name: 'data-amount', value: 'withdraw_manual' }
+                    ],
+                    value: '10.00'
+                }); %>
+
+                <button class="button button-hover button-primary shadow-2 mt-1" id="admin_manual_withdrawal_create">Withdraw</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-row max-md:flex-col gap-2 w-full">
+        <label class="flex flex-col items-start gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full pointer">
+            <div class="flex flex-row items-center justify-between gap-2 w-full">
+                <div class="text-left font-bold text-base">Crypto Confirmations</div>
+
+                <%- include('../components/inputs/switchField.ejs', {
+                    className: 'admin_switch_settings',
+                    attributes: [
+                        { name: 'data-settings', value: 'payments_manually_enable_crypto' }
+                    ],
+                    checked: response.admin.payments.manually.enable.crypto
+                }); %>
+            </div>
+
+            <div class="text-sm text-muted-foreground">If this is enabled, an admin must to confirm manually the Crypto withdrawals before processing.</div>
+        </label>
+
+    </div>
+
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Confirmations Amount</div>
+
+            <div class="text-muted-foreground">The minimum amount that requires manual confirmation by an admin before processing a withdrawal.</div>
+        </div>
+
+        <%- include('../components/inputs/inputGroup.ejs', {
+            type: 'text',
+            label: 'Confirmations Amount',
+            id: 'admin_payments_manually_amount_value',
+            value: response.admin.payments.manually.amount,
+            errors: [ 'required', 'number', 'greater' ],
+            addons: [{
+                addon: '<button class="button button-hover button-primary shadow-2" id="admin_payments_manually_amount_set">Set</button>',
+                align: 'end'
+            }]
+        }); %>
+    </div>
+
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Confirmation Listings</div>
+
+            <div class="flex flex-row gap-2">
+                <button class="button button-hover button-accent shadow-2 dashboard-load switch_panel active" data-id="confirmation" data-panel="crypto">Crypto</button>
+            </div>
+        </div>
+
+        <div class="switch_content" data-id="confirmation" data-panel="crypto">
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-row">
+                        <div class="table-column text-left">Id</div>
+                        <div class="table-column text-left">User Id</div>
+                        <div class="table-column text-left">Amount</div>
+                        <div class="table-column text-left">Currency</div>
+                        <div class="table-column text-left">Date</div>
+                        <div class="table-column text-right">Action</div>
+                    </div>
+                </div>
+
+                <div class="table-body" id="admin_crypto_confirmations">
+                    <% if(response.admin.payments.crypto.list.length > 0){ %>
+                        <% response.admin.payments.crypto.list.forEach(function(item){ %>
+                            <%- include('../components/tableAdminCryptoConfirmationsRow.ejs', item); %>
+                        <% }); %>
+                    <% } else { %>
+                        <%- include('../components/emptyTable.ejs', {
+                            title: 'No data found'
+                        }); %>
+                    <% } %>
+                </div>
+
+                <div class="table-footer">
+                    <div class="flex items-center justify-center bg-secondary p-2">
+                        <%- include('../components/pageNavigator.ejs', {
+                            id: 'pagination_admin_crypto_confirmations',
+                            page: response.admin.payments.crypto.page,
+                            pages: response.admin.payments.crypto.pages
+                        }); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Deposit Bonus Codes</div>
+
+            <div class="text-muted-foreground">Generate a code that users can redeem for a bonus when making a deposit.</div>
+        </div>
+
+        <div class="flex flex-col gap-6 w-full">
+            <div class="flex flex-row max-md:flex-col gap-1 max-md:gap-4 items-start w-full">
+                <%- include('../components/inputs/inputGroup.ejs', {
+                    type: 'text',
+                    label: 'Referral',
+                    id: 'admin_deposit_bonuses_referral',
+                    errors: [ 'required' ]
+                }); %>
+
+                <div class="flex flex-row gap-1 items-start max-md:w-full">
+                    <%- include('../components/inputs/inputGroup.ejs', {
+                        type: 'text',
+                        label: 'Code',
+                        id: 'admin_deposit_bonuses_code',
+                        errors: [ 'required' ]
+                    }); %>
+
+                    <button class="button button-hover button-primary shadow-2 mt-1" id="admin_deposit_bonuses_create">Create</button>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <%- include('../components/inputs/inputGroup.ejs', {
+                    type: 'text',
+                    label: 'Search Deposit Bonus',
+                    id: 'admin_deposit_bonuses_search'
+                }); %>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-row">
+                            <div class="table-column text-left">Code</div>
+                            <div class="table-column text-left">Referral</div>
+                            <div class="table-column text-left">Uses</div>
+                            <div class="table-column text-left">Amount</div>
+                            <div class="table-column text-right">Action</div>
+                        </div>
+                    </div>
+
+                    <div class="table-body" id="admin_deposit_bonuses">
+                        <% if(response.admin.payments.deposit_bonuses.list.length > 0){ %>
+                            <% response.admin.payments.deposit_bonuses.list.forEach(function(item){ %>
+                                <%- include('../components/tableAdminDepositBonusesRow.ejs', item); %>
+                            <% }); %>
+                        <% } else { %>
+                            <%- include('../components/emptyTable.ejs', {
+                                title: 'No data found'
+                            }); %>
+                        <% } %>
+                    </div>
+
+                    <div class="table-footer">
+                        <div class="flex items-center justify-center bg-secondary p-2">
+                            <%- include('../components/pageNavigator.ejs', {
+                                id: 'pagination_admin_deposit_bonuses',
+                                page: response.admin.payments.deposit_bonuses.page,
+                                pages: response.admin.payments.deposit_bonuses.pages
+                            }); %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <% if(response.admin.payments.enable.cash.length > 0){ %>
+        <div class="flex flex-col items-start gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+            <div class="flex flex-col gap-2">
+                <div class="text-left font-bold text-base">Cash Deposits Methods</div>
+
+                <div class="text-muted-foreground">Enable or disable Cash methods to control their availability for deposits.</div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <% response.admin.payments.enable.cash.forEach(function(item){ %>
+                    <div class="flex flex-row items-center gap-2">
+                        <%- include('../components/inputs/switchField.ejs', {
+                            className: 'admin_switch_settings',
+                            attributes: [
+                                { name: 'data-settings', value: 'payments_methods_cash_' + item.method + '_enable_deposit' }
+                            ],
+                            checked: item.enable.deposit
+                        }); %>
+
+                        <div class="text-sm text-muted-foreground"><%= item.name %></div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    <% } %>
+
+    <% if(response.admin.payments.enable.crypto.length > 0){ %>
+        <div class="flex flex-col items-start gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+            <div class="flex flex-col gap-2">
+                <div class="text-left font-bold text-base">Crypto Deposits Methods</div>
+
+                <div class="text-muted-foreground">Enable or disable Crypto methods to control their availability for deposits.</div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <% response.admin.payments.enable.crypto.forEach(function(item){ %>
+                    <div class="flex flex-row items-center gap-2">
+                        <%- include('../components/inputs/switchField.ejs', {
+                            className: 'admin_switch_settings',
+                            attributes: [
+                                { name: 'data-settings', value: 'payments_methods_crypto_' + item.method + '_enable_deposit' }
+                            ],
+                            checked: item.enable.deposit
+                        }); %>
+
+                        <div class="text-sm text-muted-foreground"><%= item.name %></div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+
+        <div class="flex flex-col items-start gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+            <div class="flex flex-col gap-2">
+                <div class="text-left font-bold text-base">Crypto Withdraw Methods</div>
+
+                <div class="text-muted-foreground">Enable or disable Crypto methods to control their availability for withdrawals.</div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <% response.admin.payments.enable.crypto.forEach(function(item){ %>
+                    <div class="flex flex-row items-center gap-2">
+                        <%- include('../components/inputs/switchField.ejs', {
+                            className: 'admin_switch_settings',
+                            attributes: [
+                                { name: 'data-settings', value: 'payments_methods_crypto_' + item.method + '_enable_withdraw' }
+                            ],
+                            checked: item.enable.withdraw
+                        }); %>
+
+                        <div class="text-sm text-muted-foreground"><%= item.name %></div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    <% } %>
+
+</div>

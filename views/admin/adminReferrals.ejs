@@ -1,0 +1,57 @@
+<div class="flex flex-col gap-2">
+    <div class="flex flex-row gap-1">
+        <%- include('../components/inputs/inputGroup.ejs', {
+            type: 'text',
+            label: 'Search Referral (userid, name, code)',
+            id: 'admin_referrals_search'
+        }); %>
+
+        <div class="flex flex-row gap-1">
+            <%- include('../components/inputs/selectField.ejs', {
+                type: 'bottom',
+                label: 'Order by',
+                id: 'admin_referrals_order',
+                items: [
+                    { name: 'Create date', value: 0 },
+                    { name: 'Name A-Z', value: 1 },
+                    { name: 'Name Z-A', value: 2 },
+                    { name: 'Earnings acending', value: 3 },
+                    { name: 'Earnings descending', value: 4 }
+                ]
+            }); %>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-row">
+                <div class="table-column text-left">User</div>
+                <div class="table-column text-left">User Id</div>
+                <div class="table-column text-left">Code</div>
+                <div class="table-column text-left">Earnings</div>
+                <div class="table-column text-left">Created date</div>
+                <div class="table-column text-right">Action</div>
+            </div>
+        </div>
+        <div class="table-body" id="admin_referrals">
+            <% if(response.admin.referrals.list.length > 0){ %>
+                <% response.admin.referrals.list.forEach(function(item){ %>
+                    <%- include('../components/tableAdminReferralsRow.ejs', item); %>
+                <% }); %>
+            <% } else { %>
+                <%- include('../components/emptyTable.ejs', {
+                    title: 'No data found'
+                }); %>
+            <% } %>
+        </div>
+        <div class="table-footer">
+            <div class="flex items-center justify-center bg-secondary p-2">
+                <%- include('../components/pageNavigator.ejs', {
+                    id: 'pagination_admin_referrals',
+                    page: response.admin.referrals.page,
+                    pages: response.admin.referrals.pages
+                }); %>
+            </div>
+        </div>
+    </div>
+</div>

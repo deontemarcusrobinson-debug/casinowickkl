@@ -1,0 +1,5 @@
+<div class="tabs-menu <%= type %> flex flex-wrap flex-row gap-2 border-card">
+    <% items.forEach(function(item, index){ %>
+        <a href="<%= item.href %>"><button class="button transition duration-200 <% if(item.active){ %>active<% } %>"><%= item.label %></button></a>
+    <% }); %>
+</div>

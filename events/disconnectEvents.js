@@ -1,0 +1,21 @@
+var { loggerWarn } = require('@/lib/logger.js');
+
+var { emitSocketToAll } = require('@/utils/socket.js');
+
+var historyService = require('@/services/historyService.js');
+
+var config = require('@/config/config.js');
+
+module.exports = (socket) => {
+    return () => {
+        if(historyService.rooms[socket.data.user ? socket.data.user.userid : socket.id] !== undefined) delete historyService.rooms[socket.data.user ? socket.data.user.userid : socket.id];
+
+        if(socket.data.user) loggerWarn('[SERVER] User with userid ' + socket.data.user.userid + ' is disconnected from page /' + socket.data.paths.join('/'));
+        else loggerWarn('[SERVER] Guest with socketid ' + socket.id + ' is disconnected from page /' + socket.data.paths.join('/'));
+
+        //USERS ONLINE
+        emitSocketToAll('site', 'online', {
+            online: Object.keys(config.app.chat.channels).reduce((acc, cur) => ({ ...acc, [cur]: Array.from(socket.server.sockets.sockets.values()).filter(a => a.data.channel == cur).filter(a => a.data.user).filter((value, index, self) => self.findIndex(a => a.data.user.userid == value.data.user.userid) == index).length + Array.from(socket.server.sockets.sockets.values()).filter(a => a.data.channel == cur).filter(a => !a.data.user).length }), {})
+        });
+    };
+};

@@ -1,0 +1,22 @@
+<div class="table-row">
+    <div class="table-column text-left">
+        <a class="underline" href="/admin/support/requests/<%= id %>"><%= subject %></a>
+    </div>
+    <div class="table-column text-left"><%= { 0: 'General / Others', 1: 'Bug report', 2: 'Trade offer issue', 3: 'Improvements / Ideas', 4: 'Marketing / Partnership', 5: 'Ranking up' }[department] %></div>
+    <div class="table-column text-left"><%= created %></div>
+    <div class="table-column text-left"><%= updated %></div>
+    <div class="table-column text-left">
+        <% if(assigned){ %>
+            <%- include('./userField.ejs', { user: assigned }); %>
+        <% } else if(closed) { %>
+            <div class="font-bold text-danger">Unavailable</div>
+        <% } else { %>
+            <div class="font-bold text-success">Available</div>
+        <% } %>
+    </div>
+    <div class="table-column">
+        <div class="flex flex-row justify-end">
+            <div class="<%= [ { 0: 'bg-danger bg-opacity-50', 1: 'bg-warning bg-opacity-50', 2: 'bg-success bg-opacity-50' }[status], 'bg-info bg-opacity-50' ][closed] %> p-1 rounded-1"><%= [ { 0: 'Opened', 1: 'Unsolved', 2: 'Answered' }[status], 'Solved' ][closed] %></div>
+        </div>
+    </div>
+</div>
