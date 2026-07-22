@@ -40,6 +40,81 @@ var COINGECKO_IDS = {
     usdc: 'usd-coin'
 };
 
+// Last-known / seed USD rates so deposits never hard-fail if APIs are down
+var FALLBACK_PRICES = {
+    btc: 65000,
+    eth: 3200,
+    ltc: 85,
+    bch: 400,
+    doge: 0.15,
+    sol: 150,
+    xrp: 0.55,
+    trx: 0.25,
+    ton: 5,
+    bnbbsc: 600,
+    usdttrc20: 1,
+    usdterc20: 1,
+    usdtbsc: 1,
+    usdtsol: 1,
+    usdtmatic: 1,
+    usdc: 1
+};
+
+var COINBASE_PAIRS = {
+    btc: 'BTC-USD',
+    eth: 'ETH-USD',
+    ltc: 'LTC-USD',
+    bch: 'BCH-USD',
+    doge: 'DOGE-USD',
+    sol: 'SOL-USD',
+    xrp: 'XRP-USD',
+    ton: 'TON-USD'
+};
+
+var CRYPTOCOMPARE_SYMBOLS = {
+    btc: 'BTC',
+    eth: 'ETH',
+    ltc: 'LTC',
+    bch: 'BCH',
+    doge: 'DOGE',
+    sol: 'SOL',
+    xrp: 'XRP',
+    trx: 'TRX',
+    ton: 'TON',
+    bnbbsc: 'BNB'
+};
+
+// Seed amounts immediately so deposits work before any API responds
+Object.keys(FALLBACK_PRICES).forEach(function(c) {
+    amounts[c] = FALLBACK_PRICES[c];
+    fees[c] = 0;
+});
+
+function rememberPrice(currency, price) {
+    if(!(price > 0)) return;
+    amounts[currency] = price;
+    FALLBACK_PRICES[currency] = price;
+    fees[currency] = fees[currency] || 0;
+}
+
+function httpJson(url, callback) {
+    request({
+        method: 'GET',
+        url: url,
+        json: true,
+        timeout: 12000,
+        headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'GoldWitch-PriceBot/1.0'
+        }
+    }, function(err, res, body) {
+        if(err || !res || res.statusCode < 200 || res.statusCode >= 300) {
+            return callback(err || new Error('HTTP ' + (res && res.statusCode)));
+        }
+        callback(null, body);
+    });
+}
+
 function initializeCurrencies(){
 	loggerDebug('[CRYPTO] Loading Currencies');
 	// Do NOT lock deposits with updating=true — prices refresh in background
@@ -47,6 +122,7 @@ function initializeCurrencies(){
 	updateCurrencies(0, function(err1){
         if(err1) {
             loggerInfo('[CRYPTO] Error In Loading Currencies: ' + (err1.message || err1));
+            seedFallbackAmounts();
             updating.value = false;
 
             return setTimeout(function(){
@@ -71,124 +147,160 @@ function initializeCurrencies(){
 	});
 }
 
+function seedFallbackAmounts() {
+    Object.keys(config.settings.payments.methods.crypto || {}).forEach(function(currency) {
+        if(amounts[currency] > 0) return;
+        if(FALLBACK_PRICES[currency] > 0) {
+            amounts[currency] = FALLBACK_PRICES[currency];
+            fees[currency] = fees[currency] || 0;
+        }
+    });
+}
+
 /* ----- INTERNAL USAGE ----- */
 function updateCurrencies(item, callback){
-    // Load all CoinGecko prices in one request, then fill amounts
     var keys = Object.keys(config.settings.payments.methods.crypto);
     var ids = [];
     var idToCurrencies = {};
 
     keys.forEach(function(currency) {
         if(['usdttrc20', 'usdterc20', 'usdtbsc', 'usdtsol', 'usdtmatic', 'usdc'].indexOf(currency) !== -1) {
-            amounts[currency] = 1;
-            fees[currency] = fees[currency] || 0;
+            rememberPrice(currency, 1);
             return;
         }
         var id = COINGECKO_IDS[currency];
-        if(!id) return;
+        if(!id) {
+            if(FALLBACK_PRICES[currency] > 0) rememberPrice(currency, FALLBACK_PRICES[currency]);
+            return;
+        }
         if(ids.indexOf(id) === -1) ids.push(id);
         if(!idToCurrencies[id]) idToCurrencies[id] = [];
         idToCurrencies[id].push(currency);
     });
 
-    if(!ids.length) return callback(null);
+    if(!ids.length) {
+        seedFallbackAmounts();
+        return callback(null);
+    }
 
-    request({
-        method: 'GET',
-        url: 'https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(ids.join(',')) + '&vs_currencies=usd',
-        json: true,
-        timeout: 20000
-    }, function(err, res, body) {
-        if(err || !body) {
-            // Fallback: per-currency (slower)
-            return updateCurrenciesSequential(0, callback);
+    httpJson('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(ids.join(',')) + '&vs_currencies=usd', function(err, body) {
+        var loaded = 0;
+        if(!err && body) {
+            Object.keys(idToCurrencies).forEach(function(id) {
+                var usd = body[id] && body[id].usd;
+                if(!(usd > 0)) return;
+                idToCurrencies[id].forEach(function(currency) {
+                    rememberPrice(currency, parseFloat(usd));
+                    loaded++;
+                });
+            });
         }
 
-        Object.keys(idToCurrencies).forEach(function(id) {
-            var usd = body[id] && body[id].usd;
-            if(!(usd > 0)) return;
-            idToCurrencies[id].forEach(function(currency) {
-                amounts[currency] = parseFloat(usd);
-                fees[currency] = fees[currency] || 0;
-            });
-        });
+        if(loaded > 0) {
+            loggerDebug('[CRYPTO] CoinGecko batch loaded ' + loaded);
+            seedFallbackAmounts();
+            return callback(null);
+        }
 
-        loggerDebug('[CRYPTO] Batch prices loaded for ' + Object.keys(amounts).length + ' currencies');
-        callback(null);
+        // CoinGecko failed — fill from Coinbase / CryptoCompare / fallbacks
+        loggerInfo('[CRYPTO] CoinGecko batch failed, using multi-source fallback');
+        fillPricesMultiSource(keys, 0, function() {
+            seedFallbackAmounts();
+            callback(null);
+        });
     });
 }
 
-function updateCurrenciesSequential(item, callback){
-    var keys = Object.keys(config.settings.payments.methods.crypto);
-    if(item >= keys.length) return callback(null);
+function fillPricesMultiSource(keys, index, callback) {
+    if(index >= keys.length) return callback();
+    var currency = keys[index];
+    if(amounts[currency] > 0) return fillPricesMultiSource(keys, index + 1, callback);
 
-    var currency = keys[item];
-
-    getCurrencyAmount(currency, function(err1, price){
-        if(err1 || !(price > 0)) {
-            loggerInfo('[CRYPTO] Skip price for ' + currency.toUpperCase() + ': ' + ((err1 && err1.message) || 'invalid'));
-            fees[currency] = fees[currency] || 0;
-            return updateCurrenciesSequential(item + 1, callback);
-        }
-
-        amounts[currency] = price;
-        fees[currency] = fees[currency] || 0;
-        updateCurrenciesSequential(item + 1, callback);
+    getCurrencyAmount(currency, function(err, price) {
+        if(!err && price > 0) rememberPrice(currency, price);
+        fillPricesMultiSource(keys, index + 1, callback);
     });
 }
 
 /* ----- INTERNAL USAGE ----- */
 function getCurrencyAmount(currency, callback){
-    var apiKey = config.trading.crypto.nowpayments && config.trading.crypto.nowpayments.api_key;
-
-    if(!apiKey) {
-        return getCurrencyAmountCoinGecko(currency, callback);
-    }
-
-    var options = {
-        'method': 'GET',
-        'url': 'https://api.nowpayments.io/v1/estimate?amount=1&currency_from=' + currency + '&currency_to=usd',
-        'timeout': 10000,
-        'headers': {
-            'x-api-key': apiKey
-        }
-    };
-
-	request(options, function(err1, response1, body1) {
-		if(err1 || !response1 || response1.statusCode != 200 || !isJsonString(body1)) {
-            loggerError(err1 || ('NOWPayments estimate HTTP ' + (response1 && response1.statusCode)));
-            return getCurrencyAmountCoinGecko(currency, callback);
-        }
-
-        var body = JSON.parse(body1);
-        var price = parseFloat(body['estimated_amount']);
-
-        if(!(price > 0)) return getCurrencyAmountCoinGecko(currency, callback);
-
-        callback(null, price);
-	});
-}
-
-function getCurrencyAmountCoinGecko(currency, callback) {
     currency = String(currency || '').toLowerCase();
+
     if(['usdttrc20', 'usdterc20', 'usdtbsc', 'usdtsol', 'usdtmatic', 'usdc'].indexOf(currency) !== -1) {
         return callback(null, 1);
     }
 
-    var id = COINGECKO_IDS[currency];
-    if(!id) return callback(new Error('No price source for ' + currency.toUpperCase()));
+    // Use cached live price first
+    if(amounts[currency] > 0) return callback(null, amounts[currency]);
 
-    request({
-        method: 'GET',
-        url: 'https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(id) + '&vs_currencies=usd',
-        json: true,
-        timeout: 15000
-    }, function(err, res, body) {
-        if(err || !body || !body[id] || !(body[id].usd > 0)) {
-            return callback(new Error('Could not load price for ' + currency.toUpperCase()));
+    var apiKey = config.trading.crypto.nowpayments && config.trading.crypto.nowpayments.api_key;
+
+    function tryCoinGecko(next) {
+        var id = COINGECKO_IDS[currency];
+        if(!id) return next();
+        httpJson('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(id) + '&vs_currencies=usd', function(err, body) {
+            if(!err && body && body[id] && body[id].usd > 0) {
+                return callback(null, parseFloat(body[id].usd));
+            }
+            next();
+        });
+    }
+
+    function tryCoinbase(next) {
+        var pair = COINBASE_PAIRS[currency];
+        if(!pair) return next();
+        httpJson('https://api.coinbase.com/v2/prices/' + pair + '/spot', function(err, body) {
+            var amt = body && body.data && parseFloat(body.data.amount);
+            if(!err && amt > 0) return callback(null, amt);
+            next();
+        });
+    }
+
+    function tryCryptoCompare(next) {
+        var sym = CRYPTOCOMPARE_SYMBOLS[currency];
+        if(!sym) return next();
+        httpJson('https://min-api.cryptocompare.com/data/price?fsym=' + sym + '&tsyms=USD', function(err, body) {
+            var amt = body && parseFloat(body.USD);
+            if(!err && amt > 0) return callback(null, amt);
+            next();
+        });
+    }
+
+    function tryNowPayments(next) {
+        if(!apiKey) return next();
+        request({
+            method: 'GET',
+            url: 'https://api.nowpayments.io/v1/estimate?amount=1&currency_from=' + currency + '&currency_to=usd',
+            timeout: 10000,
+            headers: { 'x-api-key': apiKey }
+        }, function(err1, response1, body1) {
+            if(err1 || !response1 || response1.statusCode != 200 || !isJsonString(body1)) return next();
+            var price = parseFloat(JSON.parse(body1).estimated_amount);
+            if(price > 0) return callback(null, price);
+            next();
+        });
+    }
+
+    function useFallback() {
+        if(FALLBACK_PRICES[currency] > 0) {
+            loggerInfo('[CRYPTO] Using fallback price for ' + currency.toUpperCase() + ': ' + FALLBACK_PRICES[currency]);
+            return callback(null, FALLBACK_PRICES[currency]);
         }
-        callback(null, parseFloat(body[id].usd));
+        callback(new Error('Could not load price for ' + currency.toUpperCase()));
+    }
+
+    tryCoinGecko(function() {
+        tryCoinbase(function() {
+            tryCryptoCompare(function() {
+                tryNowPayments(useFallback);
+            });
+        });
     });
+}
+
+function getCurrencyAmountCoinGecko(currency, callback) {
+    // Kept for compatibility — routes through multi-source getter
+    getCurrencyAmount(currency, callback);
 }
 
 /* ----- INTERNAL USAGE ----- */
