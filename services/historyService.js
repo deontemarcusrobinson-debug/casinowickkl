@@ -336,10 +336,16 @@ function getUserHistory(user, socket){
 
 /* ----- INTERNAL USAGE ----- */
 function loadHistory(user, history, game, all_games, callback){
-	if(history == 'game_bets') {
-		if(all_games) return callback(null, Object.keys(histories[history]).map(a => histories[history][a]).reduce((acc, arr) => { return [ ...acc, ...arr ] }, []).sort(function(a, b){ return b.time - a.time }).slice(0, 10).reverse());
+	var activityService = require('@/services/activityService.js');
 
-        return callback(null, histories[history][game] !== undefined ? histories[history][game] : []);
+	if(history == 'game_bets') {
+		if(all_games) {
+			var combined = Object.keys(histories[history]).map(a => histories[history][a]).reduce((acc, arr) => { return [ ...acc, ...arr ] }, []).sort(function(a, b){ return b.time - a.time }).slice(0, 10).reverse();
+			return callback(null, activityService.mergeWithFakeBets(combined, 'all_bets'));
+		}
+
+		var pageList = histories[history][game] !== undefined ? histories[history][game] : [];
+		return callback(null, activityService.mergeWithFakeBets(pageList, game === 'casino' ? 'all_bets' : history));
 	} else if(history == 'my_bets') {
 		var query = '';
 		if(!all_games) {
@@ -382,7 +388,8 @@ function loadHistory(user, history, game, all_games, callback){
 			return callback(null, list);
 		});
 	} else {
-		return callback(null, histories[history]);
+		var activityService = require('@/services/activityService.js');
+		return callback(null, activityService.mergeWithFakeBets(histories[history], history));
 	}
 }
 

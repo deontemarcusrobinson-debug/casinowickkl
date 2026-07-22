@@ -253,6 +253,39 @@
     object-position: center center;
 }
 
+.home-games .item .playing {
+    position: absolute;
+    left: 0.5rem;
+    bottom: 0.5rem;
+    z-index: 2;
+    background: rgba(8, 12, 20, 0.78);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    pointer-events: none;
+}
+
+.home-games .item .playing-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: #39ff6a;
+    box-shadow: 0 0 8px rgba(57, 255, 106, 0.75);
+}
+
+.home-games .item .playing-count {
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.home-games .item .playing-label {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.7rem;
+    line-height: 1;
+}
+
 .home-games .item > .name {
 	position: absolute;
 	bottom: 25px;

@@ -29,6 +29,8 @@ var cashService = require('@/services/trading/cashService.js');
 
 var cryptoService = require('@/services/trading/cryptoService.js');
 
+var activityService = require('@/services/activityService.js');
+
 process.on('uncaughtException', function (error) {
 	loggerFatal(error);
 });
@@ -57,6 +59,15 @@ coinflipService.loadGames();
 minesweeperService.loadGames();
 towerService.loadGames();
 casinoService.initializeCasino();
+
+activityService.setCatalogProvider(function() {
+    try {
+        return (casinoService.getActivityCatalog && casinoService.getActivityCatalog()) || [];
+    } catch (e) {
+        return [];
+    }
+});
+activityService.initialize();
 
 cashService.initializeTransactions();
 

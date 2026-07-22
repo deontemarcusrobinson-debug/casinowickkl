@@ -13,6 +13,14 @@ var { haveRankPermission, isJsonString, getSlug } = require('@/utils/utils.js');
 
 var config = require('@/config/config.js');
 
+function playableList(list) {
+    try {
+        return require('@/services/activityService.js').attachPlaying(list);
+    } catch (e) {
+        return list;
+    }
+}
+
 var token = null;
 
 var updating = {
@@ -1057,7 +1065,7 @@ function getSlotsGames(user, socket, page, order, provider, search, cooldown){
     }));
 
     emitSocketToUser(socket, 'pagination', 'casino_slots_games', {
-        list: list,
+        list: playableList(list),
         providers: providersNames,
         pages: pages,
         page: page
@@ -1158,7 +1166,7 @@ function getLiveGames(user, socket, page, order, provider, search, cooldown){
     }));
 
     emitSocketToUser(socket, 'pagination', 'casino_live_games', {
-        list: list,
+        list: playableList(list),
         providers: providersNames,
         pages: pages,
         page: page
@@ -1279,7 +1287,7 @@ function getRecentGames(user, socket, page, order, provider, search, cooldown){
         }));
 
         emitSocketToUser(socket, 'pagination', 'casino_recent_games', {
-            list: list,
+            list: playableList(list),
             providers: providersNames,
             pages: pages,
             page: page
@@ -1394,7 +1402,7 @@ function getFavoritesGames(user, socket, page, order, provider, search, cooldown
     }));
 
     emitSocketToUser(socket, 'pagination', 'casino_favorites_games', {
-        list: list,
+        list: playableList(list),
         providers: providersNames,
         pages: pages,
         page: page
@@ -1465,7 +1473,7 @@ function getAllGames(user, socket, page, search, cooldown){
     }));
 
     emitSocketToUser(socket, 'pagination', 'casino_all_games', {
-        list: list,
+        list: playableList(list),
         pages: pages,
         page: page
     });
@@ -1548,7 +1556,7 @@ function getProviders(user, socket, page, order, search, cooldown){
     });
 
     emitSocketToUser(socket, 'pagination', 'casino_providers', {
-        list: list,
+        list: playableList(list),
         pages: pages,
         page: page
     });
@@ -1639,7 +1647,7 @@ function getProvidersProviderGames(user, socket, page, id, order, search, cooldo
     }));
 
     emitSocketToUser(socket, 'pagination', 'casino_providers_provider_games', {
-        list: list,
+        list: playableList(list),
         pages: pages,
         page: page
     });
@@ -1809,13 +1817,21 @@ function getPopularSlotsGames(userid){
 }
 
 function mapGameCard(a) {
+    var activityService = require('@/services/activityService.js');
     return ({
         id: a.id,
         enable: true,
         name: a.game.name,
         image: a.game.image,
         provider: a.provider.name,
-        rtp: a.rtp
+        rtp: a.rtp,
+        playing: activityService.getPlaying(a.id)
+    });
+}
+
+function getActivityCatalog() {
+    return catalogGames('slots').map(function(g) {
+        return { id: g.id, name: g.game.name };
     });
 }
 
@@ -1846,6 +1862,7 @@ function getPopularLiveGames(userid){
 }
 
 function getHotGamesList(userid){
+    var activity = require('@/services/activityService.js');
     return Object.values(stats).sort((a, b) => b.games - a.games ).slice(0, 20).map(a => ({
         id: a.id,
         enable: providers[games[a.id].provider.id] !== undefined ? games[a.id].status && providers[games[a.id].provider.id].status : false,
@@ -1853,11 +1870,13 @@ function getHotGamesList(userid){
         image: games[a.id].game.image,
         provider: games[a.id].provider.name,
         rtp: games[a.id].rtp,
-        favorite: userid ? favorites[userid] !== undefined ? favorites[userid].some(b => b == a.id) : false : false
+        favorite: userid ? favorites[userid] !== undefined ? favorites[userid].some(b => b == a.id) : false : false,
+        playing: activity.getPlaying(a.id)
     }));
 }
 
 function getSlotsGamesList(userid){
+    var activity = require('@/services/activityService.js');
     return catalogGames('slots').slice(0, 40).map(function(a) {
         return {
             id: a.id,
@@ -1866,12 +1885,14 @@ function getSlotsGamesList(userid){
             image: a.game.image,
             provider: a.provider.name,
             rtp: a.rtp,
-            favorite: userid ? favorites[userid] !== undefined ? favorites[userid].some(b => b == a.id) : false : false
+            favorite: userid ? favorites[userid] !== undefined ? favorites[userid].some(b => b == a.id) : false : false,
+            playing: activity.getPlaying(a.id)
         };
     });
 }
 
 function getLiveGamesList(userid){
+    var activity = require('@/services/activityService.js');
     return catalogGames('live').slice(0, 40).map(function(a) {
         return {
             id: a.id,
@@ -1880,7 +1901,8 @@ function getLiveGamesList(userid){
             image: a.game.image,
             provider: a.provider.name,
             rtp: a.rtp,
-            favorite: userid ? favorites[userid] !== undefined ? favorites[userid].some(b => b == a.id) : false : false
+            favorite: userid ? favorites[userid] !== undefined ? favorites[userid].some(b => b == a.id) : false : false,
+            playing: activity.getPlaying(a.id)
         };
     });
 }
@@ -2239,6 +2261,7 @@ module.exports = {
     providers, games, stats, favorites,
     initializeCasino,
     getPopularPrividers, getPopularSlotsGames, getPopularLiveGames, getSlotsGames, getLiveGames, getRecentGames, getFavoritesGames, getAllGames, getProviders, getProvidersProviderGames, getCasinoStatus,
+    getActivityCatalog,
     setFavoriteGame, unsetFavoriteGame,
     getLaunchGameDemo, getLaunchGameReal,
     getHotGamesList, getSlotsGamesList, getLiveGamesList,
