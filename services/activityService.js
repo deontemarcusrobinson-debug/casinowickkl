@@ -17,8 +17,16 @@ var catalogProvider = null;
 var started = false;
 var ONLINE_CAP = 8700;
 var OTHER_CHANNEL_CAP = 179;
+var EN_MIN = 800;
+var EN_MAX = 8700;
 
-// Baseline activity by language (English/USA is computed from slots)
+// English online drift state (slow, realistic — never snaps)
+var enOnline = null;
+var enOnlineBootAt = 0;
+var enLastDipAt = 0;
+var enSoftTarget = 4200;
+
+// Baseline activity by language (English/USA uses slow drift below)
 var CHANNEL_SEEDS = {
     fr: [70, 150],
     de: [80, 160],
@@ -108,7 +116,8 @@ function refreshPlayingCounts() {
     });
 
     scalePlayingToCap();
-    refreshChannelOnline(false);
+    // Don't snap English online to slots total — only nudge other languages
+    nudgeOtherChannels();
 }
 
 function getTotalPlaying() {
@@ -158,41 +167,81 @@ function ensureChannelOnlineSeeded() {
         var range = CHANNEL_SEEDS[ch] || [30, 150];
         channelOnline[ch] = randInt(range[0], Math.min(OTHER_CHANNEL_CAP, range[1]));
     });
+    seedEnglishOnline();
 }
 
-function refreshChannelOnline(broadcast) {
-    ensureChannelOnlineSeeded();
+function seedEnglishOnline() {
+    if(enOnline != null) return;
+    // Start near the floor so it climbs naturally
+    enOnline = randInt(EN_MIN, EN_MIN + 40);
+    enOnlineBootAt = Date.now();
+    enLastDipAt = Date.now();
+    enSoftTarget = randInt(3200, 5600);
+    channelOnline.en = enOnline;
+}
 
-    // Nudge non-English channels (always under 180, all different)
+function nudgeOtherChannels() {
+    ensureChannelOnlineSeeded();
     getChatChannels().forEach(function(ch) {
         if(ch === 'en') return;
         var cur = channelOnline[ch] != null ? channelOnline[ch] : randInt(30, 150);
-        var delta = randInt(-14, 16);
+        var delta = randInt(-8, 10);
         channelOnline[ch] = Math.max(18, Math.min(OTHER_CHANNEL_CAP, cur + delta));
     });
+}
 
-    // English / USA takes the slots total (highest), with small live jitter
-    var slotsTotal = getTotalPlaying();
-    var jitter = randInt(-55, 70);
-    var en = Math.min(ONLINE_CAP, Math.max(0, slotsTotal + jitter));
-    en = Math.max(en, maxOtherOnline() + 120); // always clearly highest
-    en = Math.min(ONLINE_CAP, en);
-    channelOnline.en = en;
+function tickEnglishOnline() {
+    seedEnglishOnline();
 
+    var now = Date.now();
+    var warmedUp = (now - enOnlineBootAt) >= (30 * 60 * 1000);
+
+    // Every ~12 minutes: small dip to keep it balanced
+    if((now - enLastDipAt) >= (12 * 60 * 1000)) {
+        enOnline = Math.max(EN_MIN, enOnline - randInt(18, 48));
+        enLastDipAt = now;
+        enSoftTarget = Math.max(EN_MIN + 400, Math.min(EN_MAX - 400, enSoftTarget + randInt(-180, 180)));
+    }
+
+    var delta;
+    if(!warmedUp) {
+        // First 30 min: steady climb (~+8 to +15 each ~30s, e.g. 800 → 812)
+        delta = randInt(8, 15);
+    } else if(enOnline < enSoftTarget - 100) {
+        // After 30 min: slower climb toward soft target
+        delta = randInt(2, 6);
+    } else if(enOnline > enSoftTarget + 100) {
+        // Gently ease down toward balance
+        delta = -randInt(2, 8);
+    } else {
+        // Hover near target with tiny noise
+        delta = randInt(-4, 5);
+    }
+
+    enOnline = Math.max(EN_MIN, Math.min(EN_MAX, enOnline + delta));
+    // Always stay clearly above other languages
+    enOnline = Math.max(enOnline, maxOtherOnline() + 200);
+    enOnline = Math.min(EN_MAX, enOnline);
+    channelOnline.en = enOnline;
+}
+
+function refreshChannelOnline(broadcast) {
+    nudgeOtherChannels();
+    tickEnglishOnline();
     if(broadcast !== false) broadcastOnline();
 }
 
 function getOnlineByChannel() {
     ensureChannelOnlineSeeded();
-    if(channelOnline.en == null) refreshChannelOnline(false);
 
     var out = {};
     getChatChannels().forEach(function(ch) {
         out[ch] = channelOnline[ch] != null ? channelOnline[ch] : 0;
     });
-    // Keep English highest even if someone reads mid-refresh
     if(out.en != null) {
-        out.en = Math.min(ONLINE_CAP, Math.max(out.en, maxOtherOnline() + 120));
+        out.en = Math.max(EN_MIN, Math.min(EN_MAX, out.en));
+        out.en = Math.max(out.en, maxOtherOnline() + 200);
+        out.en = Math.min(EN_MAX, out.en);
     }
     return out;
 }
@@ -206,7 +255,8 @@ function broadcastOnline() {
 
 function scheduleChannelOnlineTick() {
     refreshChannelOnline(true);
-    var delay = randInt(18, 42) * 1000; // fluctuate every ~20–40s
+    // ~30s cadence so climbs feel gradual (800 → ~812), not sudden jumps
+    var delay = randInt(28, 33) * 1000;
     setTimeout(scheduleChannelOnlineTick, delay);
 }
 
