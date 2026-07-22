@@ -1,0 +1,53 @@
+GoldWitch — Google / Discord / reCAPTCHA setup
+==============================================
+
+Internal Server Error happened because OAuth was enabled in the UI but
+GOOGLE_* / DISCORD_* secrets were never set on Render.
+
+After you add the keys below, Manual Deploy. Check:
+  https://goldwitch-8gft.onrender.com/auth/status
+google.active / discord.active should be true.
+
+------------------------------------------------
+1) Google OAuth
+------------------------------------------------
+https://console.cloud.google.com/apis/credentials
+
+- Create OAuth client ID → Web application
+- Authorized JavaScript origins:
+    https://goldwitch-8gft.onrender.com
+- Authorized redirect URIs:
+    https://goldwitch-8gft.onrender.com/auth/google/callback
+
+Render Environment:
+  GOOGLE_CLIENT_ID=...
+  GOOGLE_CLIENT_SECRET=...
+  GOOGLE_CALLBACK_URL=https://goldwitch-8gft.onrender.com/auth/google/callback
+
+------------------------------------------------
+2) Discord OAuth
+------------------------------------------------
+https://discord.com/developers/applications
+
+- New Application → OAuth2
+- Redirects:
+    https://goldwitch-8gft.onrender.com/auth/discord/callback
+
+Render Environment:
+  DISCORD_CLIENT_ID=...
+  DISCORD_CLIENT_SECRET=...
+  DISCORD_CALLBACK_URL=https://goldwitch-8gft.onrender.com/auth/discord/callback
+
+------------------------------------------------
+3) reCAPTCHA (optional for claim modal)
+------------------------------------------------
+https://www.google.com/recaptcha/admin
+
+- reCAPTCHA v2 "I'm not a robot"
+- Domains: goldwitch-8gft.onrender.com
+
+Render Environment:
+  RECAPTCHA_PUBLIC_KEY=...
+  RECAPTCHA_PRIVATE_KEY=...
+
+If these are empty, claim flows still work (recaptcha is skipped).

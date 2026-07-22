@@ -1,5 +1,24 @@
 var { resolveDatabaseConfig } = require('./databaseEnv.js');
 
+function trimEnv(value) {
+    return String(value || '').trim().replace(/^['"]|['"]$/g, '');
+}
+
+function oauthCallbackUrl(envValue, defaultPath) {
+    var raw = trimEnv(envValue) || defaultPath;
+    if(/^https?:\/\//i.test(raw)) return raw;
+    var base = trimEnv(process.env.APP_URL).replace(/\/$/, '');
+    if(!base) return raw;
+    return base + (raw.charAt(0) === '/' ? raw : '/' + raw);
+}
+
+var googleClient = trimEnv(process.env.GOOGLE_CLIENT_ID);
+var googleSecret = trimEnv(process.env.GOOGLE_CLIENT_SECRET);
+var discordClient = trimEnv(process.env.DISCORD_CLIENT_ID);
+var discordSecret = trimEnv(process.env.DISCORD_CLIENT_SECRET);
+var recaptchaPrivate = trimEnv(process.env.RECAPTCHA_PRIVATE_KEY);
+var recaptchaPublic = trimEnv(process.env.RECAPTCHA_PUBLIC_KEY);
+
 const config = {
 	settings: require('../settings.json'),
 
@@ -36,19 +55,17 @@ const config = {
         },
 
         google: {
-            active: false,
-
-            client: process.env.GOOGLE_CLIENT_ID,
-            secret: process.env.GOOGLE_CLIENT_SECRET,
-            callback_url: process.env.GOOGLE_CALLBACK_URL
+            active: !!(googleClient && googleSecret),
+            client: googleClient,
+            secret: googleSecret,
+            callback_url: oauthCallbackUrl(process.env.GOOGLE_CALLBACK_URL, '/auth/google/callback')
         },
 
         discord: {
-            active: false,
-
-            client: process.env.DISCORD_CLIENT_ID,
-            secret: process.env.DISCORD_CLIENT_SECRET,
-            callback_url: process.env.DISCORD_CALLBACK_URL
+            active: !!(discordClient && discordSecret),
+            client: discordClient,
+            secret: discordSecret,
+            callback_url: oauthCallbackUrl(process.env.DISCORD_CALLBACK_URL, '/auth/discord/callback')
         },
 
 		mailer: {
@@ -60,8 +77,9 @@ const config = {
 		},
 
 		recaptcha: {
-			private_key: process.env.RECAPTCHA_PRIVATE_KEY,
-			public_key: process.env.RECAPTCHA_PUBLIC_KEY
+			private_key: recaptchaPrivate,
+			public_key: recaptchaPublic,
+			active: !!(recaptchaPrivate && recaptchaPublic)
 		},
 
         pages: {

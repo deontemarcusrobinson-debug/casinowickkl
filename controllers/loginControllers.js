@@ -14,7 +14,10 @@ exports.login = async (req, res, next) => {
         name: config.app.pages['login'],
         response: {
             returnUrl,
-            links: config.settings.server.auth
+            links: {
+                google: { enable: !!(config.settings.server.auth.google && config.settings.server.auth.google.enable && config.app.google.active) },
+                discord: { enable: !!(config.settings.server.auth.discord && config.settings.server.auth.discord.enable && config.app.discord.active) }
+            }
         }
     });
 };

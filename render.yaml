@@ -80,3 +80,19 @@ services:
         value: "true"
       - key: ADMIN_EMAILS
         value: "nbtnateyt@gmail.com,nbtrobinson@gmail.com"
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        value: https://goldwitch-8gft.onrender.com/auth/google/callback
+      - key: DISCORD_CLIENT_ID
+        sync: false
+      - key: DISCORD_CLIENT_SECRET
+        sync: false
+      - key: DISCORD_CALLBACK_URL
+        value: https://goldwitch-8gft.onrender.com/auth/discord/callback
+      - key: RECAPTCHA_PUBLIC_KEY
+        sync: false
+      - key: RECAPTCHA_PRIVATE_KEY
+        sync: false

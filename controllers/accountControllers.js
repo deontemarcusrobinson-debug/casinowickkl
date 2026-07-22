@@ -66,11 +66,11 @@ exports.accountSettings = async (req, res, next) => {
 
                                         links: {
                                             ...Object.keys(config.settings.server.auth).reduce((acc, cur) => ({ ...acc, [cur]: {
-                                                enable: config.settings.server.auth[cur].enable,
+                                                enable: !!(config.settings.server.auth[cur].enable && config.app[cur] && config.app[cur].active),
                                                 linked: false
                                             } }), {}),
                                             ...row5.reduce((acc, cur) => ({ ...acc, [cur.provider]: {
-                                                enable: config.settings.server.auth[cur.provider].enable,
+                                                enable: !!(config.settings.server.auth[cur.provider].enable && config.app[cur.provider] && config.app[cur.provider].active),
                                                 linked: true
                                             } }), {})
                                         }

@@ -127,6 +127,13 @@ exports.register = async (req, res) => {
 };
 
 exports.google = async (req, res, next) => {
+    if(!config.app.google.active) {
+        return res.status(503).render('409', {
+            layout: 'layouts/error',
+            error: 'Google login is not configured yet. Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET on Render, then redeploy.'
+        });
+    }
+
     if(res.locals.user && req.query.link !== 'true') return res.status(409).render('409', { layout: 'layouts/error', error: 'User already logged in' });
 
     req.session.link = req.query.link === 'true';
@@ -152,14 +159,22 @@ exports.googleCallback = async (req, res, next) => {
         delete req.session.returnUrl;
 
         var id = user.id;
-        var email = user.emails[0].value;
-        var name = user.displayName;
-        var avatar = user.photos[0].value;
+        var email = user.emails && user.emails[0] && user.emails[0].value;
+        var name = user.displayName || (email ? email.split('@')[0] : 'GoogleUser');
+        var avatar = user.photos && user.photos[0] && user.photos[0].value;
+
+        if(!email) {
+            return res.status(409).render('409', { layout: 'layouts/error', error: 'Google did not return an email. Enable the email scope in Google Cloud Console.' });
+        }
 
         var ip = req.ip;
         var agent = req.headers['user-agent'];
 
         if(link){
+            if(!res.locals.user) {
+                return res.status(409).render('409', { layout: 'layouts/error', error: 'You must be logged in to link Google.' });
+            }
+
             authService.linkAccount(res.locals.user.userid, 'google', id, function(err2){
                 if(err2) return res.status(409).render('409', { layout: 'layouts/error', error: err2.message });
 
@@ -220,6 +235,13 @@ exports.googleCallback = async (req, res, next) => {
 };
 
 exports.discord = async (req, res, next) => {
+    if(!config.app.discord.active) {
+        return res.status(503).render('409', {
+            layout: 'layouts/error',
+            error: 'Discord login is not configured yet. Add DISCORD_CLIENT_ID and DISCORD_CLIENT_SECRET on Render, then redeploy.'
+        });
+    }
+
     if(res.locals.user && req.query.link !== 'true') return res.status(409).render('409', { layout: 'layouts/error', error: 'User already logged in' });
 
     req.session.link = req.query.link === 'true';
@@ -246,13 +268,23 @@ exports.discordCallback = async (req, res, next) => {
 
         var id = user.id;
         var email = user.email;
-        var name = user.global_name;
-        var avatar = 'https://cdn.discordapp.com/avatars/' + id + '/' + user.avatar + '?size=100';
+        var name = user.global_name || user.username || (email ? email.split('@')[0] : 'DiscordUser');
+        var avatar = user.avatar
+            ? ('https://cdn.discordapp.com/avatars/' + id + '/' + user.avatar + '?size=100')
+            : ('https://cdn.discordapp.com/embed/avatars/' + (Number(id) % 5) + '.png');
+
+        if(!email) {
+            return res.status(409).render('409', { layout: 'layouts/error', error: 'Discord did not return an email. Make sure your Discord account has a verified email.' });
+        }
 
         var ip = req.ip;
         var agent = req.headers['user-agent'];
 
         if(link){
+            if(!res.locals.user) {
+                return res.status(409).render('409', { layout: 'layouts/error', error: 'You must be logged in to link Discord.' });
+            }
+
             authService.linkAccount(res.locals.user.userid, 'discord', id, function(err2){
                 if(err2) return res.status(409).render('409', { layout: 'layouts/error', error: err2.message });
 

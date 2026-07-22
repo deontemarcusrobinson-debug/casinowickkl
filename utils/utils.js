@@ -146,6 +146,11 @@ function haveRankPermission(permission, rank){
 }
 
 function verifyRecaptcha(recaptcha, callback){
+    // If reCAPTCHA keys are not set yet, do not block rewards/login flows
+    if(!config.app.recaptcha || !config.app.recaptcha.private_key || !config.app.recaptcha.public_key) {
+        return callback(true);
+    }
+
 	request('https://www.google.com/recaptcha/api/siteverify?secret=' + config.app.recaptcha.private_key + '&response=' + recaptcha, function(err1, response1) {
 		if(err1) {
 			loggerError(err1);
