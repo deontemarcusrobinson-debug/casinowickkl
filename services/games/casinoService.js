@@ -126,19 +126,53 @@ function listedGames() {
     return Object.values(games).filter(isGameListed);
 }
 
-/** Always keep 1 playable game per provider in lobby catalogs. */
+/** Always keep 1 playable game per provider in lobby catalogs. Prefer demo-capable titles. */
 function oneGamePerProvider(list) {
     var byProvider = {};
     list.forEach(function(game) {
         var key = game.provider.id;
-        var score = (stats[game.id] && stats[game.id].games) || 0;
-        if(!byProvider[key] || score > ((stats[byProvider[key].id] && stats[byProvider[key].id].games) || 0)) {
+        var playScore = (stats[game.id] && stats[game.id].games) || 0;
+        // only_demo games can launch in fun mode without wallet webhook
+        var score = playScore + (game.onlyDemo || game.demo ? 1000000 : 0);
+        var current = byProvider[key];
+        var currentScore = current
+            ? (((stats[current.id] && stats[current.id].games) || 0) + (current.onlyDemo || current.demo ? 1000000 : 0))
+            : -1;
+        if(!current || score > currentScore) {
             byProvider[key] = game;
         }
     });
     return Object.values(byProvider).sort(function(a, b) {
         return a.provider.name.localeCompare(b.provider.name);
     });
+}
+
+function fingerprint(value) {
+    var s = String(value || '');
+    if(!s) return null;
+    if(s.length <= 8) return 'len:' + s.length;
+    return s.slice(0, 4) + '…' + s.slice(-4) + ':len' + s.length;
+}
+
+function launchErrorFromBody(statusCode, body1) {
+    var raw = String(body1 || '');
+    if(isJsonString(raw)) {
+        try {
+            var body = JSON.parse(raw);
+            var code = body.error || body.code;
+            var msg = body.message || '';
+            if(code === 'FUN_MODE_NOT_AVAILABLE') {
+                return 'This game has no demo. Sign in and play for real.';
+            }
+            if(code === 'INTEGRATION_VALIDATION_FAILED') {
+                return 'Wallet callback failed. Check Drakon Site Endpoint and DRAKON_* env on Render.';
+            }
+            if(msg) return msg;
+            if(code) return 'Launch failed (' + code + ').';
+        } catch (e) {}
+    }
+    if(statusCode === 422) return 'This game cannot launch in the selected mode. Try another.';
+    return 'Could not launch this game. Please try another.';
 }
 
 function catalogGames(type) {
@@ -797,8 +831,8 @@ function getLaunchUrl(userid, name, id, demo, device, callback, retried) {
                     });
                 }
 
-                loggerError('[CASINO] Launch HTTP ' + (response1 && response1.statusCode) + ' game=' + id + ' body=' + String(body1 || '').slice(0, 200));
-                return callback(new Error('Could not launch this game. Please try another.'));
+                loggerError('[CASINO] Launch HTTP ' + (response1 && response1.statusCode) + ' game=' + id + ' body=' + String(body1 || '').slice(0, 300));
+                return callback(new Error(launchErrorFromBody(response1 && response1.statusCode, body1)));
             }
 
             if(!isJsonString(body1)) {
@@ -807,7 +841,7 @@ function getLaunchUrl(userid, name, id, demo, device, callback, retried) {
 
             var body = JSON.parse(body1);
             if(!body || !body.game_url) {
-                return callback(new Error('Could not launch this game. Please try another.'));
+                return callback(new Error(launchErrorFromBody(200, body1)));
             }
 
             callback(null, body.game_url);
@@ -1793,6 +1827,10 @@ function getCasinoStatus(){
     return {
         configured: !!(agent.code && agent.token && agent.secret_key),
         authenticated: !!token,
+        agentCode: agent.code || null,
+        tokenFp: fingerprint(agent.token),
+        secretFp: fingerprint(agent.secret_key),
+        siteEndpointHint: String(process.env.APP_URL || '').replace(/\/$/, '') + '/drakon',
         market: config.games.games.casino.market || 'all',
         realMoneyOnly: !!config.games.games.casino.real_money_only,
         onePerProvider: !!config.games.games.casino.one_per_provider,

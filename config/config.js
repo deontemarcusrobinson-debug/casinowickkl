@@ -532,12 +532,13 @@ const config = {
 
                 drakon: {
                     agent: {
-                        code: process.env.DRAKON_AGENT_CODE,
-                        token: process.env.DRAKON_AGENT_TOKEN,
-                        secret_key: process.env.DRAKON_AGENT_SECRET_KEY,
-                        currency: process.env.DRAKON_AGENT_CURRENCY
+                        // Trim + strip accidental quotes from Render/dashboard paste
+                        code: String(process.env.DRAKON_AGENT_CODE || '').trim().replace(/^['"]|['"]$/g, ''),
+                        token: String(process.env.DRAKON_AGENT_TOKEN || '').trim().replace(/^['"]|['"]$/g, ''),
+                        secret_key: String(process.env.DRAKON_AGENT_SECRET_KEY || '').trim().replace(/^['"]|['"]$/g, ''),
+                        currency: String(process.env.DRAKON_AGENT_CURRENCY || 'USD').trim() || 'USD'
                     },
-                    language: process.env.DRAKON_LANGUAGE
+                    language: String(process.env.DRAKON_LANGUAGE || 'en').trim() || 'en'
                 },
 
                 // CASINO_MARKET=all|us|ohio
