@@ -57,11 +57,19 @@ function runSqlFile(tableName, filePath, kind, callback) {
     fs.readFile(filePath, 'utf8', function(err1, sql) {
         if(err1) return callback(err1);
 
-        // Run statement-by-statement so one ALTER/INDEX hiccup doesn't abort the whole table.
+        // Fresh installs only need CREATE TABLE (indexes are already inline).
+        // Skipping ALTER/CREATE INDEX avoids MySQL 8 vs MariaDB syntax traps.
         var statements = String(sql)
             .split(';')
             .map(function(s) { return s.trim(); })
-            .filter(function(s) { return s.length > 0; });
+            .filter(function(s) {
+                return s.length > 0 && /^\s*CREATE\s+TABLE\b/i.test(s);
+            });
+
+        if(statements.length === 0) {
+            console.log('\x1b[33m[database] Table ' + tableName + ' — no CREATE TABLE found, skip');
+            return callback(null);
+        }
 
         var ignorable = {
             ER_TABLE_EXISTS_ERROR: true,
@@ -82,7 +90,7 @@ function runSqlFile(tableName, filePath, kind, callback) {
                     if(ignorable[err2.code]) {
                         return runNext(i + 1);
                     }
-                    console.error('[database] SQL failed in ' + fileNameSafe(filePath) + ' #' + (i + 1) + ':', err2.code || '', err2.message || err2);
+                    console.error('[database] SQL failed in ' + path.basename(filePath) + ':', err2.code || '', err2.message || err2);
                     return callback(err2);
                 }
                 runNext(i + 1);
@@ -91,10 +99,6 @@ function runSqlFile(tableName, filePath, kind, callback) {
 
         runNext(0);
     });
-}
-
-function fileNameSafe(filePath) {
-    return path.basename(filePath);
 }
 
 function processMigrateTables(callback) {

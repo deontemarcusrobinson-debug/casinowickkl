@@ -1,7 +1,7 @@
-# MySQL 8 for Render private service (persistent disk must mount at /var/lib/mysql)
-# Use native password plugin so older clients can connect; app uses mysql2 (supports both).
-FROM mysql:8.0
+# MariaDB matches local GoldWitch better than MySQL 8 auth/SQL quirks.
+# Persistent disk must mount at /var/lib/mysql (MariaDB uses the same path).
+FROM mariadb:10.11
 
-CMD ["--default-authentication-plugin=mysql_native_password", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+ENV MARIADB_AUTO_UPGRADE=1
 
 EXPOSE 3306

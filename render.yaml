@@ -12,10 +12,12 @@ services:
     dockerfilePath: ./docker/mysql/Dockerfile
     dockerContext: ./docker/mysql
     disk:
-      name: goldwitch-mysql-data
+      # New disk name so we don't reuse the broken MySQL 8 data directory
+      name: goldwitch-mysql-data-v2
       mountPath: /var/lib/mysql
       sizeGB: 10
     envVars:
+      # Official MariaDB image still accepts MYSQL_* aliases
       - key: MYSQL_DATABASE
         value: vgowitch
       - key: MYSQL_USER

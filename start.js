@@ -176,9 +176,9 @@ function startApp() {
     check.query('SELECT 1 FROM `bannedip` LIMIT 1', function(errCheck) {
         check.destroy();
         if(errCheck) {
+            bootStatus = 'TABLE CHECK FAILED: ' + (errCheck.code || '') + ' ' + (errCheck.message || errCheck);
             console.error('[boot] Post-migrate check failed:', errCheck.code || '', errCheck.message || errCheck);
-            console.error('[boot] Tables may be missing. Fix MySQL env / migrate, then redeploy.');
-            process.exit(1);
+            return;
         }
 
         bootStatus = 'starting-app';
@@ -188,8 +188,10 @@ function startApp() {
             try {
                 require(appScript);
             } catch (e) {
+                // Re-open a simple error server so the failure is visible
+                bootStatus = 'APP LOAD FAILED: ' + (e && e.message ? e.message : e);
                 console.error('[boot] Failed to load app.js:', e && e.stack ? e.stack : e);
-                process.exit(1);
+                listenBootServer(function() {});
             }
         });
     });
@@ -206,15 +208,17 @@ function migrateThenStart() {
 
     runNodeScript(['scripts/database.js', '--create'], function(err2) {
         if(err2) {
+            bootStatus = 'CREATE DB FAILED: ' + (err2.message || err2);
             console.error('[boot] create failed:', err2.message || err2);
-            process.exit(1);
+            return;
         }
 
         bootStatus = 'migrating-tables';
         runNodeScript(['scripts/database.js', '--migrate'], function(err3) {
             if(err3) {
+                bootStatus = 'MIGRATE FAILED: ' + (err3.message || err3);
                 console.error('[boot] migrate failed:', err3.message || err3);
-                process.exit(1);
+                return;
             }
 
             startApp();
@@ -230,11 +234,10 @@ listenBootServer(function(errListen) {
 
     waitForMysql(120, function(err1) {
         if(err1) {
-            bootStatus = 'mysql-failed';
+            bootStatus = 'MYSQL FAILED: ' + (err1.code || '') + ' ' + (err1.message || err1);
             console.error('[boot] MySQL not reachable:', err1.code || '', err1.message || err1);
-            console.error('[boot] Fix: Render needs MySQL private service linked + mysql2 client, then Redeploy.');
-            // Keep boot server up so logs stay readable; exit after a short delay
-            setTimeout(function() { process.exit(1); }, 5000);
+            console.error('[boot] Leaving boot server up so / shows the error. Fix MySQL, then Redeploy.');
+            // Do not exit immediately — Render + browser can read the error from /
             return;
         }
 
