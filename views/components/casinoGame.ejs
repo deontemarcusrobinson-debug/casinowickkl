@@ -32,7 +32,7 @@
 
     <div class="playing flex flex-row items-center gap-1">
         <span class="playing-dot"></span>
-        <span class="playing-count"><%= typeof playing !== 'undefined' && playing != null ? playing : 0 %></span>
+        <span class="playing-count"><%= (typeof locals !== 'undefined' && locals.playing != null) ? locals.playing : (typeof playing !== 'undefined' && playing != null ? playing : 0) %></span>
         <span class="playing-label">playing</span>
     </div>
 </a>

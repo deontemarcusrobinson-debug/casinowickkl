@@ -1,11 +1,15 @@
 var { pool } = require('@/lib/database.js');
 
 var casinoService = require('@/services/games/casinoService.js');
+var activityService = require('@/services/activityService.js');
 
 var { haveRankPermission } = require('@/utils/utils.js');
 
 var config = require('@/config/config.js');
 
+function withPlaying(list) {
+    return activityService.attachPlaying(list);
+}
 exports.casinoUnset = async (req, res, next) => {
     res.redirect('/casino/lobby');
 };
@@ -54,7 +58,7 @@ exports.casinoSlots = async (req, res, next) => {
         response: {
             casino: {
                 slots: {
-                    list: result.map(a => ({
+                    list: withPlaying(result.map(a => ({
                         id: a.id,
                         enable: casinoService.providers[casinoService.games[a.id].provider.id] !== undefined ? casinoService.games[a.id].status && casinoService.providers[casinoService.games[a.id].provider.id].status : false,
                         name: casinoService.games[a.id].game.name,
@@ -62,7 +66,7 @@ exports.casinoSlots = async (req, res, next) => {
                         provider: casinoService.games[a.id].provider.name,
                         rtp: casinoService.games[a.id].rtp,
                         favorite: res.locals.user && casinoService.favorites[res.locals.user.userid] !== undefined ? casinoService.favorites[res.locals.user.userid].some(b => b == a.id) : false
-                    })),
+                    }))),
                     pages: pages,
                     page: 1
                 },
@@ -98,7 +102,7 @@ exports.casinoLive = async (req, res, next) => {
         response: {
             casino: {
                 live: {
-                    list: result.map(a => ({
+                    list: withPlaying(result.map(a => ({
                         id: a.id,
                         enable: casinoService.providers[casinoService.games[a.id].provider.id] !== undefined ? casinoService.games[a.id].status && casinoService.providers[casinoService.games[a.id].provider.id].status : false,
                         name: casinoService.games[a.id].game.name,
@@ -106,7 +110,7 @@ exports.casinoLive = async (req, res, next) => {
                         provider: casinoService.games[a.id].provider.name,
                         rtp: casinoService.games[a.id].rtp,
                         favorite: res.locals.user && casinoService.favorites[res.locals.user.userid] !== undefined ? casinoService.favorites[res.locals.user.userid].some(b => b == a.id) : false
-                    })),
+                    }))),
                     pages: pages,
                     page: 1
                 },
@@ -158,7 +162,7 @@ exports.casinoRecent = async (req, res, next) => {
 
         var result = listitems.slice(0, config.app.pagination.items.casino_recent_games);
 
-        response.casino.recent.list = result.map(a => ({
+        response.casino.recent.list = withPlaying(result.map(a => ({
             id: a.id,
             enable: casinoService.providers[casinoService.games[a.id].provider.id] !== undefined ? casinoService.games[a.id].status && casinoService.providers[casinoService.games[a.id].provider.id].status : false,
             name: casinoService.games[a.id].game.name,
@@ -166,7 +170,7 @@ exports.casinoRecent = async (req, res, next) => {
             provider: casinoService.games[a.id].provider.name,
             rtp: casinoService.games[a.id].rtp,
             favorite: res.locals.user && casinoService.favorites[res.locals.user.userid] !== undefined ? casinoService.favorites[res.locals.user.userid].some(b => b == a.id) : false
-        }));
+        })));
 
         response.casino.recent.pages = pages;
 
@@ -206,7 +210,7 @@ exports.casinoFavorites = async (req, res, next) => {
         response: {
             casino: {
                 favorites: {
-                    list: result.map(a => ({
+                    list: withPlaying(result.map(a => ({
                         id: a.id,
                         enable: casinoService.providers[casinoService.games[a.id].provider.id] !== undefined ? casinoService.games[a.id].status && casinoService.providers[casinoService.games[a.id].provider.id].status : false,
                         name: casinoService.games[a.id].game.name,
@@ -214,7 +218,7 @@ exports.casinoFavorites = async (req, res, next) => {
                         provider: casinoService.games[a.id].provider.name,
                         rtp: casinoService.games[a.id].rtp,
                         favorite: true
-                    })),
+                    }))),
                     pages: pages,
                     page: 1
                 },
@@ -254,7 +258,8 @@ exports.casinoProviders = async (req, res, next) => {
                             image: casinoService.games[b].game.image,
                             provider: casinoService.games[b].provider.name,
                             rtp: casinoService.games[b].rtp,
-                            favorite: res.locals.user && casinoService.favorites[res.locals.user.userid] !== undefined ? casinoService.favorites[res.locals.user.userid].some(c => c == b) : false
+                            favorite: res.locals.user && casinoService.favorites[res.locals.user.userid] !== undefined ? casinoService.favorites[res.locals.user.userid].some(c => c == b) : false,
+                            playing: activityService.getPlaying(b)
                         }))
                     })),
                     pages: pages,
@@ -296,7 +301,7 @@ exports.casinoGame = async (req, res, next) => {
                 provider: {
                     id: casinoService.games[id].provider.id,
                     name: casinoService.providers[casinoService.games[id].provider.id].name,
-                    games: result.map(a => ({
+                    games: withPlaying(result.map(a => ({
                         id: a.id,
                         enable: casinoService.games[a.id].status && casinoService.providers[casinoService.games[id].provider.id].status,
                         name: casinoService.games[a.id].game.name,
@@ -304,7 +309,7 @@ exports.casinoGame = async (req, res, next) => {
                         provider: casinoService.games[a.id].provider.name,
                         rtp: casinoService.games[a.id].rtp,
                         favorite: res.locals.user && casinoService.favorites[res.locals.user.userid] !== undefined ? casinoService.favorites[res.locals.user.userid].some(b => b == a.id) : false
-                    }))
+                    })))
                 },
                 providers: casinoService.getPopularPrividers()
             }
@@ -339,7 +344,7 @@ exports.casinoProvider = async (req, res, next) => {
                     name: casinoService.providers[id].name,
                     image: casinoService.providers[id].image,
                     games: {
-                        list: result.map(a => ({
+                        list: withPlaying(result.map(a => ({
                             id: a.id,
                             enable: casinoService.games[a.id].status && casinoService.providers[id].status,
                             name: casinoService.games[a.id].game.name,
@@ -347,7 +352,7 @@ exports.casinoProvider = async (req, res, next) => {
                             provider: casinoService.games[a.id].provider.name,
                             rtp: casinoService.games[a.id].rtp,
                             favorite: res.locals.user && casinoService.favorites[res.locals.user.userid] !== undefined ? casinoService.favorites[res.locals.user.userid].some(b => b == a.id) : false
-                        })),
+                        }))),
                         pages: pages,
                         page: 1
                     },
