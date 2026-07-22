@@ -24,12 +24,18 @@ var referral = async (req, res) => {
         var agent = req.headers['user-agent'];
 
         getLocationByIp(ip, function(err2, response){
-            if(err2) return res.status(409).render('409', { layout: 'layouts/error', error: err2.message });
+            if(err2 || !response) response = { country: 'XX', region: 'Unknown', city: 'Unknown' };
 
             var location = [ response.city, response.region, response.country ].join(', ');
 
             pool.query('INSERT INTO `referral_visitors` SET `referral` = ' + pool.escape(row1[0].userid) + ', `ip` = ' + pool.escape(ip) + ', `location` = ' + pool.escape(location) + ', `agent` = ' + pool.escape(agent) + ', `time` = ' + pool.escape(time()), function(err3) {
-                if(err3) return res.status(409).render('409', { layout: 'layouts/error', error: 'An error occurred while processing referral middleware (2)' });
+                if(err3) {
+                    if(!res.locals.user) {
+                        req.session.referral = code;
+                        return res.redirect('/');
+                    }
+                    return res.redirect('/');
+                }
 
                 if(!res.locals.user) {
                     req.session.referral = code;

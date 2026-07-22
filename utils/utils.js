@@ -8,26 +8,39 @@ var { roundedToFixed, getFormatAmount } = require('@/utils/formatAmount.js');
 var config = require('@/config/config.js');
 
 function getLocationByIp(ip, callback){
-    request('https://ipinfo.io/' + ip + '/json?token=' + config.app.ipinfo.api_token, function(err1, response1) {
+    var fallback = { country: 'XX', region: 'Unknown', city: 'Unknown' };
+
+    if(!ip || ip === '::1' || ip === '127.0.0.1' || String(ip).indexOf('127.') === 0 || String(ip).indexOf('10.') === 0 || String(ip).indexOf('192.168.') === 0 || String(ip).indexOf('fc') === 0 || String(ip).indexOf('fd') === 0) {
+        return callback(null, fallback);
+    }
+
+    var token = config.app.ipinfo && config.app.ipinfo.api_token;
+    if(!token) {
+        return callback(null, fallback);
+    }
+
+    request('https://ipinfo.io/' + ip + '/json?token=' + token, function(err1, response1) {
 		if(err1) {
             loggerError(err1);
-
-            return callback(new Error('An error occurred while getting location by ip (1)'));
+            return callback(null, fallback);
         }
 
         if(!response1 || response1.statusCode != 200) {
-            loggerError('Unable to load IP location for ' + ip + '. Response body: ' + response1.body);
-
-            return callback(new Error('An error occurred while getting location by ip (2)'));
+            loggerError('Unable to load IP location for ' + ip + '. Response body: ' + (response1 && response1.body));
+            return callback(null, fallback);
         }
 
-		var res = JSON.parse(response1.body);
-
-        var country = res.country;
-        var region = res.region;
-        var city = res.city;
-
-		callback(null, { country, region, city });
+        try {
+            var res = JSON.parse(response1.body);
+            callback(null, {
+                country: res.country || 'XX',
+                region: res.region || 'Unknown',
+                city: res.city || 'Unknown'
+            });
+        } catch (e) {
+            loggerError(e);
+            callback(null, fallback);
+        }
 	});
 }
 
