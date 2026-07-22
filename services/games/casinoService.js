@@ -102,13 +102,15 @@ function blockBrokenGame(id, reason) {
     loggerInfo('[CASINO] Removed broken game from catalog: ' + id + ' (' + reason + ')');
 }
 
-function isLaunchFailureToRemove(err) {
+function isHardConnectFailure(err) {
     var msg = String((err && err.message) || err || '').toLowerCase();
-    return msg.indexOf('getting launch url (2)') !== -1
+    var code = String((err && err.code) || '').toLowerCase();
+    return code === 'econnrefused'
+        || code === 'enotfound'
+        || code === 'etimedout'
         || msg.indexOf('refused to connect') !== -1
         || msg.indexOf('econnrefused') !== -1
-        || msg.indexOf('enotfound') !== -1
-        || (msg.indexOf('gator.drakon.casino') !== -1 && msg.indexOf('refused') !== -1);
+        || msg.indexOf('enotfound') !== -1;
 }
 
 function isGameListed(game) {
@@ -734,69 +736,92 @@ function loadGames(callback){
             delete gameids[id];
         });
 
-        loggerInfo('[CASINO] Catalog filter market=' + (config.games.games.casino.market || 'us') +
+        loggerInfo('[CASINO] Catalog filter market=' + (config.games.games.casino.market || 'all') +
             ' kept=' + gamesNew.length +
             ' skippedProvider=' + skippedProvider +
             ' skippedDemoOnly=' + skippedDemoOnly);
+
+        // Fresh catalog — clear temporary launch blocks
+        blockedGames = {};
 
         callback(null);
 	});
 }
 
 /* ----- INTERNAL USAGE ----- */
-function getLaunchUrl(userid, name, id, demo, device, callback){
-    var options = {
-		'method': 'GET',
-		'url': 'https://gator.drakon.casino/api/v1/games/game_launch',
-		'headers': {
-			'Authorization': 'Bearer ' + token
-		},
-		'qs': {
-            'agent_code': config.games.games.casino.drakon.agent.code,
-            'agent_token': config.games.games.casino.drakon.agent.token,
-			'game_id': games[id].game.id,
-			'user_id': userid,
-			'user_name': name,
-			'type': demo ? 'TRY' : 'CHARGED',
-			'mode': demo ? 'fun' : 'real',
-			'device': device,
-			'currency': config.games.games.casino.drakon.agent.currency,
-			'lang': config.games.games.casino.drakon.language
-        },
-        timeout: 60000,
-        gzip: true
-	};
+function getLaunchUrl(userid, name, id, demo, device, callback, retried) {
+    if(!games[id]) return callback(new Error('Invalid game!'));
 
-    request(options, function(err1, response1, body1) {
-		if(err1) {
-            loggerError(err1);
-            var errConn = new Error('An error occurred while getting launch url (1)');
-            if(isLaunchFailureToRemove(err1) || isLaunchFailureToRemove(err1.code)) {
-                blockBrokenGame(id, err1.code || err1.message || 'connect_failed');
+    // Allow another try even if previously blocked (token/network issues)
+    if(blockedGames[id]) delete blockedGames[id];
+
+    function runLaunch() {
+        var options = {
+            method: 'GET',
+            url: 'https://gator.drakon.casino/api/v1/games/game_launch',
+            headers: {
+                Authorization: 'Bearer ' + token
+            },
+            qs: {
+                agent_code: config.games.games.casino.drakon.agent.code,
+                agent_token: config.games.games.casino.drakon.agent.token,
+                game_id: games[id].game.id,
+                user_id: userid,
+                user_name: name,
+                type: demo ? 'TRY' : 'CHARGED',
+                mode: demo ? 'fun' : 'real',
+                device: device,
+                currency: config.games.games.casino.drakon.agent.currency,
+                lang: config.games.games.casino.drakon.language
+            },
+            timeout: 60000,
+            gzip: true
+        };
+
+        request(options, function(err1, response1, body1) {
+            if(err1) {
+                loggerError(err1);
+                if(isHardConnectFailure(err1)) {
+                    blockBrokenGame(id, err1.code || 'refused_to_connect');
+                    return callback(new Error('This game provider is offline right now. Try another game.'));
+                }
+                return callback(new Error('Could not launch this game. Please try again.'));
             }
-            return callback(errConn);
-        }
 
-        if(!response1 || response1.statusCode != 200) {
-            var errHttp = new Error('An error occurred while getting launch url (2)');
-            blockBrokenGame(id, 'launch_http_' + (response1 && response1.statusCode));
-            return callback(errHttp);
-        }
-		if(!isJsonString(body1)) {
-            var errJson = new Error('An error occurred while getting launch url (3)');
-            blockBrokenGame(id, 'launch_bad_json');
-            return callback(errJson);
-        }
+            if(!response1 || response1.statusCode != 200) {
+                // Token expired / temporary API error — refresh once, then soft-fail (do NOT remove from lobby)
+                if(!retried && response1 && (response1.statusCode === 401 || response1.statusCode === 403)) {
+                    return generateToken(function(errAuth) {
+                        if(errAuth) return callback(new Error('Could not launch this game. Please try again.'));
+                        getLaunchUrl(userid, name, id, demo, device, callback, true);
+                    });
+                }
 
-        var body = JSON.parse(body1);
-        if(!body || !body.game_url) {
-            var errUrl = new Error('An error occurred while getting launch url (2)');
-            blockBrokenGame(id, 'launch_missing_url');
-            return callback(errUrl);
-        }
+                loggerError('[CASINO] Launch HTTP ' + (response1 && response1.statusCode) + ' game=' + id + ' body=' + String(body1 || '').slice(0, 200));
+                return callback(new Error('Could not launch this game. Please try another.'));
+            }
 
-        callback(null, body.game_url);
-	});
+            if(!isJsonString(body1)) {
+                return callback(new Error('Could not launch this game. Please try another.'));
+            }
+
+            var body = JSON.parse(body1);
+            if(!body || !body.game_url) {
+                return callback(new Error('Could not launch this game. Please try another.'));
+            }
+
+            callback(null, body.game_url);
+        });
+    }
+
+    if(!token) {
+        return generateToken(function(errAuth) {
+            if(errAuth) return callback(new Error('Could not launch this game. Please try again.'));
+            runLaunch();
+        });
+    }
+
+    runLaunch();
 }
 
 /* ----- CLIENT USAGE ----- */
@@ -1634,9 +1659,7 @@ function getLaunchGameDemo(user, socket, id, device, cooldown){
     getLaunchUrl(0, 'Guest', id, true, device, function(err1, url){
         if(err1) {
             emitSocketToUser(socket, 'message', 'error', {
-                message: blockedGames[id]
-                    ? 'This game is unavailable and was removed from the lobby.'
-                    : err1.message
+                message: err1.message || 'Could not launch this game. Please try another.'
             });
 
             return cooldown(false, true);
@@ -1715,9 +1738,7 @@ function getLaunchGameReal(user, socket, id, device, cooldown){
         getLaunchUrl(row1[0].id, user.name, id, false, device, function(err2, url){
             if(err2) {
                 emitSocketToUser(socket, 'message', 'error', {
-                    message: blockedGames[id]
-                        ? 'This game is unavailable and was removed from the lobby.'
-                        : err2.message
+                    message: err2.message || 'Could not launch this game. Please try another.'
                 });
 
                 return cooldown(false, true);
