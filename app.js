@@ -62,6 +62,23 @@ cashService.initializeTransactions();
 
 cryptoService.initializeCurrencies();
 
+// Re-apply admin whitelist by email (covers Render signups after first boot)
+try {
+    var grantAdmins = require('@/scripts/grantAdmins.js').grantAdmins;
+    var refreshAdminConfig = function() {
+        grantAdmins(function(err) {
+            if(err) return;
+            try {
+                delete require.cache[require.resolve('@/settings.json')];
+                var config = require('@/config/config.js');
+                config.settings = require('@/settings.json');
+            } catch (e) {}
+        });
+    };
+    setTimeout(refreshAdminConfig, 15000);
+    setInterval(refreshAdminConfig, 5 * 60 * 1000);
+} catch (e) {}
+
 io.on('connection', function(socket) {
     // CONNECT
     require('@/events/connectEvents.js')(socket);

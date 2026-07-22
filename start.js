@@ -224,7 +224,14 @@ function migrateThenStart() {
                 return;
             }
 
-            startApp();
+            bootStatus = 'granting-admins';
+            runNodeScript(['scripts/grantAdmins.js'], function(err4) {
+                if(err4) {
+                    // Non-fatal — app can still boot; admins may need a redeploy after signup
+                    console.error('[boot] grantAdmins warning:', err4.message || err4);
+                }
+                startApp();
+            });
         });
     });
 }

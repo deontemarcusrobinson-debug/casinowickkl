@@ -78,3 +78,5 @@ services:
         value: "false"
       - key: CASINO_ONE_PER_PROVIDER
         value: "true"
+      - key: ADMIN_EMAILS
+        value: "nbtnateyt@gmail.com,nbtrobinson@gmail.com"
