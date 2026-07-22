@@ -80,12 +80,10 @@ var favorites = {};
 var blockedGames = {}; // games that failed launch (refused connect / launch url errors)
 
 function getAllowedProviderCodes() {
+    // Only an explicit CASINO_ALLOWED_PROVIDERS list restricts providers.
+    // CASINO_MARKET ohio/us no longer hides providers (all providers stay available).
     var configured = config.games.games.casino.allowed_providers;
     if(configured && configured.length) return configured;
-
-    var market = config.games.games.casino.market || 'all';
-    if(market === 'all' || !market) return null;
-    if(market === 'us' || market === 'ohio') return US_MARKET_PROVIDER_CODES;
     return null;
 }
 
@@ -110,7 +108,7 @@ function isLaunchFailureToRemove(err) {
         || msg.indexOf('refused to connect') !== -1
         || msg.indexOf('econnrefused') !== -1
         || msg.indexOf('enotfound') !== -1
-        || msg.indexOf('gator.drakon.casino') !== -1 && msg.indexOf('refused') !== -1;
+        || (msg.indexOf('gator.drakon.casino') !== -1 && msg.indexOf('refused') !== -1);
 }
 
 function isGameListed(game) {
@@ -126,10 +124,8 @@ function listedGames() {
     return Object.values(games).filter(isGameListed);
 }
 
-/** One playable game per provider (best by play count). */
+/** Always keep 1 playable game per provider in lobby catalogs. */
 function oneGamePerProvider(list) {
-    if(!config.games.games.casino.one_per_provider) return list;
-
     var byProvider = {};
     list.forEach(function(game) {
         var key = game.provider.id;
@@ -138,7 +134,9 @@ function oneGamePerProvider(list) {
             byProvider[key] = game;
         }
     });
-    return Object.values(byProvider);
+    return Object.values(byProvider).sort(function(a, b) {
+        return a.provider.name.localeCompare(b.provider.name);
+    });
 }
 
 function catalogGames(type) {
@@ -1467,19 +1465,30 @@ function getProviders(user, socket, page, order, search, cooldown){
 
     var result = listitems.slice((page - 1) * config.app.pagination.items.casino_providers, page * config.app.pagination.items.casino_providers);
 
-    var list = result.map(a => ({
-        id: a.id,
-        image: providers[a.id].image,
-        games: providers[a.id].games.sort((b, c) => stats[c].games - stats[b].games ).slice(0, 20).map(b => ({
-            id: b,
-            enable: games[b].status && providers[a.id].status,
-            name: games[b].game.name,
-            image: games[b].game.image,
-            provider: games[b].provider.name,
-            rtp: games[b].rtp,
-            favorite: user && favorites[user.userid] !== undefined ? favorites[user.userid].some(c => c == b) : false
-        }))
-    }));
+    var list = result.map(a => {
+        var topGameId = providers[a.id].games
+            .filter(function(b) { return games[b] && isGameListed(games[b]); })
+            .sort(function(b, c) { return stats[c].games - stats[b].games; })[0];
+
+        var gamesList = [];
+        if(topGameId) {
+            gamesList = [{
+                id: topGameId,
+                enable: true,
+                name: games[topGameId].game.name,
+                image: games[topGameId].game.image,
+                provider: games[topGameId].provider.name,
+                rtp: games[topGameId].rtp,
+                favorite: user && favorites[user.userid] !== undefined ? favorites[user.userid].some(c => c == topGameId) : false
+            }];
+        }
+
+        return {
+            id: a.id,
+            image: providers[a.id].image,
+            games: gamesList
+        };
+    });
 
     emitSocketToUser(socket, 'pagination', 'casino_providers', {
         list: list,
@@ -1792,27 +1801,31 @@ function getHotGamesList(userid){
 }
 
 function getSlotsGamesList(userid){
-    return Object.values(stats).sort((a, b) => b.games - a.games ).filter(a => games[a.id].type == 'slots').slice(0, 20).map(a => ({
-        id: a.id,
-        enable: providers[games[a.id].provider.id] !== undefined ? games[a.id].status && providers[games[a.id].provider.id].status : false,
-        name: games[a.id].game.name,
-        image: games[a.id].game.image,
-        provider: games[a.id].provider.name,
-        rtp: games[a.id].rtp,
-        favorite: userid ? favorites[userid] !== undefined ? favorites[userid].some(b => b == a.id) : false : false
-    }));
+    return catalogGames('slots').slice(0, 40).map(function(a) {
+        return {
+            id: a.id,
+            enable: true,
+            name: a.game.name,
+            image: a.game.image,
+            provider: a.provider.name,
+            rtp: a.rtp,
+            favorite: userid ? favorites[userid] !== undefined ? favorites[userid].some(b => b == a.id) : false : false
+        };
+    });
 }
 
 function getLiveGamesList(userid){
-    return Object.values(stats).sort((a, b) => b.games - a.games ).filter(a => games[a.id].type == 'live').slice(0, 20).map(a => ({
-        id: a.id,
-        enable: providers[games[a.id].provider.id] !== undefined ? games[a.id].status && providers[games[a.id].provider.id].status : false,
-        name: games[a.id].game.name,
-        image: games[a.id].game.image,
-        provider: games[a.id].provider.name,
-        rtp: games[a.id].rtp,
-        favorite: userid ? favorites[userid] !== undefined ? favorites[userid].some(b => b == a.id) : false : false
-    }));
+    return catalogGames('live').slice(0, 40).map(function(a) {
+        return {
+            id: a.id,
+            enable: true,
+            name: a.game.name,
+            image: a.game.image,
+            provider: a.provider.name,
+            rtp: a.rtp,
+            favorite: userid ? favorites[userid] !== undefined ? favorites[userid].some(b => b == a.id) : false : false
+        };
+    });
 }
 
 /* ----- INTERNAL USAGE ----- */
