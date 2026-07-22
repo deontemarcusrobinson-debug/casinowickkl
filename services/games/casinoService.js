@@ -77,15 +77,16 @@ var vendors = {};
 
 var stats = {};
 var favorites = {};
+var blockedGames = {}; // games that failed launch (refused connect / launch url errors)
 
 function getAllowedProviderCodes() {
     var configured = config.games.games.casino.allowed_providers;
     if(configured && configured.length) return configured;
 
-    var market = config.games.games.casino.market || 'us';
-    if(market === 'all') return null;
+    var market = config.games.games.casino.market || 'all';
+    if(market === 'all' || !market) return null;
     if(market === 'us' || market === 'ohio') return US_MARKET_PROVIDER_CODES;
-    return US_MARKET_PROVIDER_CODES;
+    return null;
 }
 
 function isProviderAllowed(providerCode) {
@@ -94,8 +95,27 @@ function isProviderAllowed(providerCode) {
     return allowed.indexOf(providerCode) !== -1;
 }
 
+function blockBrokenGame(id, reason) {
+    if(!id || !games[id]) return;
+    blockedGames[id] = {
+        reason: reason || 'launch_failed',
+        time: Date.now()
+    };
+    loggerInfo('[CASINO] Removed broken game from catalog: ' + id + ' (' + reason + ')');
+}
+
+function isLaunchFailureToRemove(err) {
+    var msg = String((err && err.message) || err || '').toLowerCase();
+    return msg.indexOf('getting launch url (2)') !== -1
+        || msg.indexOf('refused to connect') !== -1
+        || msg.indexOf('econnrefused') !== -1
+        || msg.indexOf('enotfound') !== -1
+        || msg.indexOf('gator.drakon.casino') !== -1 && msg.indexOf('refused') !== -1;
+}
+
 function isGameListed(game) {
     if(!game || !game.status) return false;
+    if(blockedGames[game.id]) return false;
     if(!providers[game.provider.id] || !providers[game.provider.id].status) return false;
     if(!isProviderAllowed(game.provider.code)) return false;
     if(config.games.games.casino.real_money_only && game.onlyDemo) return false;
@@ -104,6 +124,27 @@ function isGameListed(game) {
 
 function listedGames() {
     return Object.values(games).filter(isGameListed);
+}
+
+/** One playable game per provider (best by play count). */
+function oneGamePerProvider(list) {
+    if(!config.games.games.casino.one_per_provider) return list;
+
+    var byProvider = {};
+    list.forEach(function(game) {
+        var key = game.provider.id;
+        var score = (stats[game.id] && stats[game.id].games) || 0;
+        if(!byProvider[key] || score > ((stats[byProvider[key].id] && stats[byProvider[key].id].games) || 0)) {
+            byProvider[key] = game;
+        }
+    });
+    return Object.values(byProvider);
+}
+
+function catalogGames(type) {
+    var list = listedGames();
+    if(type) list = list.filter(function(a) { return a.type == type; });
+    return oneGamePerProvider(list);
 }
 
 var providersMapping = {
@@ -723,20 +764,38 @@ function getLaunchUrl(userid, name, id, demo, device, callback){
 			'device': device,
 			'currency': config.games.games.casino.drakon.agent.currency,
 			'lang': config.games.games.casino.drakon.language
-        }
+        },
+        timeout: 60000,
+        gzip: true
 	};
 
     request(options, function(err1, response1, body1) {
 		if(err1) {
             loggerError(err1);
-
-            return callback(new Error('An error occurred while getting launch url (1)'));
+            var errConn = new Error('An error occurred while getting launch url (1)');
+            if(isLaunchFailureToRemove(err1) || isLaunchFailureToRemove(err1.code)) {
+                blockBrokenGame(id, err1.code || err1.message || 'connect_failed');
+            }
+            return callback(errConn);
         }
 
-        if(!response1 || response1.statusCode != 200) return callback(new Error('An error occurred while getting launch url (2)'));
-		if(!isJsonString(body1)) return callback(new Error('An error occurred while getting launch url (3)'));
+        if(!response1 || response1.statusCode != 200) {
+            var errHttp = new Error('An error occurred while getting launch url (2)');
+            blockBrokenGame(id, 'launch_http_' + (response1 && response1.statusCode));
+            return callback(errHttp);
+        }
+		if(!isJsonString(body1)) {
+            var errJson = new Error('An error occurred while getting launch url (3)');
+            blockBrokenGame(id, 'launch_bad_json');
+            return callback(errJson);
+        }
 
         var body = JSON.parse(body1);
+        if(!body || !body.game_url) {
+            var errUrl = new Error('An error occurred while getting launch url (2)');
+            blockBrokenGame(id, 'launch_missing_url');
+            return callback(errUrl);
+        }
 
         callback(null, body.game_url);
 	});
@@ -876,7 +935,7 @@ function getSlotsGames(user, socket, page, order, provider, search, cooldown){
 	page = parseInt(page);
 	search = search.trim();
 
-    var listitems = listedGames().filter(a => a.type == 'slots').map(a => ({
+    var listitems = catalogGames('slots').map(a => ({
         id: a.id,
         name: a.game.name,
         provider: {
@@ -977,7 +1036,7 @@ function getLiveGames(user, socket, page, order, provider, search, cooldown){
 	page = parseInt(page);
 	search = search.trim();
 
-    var listitems = listedGames().filter(a => a.type == 'live').map(a => ({
+    var listitems = catalogGames('live').map(a => ({
         id: a.id,
         name: a.game.name,
         provider: {
@@ -1296,7 +1355,7 @@ function getAllGames(user, socket, page, search, cooldown){
 	page = parseInt(page);
 	search = search.trim();
 
-    var listitems = listedGames().map(a => ({
+    var listitems = catalogGames().map(a => ({
         id: a.id,
         name: a.game.name,
         provider: {
@@ -1566,7 +1625,9 @@ function getLaunchGameDemo(user, socket, id, device, cooldown){
     getLaunchUrl(0, 'Guest', id, true, device, function(err1, url){
         if(err1) {
             emitSocketToUser(socket, 'message', 'error', {
-                message: err1.message
+                message: blockedGames[id]
+                    ? 'This game is unavailable and was removed from the lobby.'
+                    : err1.message
             });
 
             return cooldown(false, true);
@@ -1645,7 +1706,9 @@ function getLaunchGameReal(user, socket, id, device, cooldown){
         getLaunchUrl(row1[0].id, user.name, id, false, device, function(err2, url){
             if(err2) {
                 emitSocketToUser(socket, 'message', 'error', {
-                    message: err2.message
+                    message: blockedGames[id]
+                        ? 'This game is unavailable and was removed from the lobby.'
+                        : err2.message
                 });
 
                 return cooldown(false, true);
@@ -1665,97 +1728,22 @@ function getLaunchGameReal(user, socket, id, device, cooldown){
 }
 
 function getPopularPrividers(){
-    var ids = [
-        '3_oaks_gaming',
-        'amigo_gaming',
-        'amusnet_interactive',
-        'barbara_bang',
-        'betsoft',
-        'bgaming',
-        'booming_games',
-        'caleta_gaming',
-        'clawbuster',
-        'creedroomz',
-        'eeze',
-        'egt_digital',
-        'endorphina',
-        'evolution',
-        'evoplay',
-        'fazi',
-        'foxy_games',
-        'habanero',
-        'hacksaw',
-        'iconix_international',
-        'mascot_gaming',
-        'microgaming',
-        'netent',
-        'nolimit_city',
-        'novomatic',
-        'onetouch',
-        'onlyplay',
-        'pg_soft',
-        'playson',
-        'popiplay',
-        'pragmatic_play',
-        'red_tiger',
-        'retro_gaming',
-        'shady_lady',
-        'skywind_group',
-        'spinomenal',
-        'spribe',
-        'wazdan',
-        'wicked_games',
-        'yggdrasil'
-    ];
-
-    return ids.filter(a => providers[a] !== undefined).map(a => ({
-        id: a,
-        image: providers[a].image
-    }));
+    // One tile per provider that still has a listed game
+    var seen = {};
+    return catalogGames().filter(function(game) {
+        if(seen[game.provider.id]) return false;
+        seen[game.provider.id] = true;
+        return providers[game.provider.id] !== undefined;
+    }).slice(0, 40).map(function(game) {
+        return {
+            id: game.provider.id,
+            image: providers[game.provider.id].image
+        };
+    });
 }
 
 function getPopularSlotsGames(userid){
-    var ids = [
-        'pragmatic_play_gates_of_olympus',
-        'pragmatic_play_sweet_bonanza',
-        'hacksaw_gaming_wanted_dead_or_a_wild',
-        'egt_digital_40_burning_hot_clover_chance',
-        'pragmatic_play_the_dog_house',
-        'hacksaw_gaming_rip_city',
-        'pragmatic_play_fruit_party',
-        'egt_digital_shining_crown_clover_chance',
-        'pragmatic_play_sugar_rush',
-        'hacksaw_gaming_le_bandit',
-        'pragmatic_play_big_bass_bonanza',
-        'pragmatic_play_starlight_princess',
-        'egt_digital_flaming_hot_extreme_clover_chance',
-        'hacksaw_gaming_chaos_crew',
-        'bgaming_aztec_clusters',
-        'hacksaw_gaming_le_pharaoh',
-        'pragmatic_play_madame_destiny',
-        'pragmatic_play_chicken_drop',
-        'hacksaw_gaming_sixsixsix',
-        'pragmatic_play_gems_bonanza',
-        'nolimit_city_mental',
-        'egt_digital_40_super_hot_clover_chance',
-        'nolimit_city_fire_in_the_hole_xbomb',
-        'pragmatic_play_release_the_kraken',
-        'hacksaw_gaming_cubes',
-        'pragmatic_play_great_rhino_megaways',
-        'hacksaw_gaming_duel_at_dawn',
-        'egt_digital_vampire_night_clover_chance',
-        'hacksaw_gaming_pray_for_three',
-        'nolimit_city_duck_hunters'
-    ];
-
-    var list = ids.filter(a => games[a] !== undefined && isGameListed(games[a])).map(a => mapGameCard(games[a]));
-
-    // If curated IDs aren't in this agent catalog, show any loaded slots
-    if(list.length === 0) {
-        list = listedGames().filter(a => a.type == 'slots').slice(0, 30).map(mapGameCard);
-    }
-
-    return list;
+    return catalogGames('slots').slice(0, 40).map(mapGameCard);
 }
 
 function mapGameCard(a) {
@@ -1771,55 +1759,24 @@ function mapGameCard(a) {
 
 function getCasinoStatus(){
     var agent = config.games.games.casino.drakon.agent || {};
-    var listed = listedGames();
+    var listed = catalogGames();
     return {
         configured: !!(agent.code && agent.token && agent.secret_key),
         authenticated: !!token,
-        market: config.games.games.casino.market || 'us',
+        market: config.games.games.casino.market || 'all',
         realMoneyOnly: !!config.games.games.casino.real_money_only,
+        onePerProvider: !!config.games.games.casino.one_per_provider,
         providers: Object.keys(providers).length,
         games: listed.length,
-        slots: listed.filter(a => a.type == 'slots').length,
-        live: listed.filter(a => a.type == 'live').length,
+        slots: catalogGames('slots').length,
+        live: catalogGames('live').length,
+        blocked: Object.keys(blockedGames).length,
         updating: !!updating.value
     };
 }
 
 function getPopularLiveGames(userid){
-    var ids = [
-        'pragmatic_play_sweet_bonanza_candyland',
-        'evolution_crazy_time',
-        'evolution_baccarat_b',
-        'amusnet_interactive_candy_wheel',
-        'evolution_extra_chilli_epic_spins',
-        'pragmatic_play_speed_baccarat_17',
-        'amusnet_interactive_live_european_roulette',
-        'foxy_games_foxy_baccarat_03',
-        'evolution_evo_speed_blackjack_2',
-        'pragmatic_play_speed_roulette_1',
-        'creedroomz_roulette_vision_vip',
-        'evolution_monopoly_live',
-        'amusnet_interactive_speed_baccarat',
-        'creedroomz_cashout_blackjack',
-        'eeze_baccarat_d51',
-        'pragmatic_play_mega_wheel',
-        'eeze_roulette_b',
-        'creedroomz_bet_on_poker',
-        'evolution_evo_speed_blackjack_2',
-        'evolution_baccarat_a',
-        'foxy_games_foxy_baccarat_01',
-        'amusnet_interactive_live_speed_roulette',
-        'evolution_evo_speed_blackjack_2',
-        'pragmatic_play_blackjack_14',
-        'creedroomz_blackjack_premium',
-        'eeze_classic_blackjack_1'
-    ];
-
-    var list = ids.filter(a => games[a] !== undefined && isGameListed(games[a])).map(a => mapGameCard(games[a]));
-    if(list.length === 0) {
-        list = listedGames().filter(a => a.type == 'live').slice(0, 30).map(mapGameCard);
-    }
-    return list;
+    return catalogGames('live').slice(0, 40).map(mapGameCard);
 }
 
 function getHotGamesList(userid){

@@ -540,12 +540,13 @@ const config = {
                     language: process.env.DRAKON_LANGUAGE
                 },
 
-                // Drakon does not send state geo tags. Filter catalogs client-side instead.
-                // CASINO_MARKET=all|us|ohio  (ohio uses the us-friendly provider list)
-                // CASINO_ALLOWED_PROVIDERS=pragmatic,hacksaw,bgaming  (optional override, comma-separated codes)
+                // CASINO_MARKET=all|us|ohio
+                // CASINO_ALLOWED_PROVIDERS=pragmatic,hacksaw,bgaming  (optional override)
                 // CASINO_REAL_MONEY_ONLY=true  (hide demo-only titles)
-                market: (process.env.CASINO_MARKET || 'us').toLowerCase(),
-                real_money_only: String(process.env.CASINO_REAL_MONEY_ONLY || 'true').toLowerCase() !== 'false',
+                // CASINO_ONE_PER_PROVIDER=true (show 1 game from each provider)
+                market: (process.env.CASINO_MARKET || 'all').toLowerCase(),
+                real_money_only: String(process.env.CASINO_REAL_MONEY_ONLY || 'false').toLowerCase() === 'true',
+                one_per_provider: String(process.env.CASINO_ONE_PER_PROVIDER || 'true').toLowerCase() !== 'false',
                 allowed_providers: (process.env.CASINO_ALLOWED_PROVIDERS || '')
                     .split(',')
                     .map(function(s) { return s.trim(); })
