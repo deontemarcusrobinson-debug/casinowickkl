@@ -72,3 +72,7 @@ services:
         value: USD
       - key: DRAKON_LANGUAGE
         value: en
+      - key: CASINO_MARKET
+        value: ohio
+      - key: CASINO_REAL_MONEY_ONLY
+        value: "true"
