@@ -215,6 +215,7 @@ const config = {
                 deposit_cash: { min: 10.00, max: 1000.00 },
 
                 deposit_crypto: { min: 20.00, max: 500.00 },
+                deposit_crypto_hash: { min: 5.00, max: 10000.00 },
                 withdraw_crypto: { min: 20.00, max: 500.00 }
 
             }
@@ -401,6 +402,31 @@ const config = {
 
 			currencies: {
 				cooldown_load: 1
+			},
+
+			// Manual tx-hash deposits → admin approve → credit balance
+			hash_deposits: {
+				enabled: process.env.CRYPTO_HASH_DEPOSITS !== 'false',
+				min_confirmations: parseInt(process.env.CRYPTO_HASH_MIN_CONFIRMATIONS || '1', 10) || 1,
+				etherscan_api_key: process.env.ETHERSCAN_API_KEY || '',
+				bscscan_api_key: process.env.BSCSCAN_API_KEY || '',
+				wallets: {
+					btc: process.env.CRYPTO_WALLET_BTC || 'bc1qvykus2xjawptxwz7qp0mwn5zxdetvzydv40eml',
+					ltc: process.env.CRYPTO_WALLET_LTC || 'ltc1qugzzl82j354mr69f3qtrm2fshhczpmxvh2vxrn',
+					eth: process.env.CRYPTO_WALLET_ETH || '0x080AAFBC75209d3cD7f8AC437A33C37CA7b35695',
+					sol: process.env.CRYPTO_WALLET_SOL || 'EuUEEQ8kbfH1NsjqMYZPQ8KL79FeqiTLJr9GVu2LrmR2',
+					bch: process.env.CRYPTO_WALLET_BCH || 'qrnplf7way4l7zd5t52g2u2lgan9c6lwmq2paflr7e',
+					xrp: process.env.CRYPTO_WALLET_XRP || 'rnYDq9QxG5zTUtiRTnDX3beiuUBdEQZEwY',
+					trx: process.env.CRYPTO_WALLET_TRX || 'TRzAFbiX7oAYhYXMvutT9dK4GbQ1siW1vy',
+					doge: process.env.CRYPTO_WALLET_DOGE || 'DPeUQws6gUczniojCnpgHmwLJatKrQco6o',
+					// Tokens reuse chain wallets unless overridden
+					usdttrc20: process.env.CRYPTO_WALLET_USDTTRC20 || process.env.CRYPTO_WALLET_USDT_TRC20 || process.env.CRYPTO_WALLET_TRX || 'TRzAFbiX7oAYhYXMvutT9dK4GbQ1siW1vy',
+					usdterc20: process.env.CRYPTO_WALLET_USDTERC20 || process.env.CRYPTO_WALLET_USDT_ERC20 || process.env.CRYPTO_WALLET_ETH || '0x080AAFBC75209d3cD7f8AC437A33C37CA7b35695',
+					usdc: process.env.CRYPTO_WALLET_USDC || process.env.CRYPTO_WALLET_ETH || '0x080AAFBC75209d3cD7f8AC437A33C37CA7b35695',
+					usdtsol: process.env.CRYPTO_WALLET_USDTSOL || process.env.CRYPTO_WALLET_SOL || 'EuUEEQ8kbfH1NsjqMYZPQ8KL79FeqiTLJr9GVu2LrmR2',
+					usdtbsc: process.env.CRYPTO_WALLET_USDTBSC || process.env.CRYPTO_WALLET_USDT_BSC || '',
+					ton: process.env.CRYPTO_WALLET_TON || ''
+				}
 			}
 		}
 

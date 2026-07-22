@@ -19,6 +19,11 @@ exports.adminPayments = async (req, res, next) => {
                     pages: 1,
                     page: 1
                 },
+                hash_deposits: {
+                    list: [],
+                    pages: 1,
+                    page: 1
+                },
                 manually: {
                     amount: '0.00',
                     enable: {
@@ -128,18 +133,29 @@ exports.adminPayments = async (req, res, next) => {
                                 })) }), {})
                             };
 
-                            res.render('admin/adminPayments', {
-                                layout: 'layouts/admin',
-                                page: 'admin',
-                                name: config.app.pages['admin'],
-                                breadcrumb: [{
-                                    page: 'payments',
-                                    name: 'Payments'
-                                }],
-                                response: response
+                            var cryptoHashDepositService = require('@/services/trading/cryptoHashDepositService.js');
+                            cryptoHashDepositService.countPending(function(errH1, hashCount) {
+                                if(errH1) hashCount = 0;
+                                var hashPages = Math.ceil((hashCount || 0) / 10) || 1;
+                                cryptoHashDepositService.loadPendingForPage(10, function(errH2, hashList) {
+                                    response.admin.payments.hash_deposits.list = errH2 ? [] : (hashList || []);
+                                    response.admin.payments.hash_deposits.pages = hashPages;
+                                    response.admin.payments.hash_deposits.page = 1;
+
+                                    res.render('admin/adminPayments', {
+                                        layout: 'layouts/admin',
+                                        page: 'admin',
+                                        name: config.app.pages['admin'],
+                                        breadcrumb: [{
+                                            page: 'payments',
+                                            name: 'Payments'
+                                        }],
+                                        response: response
+                                    });
+                                });
                             });
                         });
                     });
-    });
+                });
             });
 };

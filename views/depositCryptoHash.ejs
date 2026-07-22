@@ -1,0 +1,77 @@
+<div class="flex flex-col items-center gap-4">
+	<div class="flex flex-row justify-start w-full">
+		<a href="/deposit">
+            <button class="button button-hover button-accent shadow-2 flex flex-row gap-2 items-center justify-center">
+                <%- include('./components/icon.ejs', {
+                    icon: 'undo',
+                    className: 'size-3.5'
+                }); %>
+
+                <span>Back to Options</span>
+            </button>
+        </a>
+	</div>
+
+	<div class="flex flex-col gap-2 w-8/12 max-md:w-full">
+		<div class="flex flex-col gap-1">
+			<div class="text-xl font-bold">Crypto Deposit</div>
+			<div class="text-xs text-muted-foreground">Send crypto to the address below, then submit your transaction hash. An admin will approve and credit your balance.</div>
+		</div>
+
+		<% if(!response.deposit.currencies.length){ %>
+			<div class="bg-card bg-opacity-50 text-left rounded-2 border-2 border-secondary p-4">
+				<div class="text-sm text-danger">No deposit wallets are configured yet.</div>
+			</div>
+		<% } else { %>
+			<div class="bg-card bg-opacity-50 text-left rounded-2 border-2 border-secondary p-4 flex flex-col gap-4">
+				<div class="text-base font-bold">1. Choose currency</div>
+
+				<div class="flex flex-row flex-wrap gap-2" id="crypto_hash_currency_list">
+					<% response.deposit.currencies.forEach(function(item, index){ %>
+						<button type="button"
+							class="button button-hover <%= index === 0 ? 'button-primary' : 'button-accent' %> shadow-2 crypto_hash_currency_btn"
+							data-currency="<%= item.method %>"
+							data-name="<%= item.name %>"
+							data-network="<%= item.network %>"
+							data-address="<%= item.address %>">
+							<%= item.name %>
+						</button>
+					<% }); %>
+				</div>
+
+				<div class="flex flex-col gap-2">
+					<div class="text-base font-bold">2. Send to this address (<span id="crypto_hash_network"><%= response.deposit.currencies[0].network %></span>)</div>
+					<div class="text-xs text-warning">Only send <span id="crypto_hash_name"><%= response.deposit.currencies[0].name %></span> on the correct network. Wrong network = lost funds.</div>
+
+					<div class="flex flex-row items-center gap-2">
+						<%- include('./components/inputs/inputGroup.ejs', {
+							type: 'text',
+							label: 'Deposit address',
+							id: 'crypto_hash_address',
+							value: response.deposit.currencies[0].address
+						}); %>
+
+						<button type="button" class="button button-hover button-primary shadow-2 large" data-copy="input" data-input="#crypto_hash_address">Copy</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="bg-card bg-opacity-50 text-left rounded-2 border-2 border-secondary p-4 flex flex-col gap-4">
+				<div class="text-base font-bold">3. Submit transaction hash</div>
+
+				<input type="hidden" id="crypto_hash_currency" value="<%= response.deposit.currencies[0].method %>">
+
+				<%- include('./components/inputs/inputGroup.ejs', {
+					type: 'text',
+					label: 'Transaction hash / TXID',
+					id: 'crypto_hash_tx',
+					errors: [ 'required' ]
+				}); %>
+
+				<button type="button" class="button button-hover button-primary shadow-2 large" id="crypto_hash_submit">Submit for approval</button>
+
+				<div class="text-xs text-muted-foreground">Min <%= response.deposit.min %> – Max <%= response.deposit.max %> coins after conversion. Duplicate hashes are rejected.</div>
+			</div>
+		<% } %>
+	</div>
+</div>

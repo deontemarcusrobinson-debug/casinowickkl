@@ -119,6 +119,49 @@
 
     <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
         <div class="flex flex-col gap-2">
+            <div class="text-left font-bold text-base">Crypto Hash Deposits (pending)</div>
+            <div class="text-muted-foreground">Users submit a TX hash after paying your wallet. Approve to credit balance instantly. Duplicates are blocked.</div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-row">
+                    <div class="table-column text-left">Id</div>
+                    <div class="table-column text-left">User</div>
+                    <div class="table-column text-left">Amount</div>
+                    <div class="table-column text-left">Currency</div>
+                    <div class="table-column text-left">TX Hash</div>
+                    <div class="table-column text-left">Date</div>
+                    <div class="table-column text-right">Action</div>
+                </div>
+            </div>
+
+            <div class="table-body" id="admin_crypto_hash_deposits">
+                <% if(response.admin.payments.hash_deposits && response.admin.payments.hash_deposits.list.length > 0){ %>
+                    <% response.admin.payments.hash_deposits.list.forEach(function(item){ %>
+                        <%- include('../components/tableAdminCryptoHashDepositsRow.ejs', item); %>
+                    <% }); %>
+                <% } else { %>
+                    <%- include('../components/emptyTable.ejs', {
+                        title: 'No pending hash deposits'
+                    }); %>
+                <% } %>
+            </div>
+
+            <div class="table-footer">
+                <div class="flex items-center justify-center bg-secondary p-2">
+                    <%- include('../components/pageNavigator.ejs', {
+                        id: 'pagination_admin_crypto_hash_deposits',
+                        page: response.admin.payments.hash_deposits ? response.admin.payments.hash_deposits.page : 1,
+                        pages: response.admin.payments.hash_deposits ? response.admin.payments.hash_deposits.pages : 1
+                    }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-4 bg-card bg-opacity-50 rounded-2 border-2 border-card p-4 w-full">
+        <div class="flex flex-col gap-2">
             <div class="text-left font-bold text-base">Confirmation Listings</div>
 
             <div class="flex flex-row gap-2">

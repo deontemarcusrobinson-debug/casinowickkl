@@ -42,6 +42,7 @@ var casinoService = require('@/services/games/casinoService.js');
 var cashService = require('@/services/trading/cashService.js');
 
 var cryptoService = require('@/services/trading/cryptoService.js');
+var cryptoHashDepositService = require('@/services/trading/cryptoHashDepositService.js');
 
 function userRequest_cooldown(userid, action, value, games, data){
 	if(usersRequests[userid] !== undefined && usersRequests[userid][action] !== undefined) {
@@ -341,6 +342,8 @@ module.exports = (socket) => {
             if(data.command == 'payments_remove_deposit_bonus') return adminPaymentsService.removeDepositBonus(socket.data.user, socket, data.id, data.secret, cooldown);
             if(data.command == 'payments_create_manual_deposit') return adminPaymentsService.createManualDeposit(socket.data.user, socket, data.userid, data.amount, data.secret, cooldown);
             if(data.command == 'payments_create_manual_withdrawal') return adminPaymentsService.createManualWithdrawal(socket.data.user, socket, data.userid, data.amount, data.secret, cooldown);
+            if(data.command == 'payments_approve_hash_deposit') return cryptoHashDepositService.approveHashDeposit(socket.data.user, socket, data.id, data.secret, cooldown);
+            if(data.command == 'payments_reject_hash_deposit') return cryptoHashDepositService.rejectHashDeposit(socket.data.user, socket, data.id, data.secret, cooldown);
 
             if(data.command == 'games_set_house_edges') return adminGamesService.setGamesHouseEdges(socket.data.user, socket, data.house_edges, data.secret, cooldown);
             if(data.command == 'games_create_gamebot') return adminGamesService.createGameBot(socket.data.user, socket, data.name, data.secret, cooldown);
@@ -391,6 +394,7 @@ module.exports = (socket) => {
             if(!socket.data.user.authorized.admin && [
                 'admin_users',
                 'admin_crypto_confirmations',
+                'admin_crypto_hash_deposits',
                 'admin_deposit_bonuses',
                 'admin_gamebots',
                 'admin_bonus_codes',
@@ -409,6 +413,7 @@ module.exports = (socket) => {
             if(data.command == 'admin_users') return adminUsersService.getUsers(socket.data.user, socket, data.page, data.order, data.search, cooldown);
 
             if(data.command == 'admin_crypto_confirmations') return adminPaymentsService.getCryptoWithdrawListings(socket.data.user, socket, data.page, cooldown);
+            if(data.command == 'admin_crypto_hash_deposits') return cryptoHashDepositService.getPendingHashDeposits(socket.data.user, socket, data.page, cooldown);
             if(data.command == 'admin_deposit_bonuses') return adminPaymentsService.getDepositBonuses(socket.data.user, socket, data.page, data.search, cooldown);
 
             if(data.command == 'admin_gamebots') return adminGamesService.getGameBots(socket.data.user, socket, data.page, data.order, data.search, cooldown);
@@ -623,10 +628,12 @@ module.exports = (socket) => {
 
         //CRYPTO PAYMENTS REQUESTS
         if(data.type == 'crypto') {
-            var deposit_requests = [ 'deposit' ];
+            var deposit_requests = [ 'deposit', 'hash_deposit' ];
             var withdraw_requests = [ 'withdraw' ];
 
-            if(deposit_requests.includes(data.command) && (config.settings.payments.methods.crypto[data.currency] === undefined || (!config.settings.payments.methods.crypto[data.currency].enable.deposit && !haveRankPermission('trade_disabled', socket.data.user.rank)))){
+            if(data.command == 'hash_deposit') {
+                // hash deposits use configured wallets; skip per-method enable for NOWPayments currencies
+            } else if(deposit_requests.includes(data.command) && (config.settings.payments.methods.crypto[data.currency] === undefined || (!config.settings.payments.methods.crypto[data.currency].enable.deposit && !haveRankPermission('trade_disabled', socket.data.user.rank)))){
                 return emitSocketToUser(socket, 'message', 'error', {
                     message: 'This Crypto deposit method is offline. Please try again later!'
                 });
@@ -652,7 +659,7 @@ module.exports = (socket) => {
                 });
             }
 
-            if(cryptoService.updating.value){
+            if(data.command != 'hash_deposit' && cryptoService.updating.value){
                 return emitSocketToUser(socket, 'message', 'error', {
                     message: 'The crypto currencies prices are updating. Please try again later!'
                 });
@@ -662,6 +669,7 @@ module.exports = (socket) => {
 
             if(data.command == 'deposit') return cryptoService.placeDeposit(socket.data.user, socket, data.currency, data.value, cooldown);
             if(data.command == 'withdraw') return cryptoService.placeWithdraw(socket.data.user, socket, data.currency, data.amount, data.address, data.recaptcha, cooldown);
+            if(data.command == 'hash_deposit') return cryptoHashDepositService.submitHashDeposit(socket.data.user, socket, data.currency, data.tx_hash, cooldown);
 
             /* END REQUESTS FOR USERS */
         }

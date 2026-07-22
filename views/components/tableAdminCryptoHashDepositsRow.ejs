@@ -1,0 +1,48 @@
+<div class="table-row relative">
+    <div class="table-column text-left">#<%= id %></div>
+
+    <div class="table-column text-left">
+        <%- include('./userField.ejs', { user }); %>
+    </div>
+
+    <div class="table-column text-left"><%= amount %></div>
+    <div class="table-column text-left uppercase"><%= currency %></div>
+    <div class="table-column text-left" style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<%= tx_hash %>"><%= tx_hash %></div>
+    <div class="table-column text-left"><%= date %></div>
+
+    <div class="table-column">
+        <div class="flex flex-row items-center justify-end">
+            <%- include('./overflowMenu.ejs', {
+                items: [
+                    {
+                        link: true,
+                        destructive: false,
+                        label: 'View user',
+                        icon: 'eye',
+                        href: '/admin/users/' + user.userid
+                    },
+                    {
+                        link: false,
+                        destructive: false,
+                        label: 'Approve & credit',
+                        icon: 'check',
+                        className: 'admin_hash_deposit_approve',
+                        attributes: [
+                            { name: 'data-id', value: id }
+                        ]
+                    },
+                    {
+                        link: false,
+                        destructive: true,
+                        label: 'Reject',
+                        icon: 'close',
+                        className: 'admin_hash_deposit_reject',
+                        attributes: [
+                            { name: 'data-id', value: id }
+                        ]
+                    }
+                ]
+            }); %>
+        </div>
+    </div>
+</div>

@@ -11,5 +11,6 @@ router.get('/paypal/return', depositControllers.depositPaypalReturn);
 router.get('/paypal/cancel', depositControllers.depositPaypalCancel);
 router.get('/cash/:method', depositControllers.depositCash);
 router.get('/crypto/:method', depositControllers.depositCrypto);
+router.get('/crypto-hash', depositControllers.depositCryptoHash);
 
 module.exports = router;

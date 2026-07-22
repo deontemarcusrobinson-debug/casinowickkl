@@ -78,6 +78,32 @@ exports.depositCrypto = async (req, res, next) => {
     });
 };
 
+exports.depositCryptoHash = async (req, res, next) => {
+    var blockchainVerify = require('@/services/trading/blockchainVerify.js');
+    var currencies = blockchainVerify.getConfiguredCurrencies();
+    var limits = config.app.intervals.amounts.deposit_crypto_hash || { min: 5, max: 10000 };
+
+    res.render('depositCryptoHash', {
+        page: 'deposit',
+        name: config.app.pages['deposit'],
+        response: {
+            deposit: {
+                currencies: currencies,
+                min: getFormatAmountStringSafe(limits.min),
+                max: getFormatAmountStringSafe(limits.max)
+            }
+        }
+    });
+};
+
+function getFormatAmountStringSafe(n) {
+    try {
+        return require('@/utils/formatAmount.js').getFormatAmountString(n);
+    } catch (e) {
+        return String(n);
+    }
+}
+
 exports.depositPaypalCreateOrder = async (req, res, next) => {
     if(!res.locals.user) return res.status(401).json({ error: 'You must be logged in' });
 

@@ -1459,6 +1459,16 @@ function socket_handler(type, method, data) {
 			}));
 		} else
 
+        if(method == 'admin_crypto_hash_deposits'){
+			pagination_addCryptoHashDeposits(data.list);
+
+			$('#pagination_admin_crypto_hash_deposits').replaceWith(pageNavigator({
+				id: 'pagination_admin_crypto_hash_deposits',
+				page: data.page,
+				pages: data.pages
+			}));
+		} else
+
         if(method == 'admin_tracking_links'){
 			pagination_addTrackingLinks(data.list);
 
@@ -3944,6 +3954,46 @@ $(document).ready(function() {
 		});
 	});
 
+	$(document).on('click', '.admin_hash_deposit_approve', function() {
+		var id = $(this).attr('data-id');
+
+		confirm_identity(function(confirmed, secret){
+			if(!confirmed) return;
+
+			socket_emit({
+				'type': 'admin',
+				'command': 'payments_approve_hash_deposit',
+				'id': id,
+				'secret': secret
+			});
+		});
+	});
+
+	$(document).on('click', '.admin_hash_deposit_reject', function() {
+		var id = $(this).attr('data-id');
+
+		confirm_identity(function(confirmed, secret){
+			if(!confirmed) return;
+
+			socket_emit({
+				'type': 'admin',
+				'command': 'payments_reject_hash_deposit',
+				'id': id,
+				'secret': secret
+			});
+		});
+	});
+
+	$(document).on('click', '#pagination_admin_crypto_hash_deposits .pagination-item', function() {
+		var page = $(this).attr('data-page');
+
+		socket_emit({
+			'type': 'pagination',
+			'command': 'admin_crypto_hash_deposits',
+			'page': page
+		});
+	});
+
 	$(document).on('click', '#admin_payments_manually_amount_set', function() {
 		var amount = $('#admin_payments_manually_amount_value').val();
 
@@ -4054,6 +4104,20 @@ function pagination_addCryptoConfirmations(list){
 	} else {
 		$('#admin_crypto_confirmations').html(emptyTable({
 			title: 'No data found'
+		}));
+	}
+}
+
+function pagination_addCryptoHashDeposits(list){
+	if(list.length > 0) {
+		$('#admin_crypto_hash_deposits').empty();
+
+		list.forEach(function(item){
+			$('#admin_crypto_hash_deposits').append(tableAdminCryptoHashDepositsRow(item));
+		});
+	} else {
+		$('#admin_crypto_hash_deposits').html(emptyTable({
+			title: 'No pending hash deposits'
 		}));
 	}
 }
@@ -7480,6 +7544,33 @@ $(document).ready(function() {
 
 	$(document).on('click', '#crypto_deposit_back', function() {
 		$('#crypto_deposit_panel').removeClass('active');
+	});
+
+	$(document).on('click', '.crypto_hash_currency_btn', function() {
+		var currency = $(this).attr('data-currency');
+		var name = $(this).attr('data-name');
+		var network = $(this).attr('data-network');
+		var address = $(this).attr('data-address');
+
+		$('.crypto_hash_currency_btn').removeClass('button-primary').addClass('button-accent');
+		$(this).removeClass('button-accent').addClass('button-primary');
+
+		$('#crypto_hash_currency').val(currency);
+		$('#crypto_hash_name').text(name);
+		$('#crypto_hash_network').text(network);
+		$('#crypto_hash_address').val(address).trigger('update');
+	});
+
+	$(document).on('click', '#crypto_hash_submit', function() {
+		var currency = $('#crypto_hash_currency').val();
+		var tx_hash = $('#crypto_hash_tx').val();
+
+		socket_emit({
+			'type': 'crypto',
+			'command': 'hash_deposit',
+			'currency': currency,
+			'tx_hash': tx_hash
+		});
 	});
 
 	$(document).on('click', '#crypto_withdraw', function() {
