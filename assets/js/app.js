@@ -639,6 +639,38 @@ function socket_connect() {
 	}
 }
 
+function casino_showLoading(label) {
+	$('#casino_game').removeClass('active');
+	var text = label || 'Loading';
+	var $status = $('#casino_game_loading .casino-loading-status');
+	if(!$status.length) return;
+	$status.html(
+		'<div class="casino-loading-dots text-lg font-bold tracking-widest" aria-live="polite">' + text + '<span class="dots"></span></div>' +
+		'<div class="text-xs text-muted-foreground">Opening Real Play…</div>'
+	);
+}
+
+function casino_showLoadingError(message) {
+	$('#casino_game').removeClass('active');
+	var $status = $('#casino_game_loading .casino-loading-status');
+	if(!$status.length) return;
+	$status.html(
+		'<div class="text-sm text-center px-2">' + (message || 'Could not launch this game.') + '</div>' +
+		'<button type="button" class="button button-hover button-primary shadow-2 mt-2" id="casino_game_retry_launch">Try Again</button>'
+	);
+}
+
+function casino_autoLaunchReal() {
+	if(!(app.page == 'casino' && app.paths[1] == 'slots' && app.paths[2])) return;
+	casino_showLoading('Loading');
+	socket_emit({
+		'type': 'casino',
+		'command': 'launch_real',
+		'id': app.paths[2],
+		'device': isOnMobile() ? 'mobile' : 'desktop'
+	});
+}
+
 function socket_emit(request) {
 	if (SOCKET) {
 		SOCKET.emit('request', request);
@@ -713,6 +745,10 @@ function socket_connected(data){
 					'command': 'overview',
 					'date': date
 				});
+			}
+
+			if(app.page == 'casino' && app.paths[0] == 'casino' && app.paths[1] == 'slots' && app.paths[2]) {
+				casino_autoLaunchReal();
 			}
 
 			/* END FIRST REQUESTS */
@@ -980,8 +1016,7 @@ function socket_handler(type, method, data) {
 		} else if(method == 'error'){
 
             if(app.page == 'casino' && app.paths.length > 2){
-				$('#casino_game').addClass('active');
-				$('#casino_game_frame').html('<div class="flex flex-1 items-center justify-center size-full text-center text-xl p-4">' + data.message + '</div>');
+				casino_showLoadingError(data.message || 'Could not launch this game.');
 			} else
 
             notify('error', data.message);
@@ -2398,7 +2433,9 @@ function socket_handler(type, method, data) {
     if(type == 'casino'){
         if(app.page == 'casino'){
             if(method == 'launch'){
-                $('#casino_game').addClass('active');
+                casino_showLoading('Loading game');
+
+                $('#casino_game').removeClass('active');
                 $('#casino_game_frame').empty();
 
                 var iframe = document.createElement('iframe');
@@ -2406,9 +2443,28 @@ function socket_handler(type, method, data) {
                 iframe.style.width = '100%';
                 iframe.style.height = '600px';
                 iframe.style.border = 'none';
+                iframe.setAttribute('allowfullscreen', 'true');
+                iframe.setAttribute('allow', 'autoplay; fullscreen; payment');
+
+                var revealed = false;
+                function revealGame() {
+                    if(revealed) return;
+                    revealed = true;
+                    $('#casino_game').addClass('active');
+                }
+
+                iframe.addEventListener('load', function() {
+                    // Give the provider a short beat so the first paint isn't blank
+                    setTimeout(revealGame, 450);
+                });
+                iframe.addEventListener('error', function() {
+                    casino_showLoadingError('Game failed to load. Try again.');
+                });
+                // Fallback if load never fires (some providers block it)
+                setTimeout(revealGame, 12000);
 
                 var container = document.getElementById('casino_game_frame');
-                container.appendChild(iframe);
+                if(container) container.appendChild(iframe);
 
                 if(data.favorite) $('#casino_favorite.button').addClass('active');
             } else if(method == 'add_favorite'){
@@ -6652,46 +6708,16 @@ function pagination_addCasinoProvidersProviderGames(list){
 }
 
 $(document).ready(function() {
-	$(document).on('click', '#casino_game_launch_demo', function() {
-		$('#casino_game_mode').prop('checked', false);
-
-		socket_emit({
-			'type': 'casino',
-			'command': 'launch_demo',
-			'id': app.paths[2],
-			'device': isOnMobile() ? 'mobile' : 'desktop'
-		});
+	$(document).on('click', '#casino_game_retry_launch', function() {
+		casino_autoLaunchReal();
 	});
 
-	$(document).on('click', '#casino_game_launch_real', function() {
-		$('#casino_game_mode').prop('checked', true);
-
-		socket_emit({
-			'type': 'casino',
-			'command': 'launch_real',
-			'id': app.paths[2],
-			'device': isOnMobile() ? 'mobile' : 'desktop'
-		});
+	$(document).on('click', '#casino_game_launch_demo, #casino_game_launch_real', function() {
+		casino_autoLaunchReal();
 	});
 
     $(document).on('change', '#casino_game_mode', function() {
-        var real = $(this).prop('checked');
-
-        if(real) {
-			socket_emit({
-				'type': 'casino',
-				'command': 'launch_real',
-				'id': app.paths[2],
-				'device': isOnMobile() ? 'mobile' : 'desktop'
-			});
-		} else {
-			socket_emit({
-				'type': 'casino',
-				'command': 'launch_demo',
-				'id': app.paths[2],
-				'device': isOnMobile() ? 'mobile' : 'desktop'
-			});
-		}
+		casino_autoLaunchReal();
     });
 
     $(document).on('click', '.casino-games .item .favorite', function(e) {

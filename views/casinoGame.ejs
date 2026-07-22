@@ -15,30 +15,20 @@
 	<div class="casino-game flex flex-1 flex-col gap-8">
         <div class="flex flex-1 flex-col">
             <div class="content flex flex-col flex-1" id="casino_game">
-                <div class="welcome flex flex-row items-center justify-center">
-                    <img class="background" src="<%= response.casino.game.image %>">
+                <div class="welcome flex flex-row items-center justify-center" id="casino_game_loading">
+                    <img class="background" src="<%= response.casino.game.image %>" alt="">
 
-                    <div class="game bg-card bg-opacity-80 flex flex-row max-md:flex-col gap-6 rounded-2 px-6 py-4">
-                        <img class="image" src="<%= response.casino.game.image %>">
+                    <div class="game-loading bg-card bg-opacity-80 flex flex-col items-center justify-center gap-4 rounded-2 px-8 py-6">
+                        <img class="image" src="<%= response.casino.game.image %>" alt="<%= response.casino.game.name %>">
 
-                        <div class="flex flex-1 flex-col justify-between gap-4 overflow-hidden py-2">
-                            <div class="flex flex-col gap-2">
-                                <div class="text-lg text-nowrap font-bold "><%= response.casino.game.name %></div>
-                                <div class="text-xs text-nowrap text-muted-foreground">By <%= response.casino.game.provider %></div>
-                            </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="text-lg text-nowrap font-bold"><%= response.casino.game.name %></div>
+                            <div class="text-xs text-nowrap text-muted-foreground">By <%= response.casino.game.provider %></div>
+                        </div>
 
-                            <div class="flex flex-col gap-2">
-                                <div class="text-xs text-muted-foreground">RTP</div>
-                                <div class="text-lg font-bold"><%= response.casino.game.rtp %>%</div>
-                            </div>
-
-                            <div class="flex flex-row gap-2 w-full">
-                                <button class="button button-hover button-primary shadow-2 w-full" id="casino_game_launch_real">Real Play</button>
-
-                                <% if(response.casino.game.demo){ %>
-                                    <button class="button button-hover button-accent shadow-2 w-full" id="casino_game_launch_demo">Fun Play</button>
-                                <% } %>
-                            </div>
+                        <div class="casino-loading-status flex flex-col items-center gap-2">
+                            <div class="casino-loading-dots text-lg font-bold tracking-widest" aria-live="polite">Loading<span class="dots"></span></div>
+                            <div class="text-xs text-muted-foreground">Opening Real Play…</div>
                         </div>
                     </div>
                 </div>
@@ -67,16 +57,7 @@
 
                 <img class="logo" src="/img/logo.png">
 
-                <div class="flex flex-row items-center gap-2 <% if(!response.casino.game.demo){ %>disabled<% } %>">
-                    <div class="text-xs font-bold">Fun Play</div>
-
-                    <%- include('./components/inputs/switchField.ejs', {
-						id: 'casino_game_mode',
-                        checked: true
-					}); %>
-
-                    <div class="text-xs font-bold">Real Play</div>
-                </div>
+                <div class="text-xs font-bold text-muted-foreground">Real Play</div>
             </div>
         </div>
 
