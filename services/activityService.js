@@ -45,7 +45,20 @@ var FAKE_NAMES = [
     'RubyDrift', 'AceHarbor', 'PixelPot', 'StormCoin', 'VelvetWin', 'ShadowBet',
     'CrystalFox', 'IronLotus', 'NeonHarbor', 'BlueComet', 'SilverFang', 'EchoKing',
     'RapidTide', 'PrimeVault', 'OnyxRoll', 'AmberJack', 'FrostBet', 'SolarChip',
-    'QuinnSpin', 'MiloStake', 'ZaraLuck', 'KaiFortune', 'LenaRoll', 'DrewJackpot'
+    'QuinnSpin', 'MiloStake', 'ZaraLuck', 'KaiFortune', 'LenaRoll', 'DrewJackpot',
+    'ApexCoin', 'BlitzPot', 'ChromeWin', 'DeltaRush', 'EmberStake', 'FlashTide',
+    'GlintBet', 'HyperRoll', 'IvoryCash', 'JetFortune', 'KarmaSpin', 'LunarPot',
+    'MirageWin', 'NitroChip', 'OrbitLuck', 'PulseStake', 'QuantumBet', 'RogueSpin',
+    'StellarWin', 'TurboVault', 'UltraFang', 'VortexCoin', 'WaveJack', 'XenonRoll',
+    'YellowAce', 'ZenHarbor', 'AlphaMint', 'BraveGold', 'CyberRex', 'DarkNova',
+    'EliteByte', 'FireComet', 'GhostPot', 'HoloStake', 'IceKing', 'JazzChip',
+    'KingRush', 'LiteViper', 'MegaOrbit', 'NightBet', 'OmegaWin', 'PhantomRoll',
+    'QuickJade', 'RoyalTide', 'SkyFortune', 'TitanSpin', 'UrbanCash', 'VividAce',
+    'WildEcho', 'AeroJack', 'BoltMint', 'CoinFox', 'DriftKing', 'EdgeVault'
+];
+
+var FAKE_NAME_SUFFIXES = [
+    '', 'X', 'Pro', 'VIP', 'HQ', '88', '77', '21', '99', 'Prime', 'Max', 'Plus'
 ];
 
 function setCatalogProvider(fn) {
@@ -74,11 +87,14 @@ function fakeAvatar() {
     return base + '/img/avatar.jpg';
 }
 
-function fakeUser() {
-    var name = pick(FAKE_NAMES) || 'Player';
-    var xp = randInt(50, 4200); // levels roughly 1–40ish depending on curve
+function fakeUser(forcedName) {
+    var base = forcedName || pick(FAKE_NAMES) || 'Player';
+    var suffix = pick(FAKE_NAME_SUFFIXES) || '';
+    var name = suffix ? (base + suffix) : base;
+    if(Math.random() < 0.35) name = base + randInt(2, 99);
+    var xp = randInt(80, 5200);
     return getUserInfo({
-        userid: 'bot-' + name.toLowerCase() + '-' + randInt(1000, 9999),
+        userid: 'bot-' + name.toLowerCase().replace(/[^a-z0-9]/g, '') + '-' + randInt(1000, 9999),
         name: name,
         avatar: fakeAvatar(),
         xp: xp,
@@ -351,20 +367,41 @@ function mergeWithFakeBets(realList, type) {
 
 function rebuildLeaderboardFakes() {
     var rows = [];
-    for(var i = 0; i < 8; i++) {
+    var usedNames = {};
+
+    for(var i = 0; i < 100; i++) {
         var user = fakeUser();
-        var wageredNum = randInt(120, 9800) + Math.random();
-        var winningsNum = wageredNum * (0.55 + Math.random() * 0.7);
+        var guard = 0;
+        while(usedNames[user.name] && guard < 20) {
+            user = fakeUser();
+            guard++;
+        }
+        usedNames[user.name] = true;
+
+        // Bigger wagered near the top of the list
+        var tier = i < 10 ? 'high' : (i < 40 ? 'mid' : 'low');
+        var wageredNum;
+        if(tier === 'high') wageredNum = randInt(1800, 9200) + Math.random();
+        else if(tier === 'mid') wageredNum = randInt(400, 2800) + Math.random();
+        else wageredNum = randInt(80, 900) + Math.random();
+
+        // Always look profitable: won more than they played (about +8% to +90%)
+        var profitMult = 1.08 + Math.random() * 0.82;
+        var winningsNum = wageredNum * profitMult;
+
         rows.push({
             user: user,
-            games: randInt(40, 2200),
+            games: tier === 'high' ? randInt(700, 2400) : (tier === 'mid' ? randInt(200, 1600) : randInt(40, 600)),
             wagered: getFormatAmountString(wageredNum),
             winnings: getFormatAmountString(winningsNum),
             _wagered: wageredNum,
             fake: true
         });
     }
-    fakeLeaderboard = rows;
+
+    fakeLeaderboard = rows.sort(function(a, b) {
+        return (b._wagered || 0) - (a._wagered || 0);
+    });
 }
 
 function mergeLeaderboard(realRows) {
@@ -378,15 +415,14 @@ function mergeLeaderboard(realRows) {
 
     return real.concat(fakeLeaderboard)
         .sort(function(a, b) { return (b._wagered || 0) - (a._wagered || 0); })
-        .slice(0, 12)
+        .slice(0, 100)
         .map(function(row) {
-            var out = {
+            return {
                 user: row.user,
                 games: row.games,
                 wagered: row.wagered,
                 winnings: row.winnings
             };
-            return out;
         });
 }
 
