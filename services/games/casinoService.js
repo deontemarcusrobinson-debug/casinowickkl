@@ -223,17 +223,32 @@ var providersMapping = {
 };
 
 function initializeCasino(){
+    var agent = config.games.games.casino.drakon.agent || {};
+    if(!agent.token || !agent.secret_key || !agent.code) {
+        loggerError('[CASINO] Drakon credentials missing. Set DRAKON_AGENT_CODE, DRAKON_AGENT_TOKEN, DRAKON_AGENT_SECRET_KEY on Render Environment, then redeploy.');
+        return;
+    }
+
     generateToken(function(err1){
-        if(err1) return;
+        if(err1) {
+            loggerError('[CASINO] Auth failed — slots will stay empty until Drakon login works: ' + (err1.message || err1));
+            return setTimeout(initializeCasino, 30000);
+        }
 
         loggerDebug('[CASINO] Casino Authenticated');
 
         updating.value = true;
 
         initializeGames(function(err2){
-            if(err2) return;
+            if(err2) {
+                loggerError('[CASINO] Load games/providers failed: ' + (err2.message || err2));
+                updating.value = false;
+                return setTimeout(function(){ initializeCasino(); }, 30000);
+            }
 
             updating.value = false;
+
+            loggerInfo('[CASINO] Loaded providers=' + Object.keys(providers).length + ' games=' + Object.keys(games).length);
 
             loadGamesStats();
             loadFavoritesGames();
@@ -245,7 +260,10 @@ function initializeCasino(){
 
         setInterval(function(){
             generateToken(function(err2){
-                if(err2) return;
+                if(err2) {
+                    loggerError('[CASINO] Reauth failed: ' + (err2.message || err2));
+                    return;
+                }
 
                 loggerDebug('[CASINO] Casino Reauthenticated');
             });
@@ -255,7 +273,11 @@ function initializeCasino(){
             updating.value = true;
 
             initializeGames(function(err2){
-                if(err2) return;
+                if(err2) {
+                    loggerError('[CASINO] Refresh games failed: ' + (err2.message || err2));
+                    updating.value = false;
+                    return;
+                }
 
                 updating.value = false;
 
