@@ -178,7 +178,13 @@ function launchErrorFromBody(statusCode, body1) {
 function catalogGames(type) {
     var list = listedGames();
     if(type) list = list.filter(function(a) { return a.type == type; });
-    return oneGamePerProvider(list);
+    if(config.games.games.casino.one_per_provider) return oneGamePerProvider(list);
+    // Sort by provider then name so lobby/provider pages stay readable
+    return list.slice().sort(function(a, b) {
+        var byProvider = a.provider.name.localeCompare(b.provider.name);
+        if(byProvider !== 0) return byProvider;
+        return a.game.name.localeCompare(b.game.name);
+    });
 }
 
 var providersMapping = {

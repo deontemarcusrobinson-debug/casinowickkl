@@ -565,8 +565,33 @@ const config = {
                 // CASINO_ONE_PER_PROVIDER=true (show 1 game from each provider)
                 market: (process.env.CASINO_MARKET || 'all').toLowerCase(),
                 real_money_only: String(process.env.CASINO_REAL_MONEY_ONLY || 'false').toLowerCase() === 'true',
-                one_per_provider: true,
-                allowed_providers: (process.env.CASINO_ALLOWED_PROVIDERS || '')
+                one_per_provider: String(process.env.CASINO_ONE_PER_PROVIDER || 'false').toLowerCase() === 'true',
+                // Default: only the operators you asked to keep (all games from each)
+                allowed_providers: (process.env.CASINO_ALLOWED_PROVIDERS || [
+                    '100hp',
+                    'iconix',
+                    'jacks',
+                    '7-mojos', '7mojos', '7-mojos-slots', '7mojos-slots',
+                    'abracadabra',
+                    'airdice',
+                    'avatarux',
+                    'amigogaming',
+                    'bwgaming',
+                    'bgaming', 'bgamingP',
+                    'expanse-studios',
+                    'funkygames',
+                    'pgsoft',
+                    'shadylady',
+                    'wickedgames',
+                    'mascot',
+                    'pigaboom',
+                    'caletagaming',
+                    'onegame',
+                    'imagine live', 'imagineliveLS', 'imagineliveHS',
+                    'eezecasino',
+                    'vivo',
+                    'galaxsys', 'galaxsysP'
+                ].join(','))
                     .split(',')
                     .map(function(s) { return s.trim(); })
                     .filter(Boolean),

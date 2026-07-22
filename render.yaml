@@ -77,7 +77,9 @@ services:
       - key: CASINO_REAL_MONEY_ONLY
         value: "false"
       - key: CASINO_ONE_PER_PROVIDER
-        value: "true"
+        value: "false"
+      - key: CASINO_ALLOWED_PROVIDERS
+        value: "100hp,iconix,jacks,7-mojos,7mojos,7-mojos-slots,7mojos-slots,abracadabra,airdice,avatarux,amigogaming,bwgaming,bgaming,bgamingP,expanse-studios,funkygames,pgsoft,shadylady,wickedgames,mascot,pigaboom,caletagaming,onegame,imagine live,imagineliveLS,imagineliveHS,eezecasino,vivo,galaxsys,galaxsysP"
       - key: ADMIN_EMAILS
         value: "nbtnateyt@gmail.com,nbtrobinson@gmail.com"
       - key: GOOGLE_CLIENT_ID
