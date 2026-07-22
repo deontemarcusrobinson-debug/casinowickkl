@@ -440,9 +440,9 @@ module.exports = (socket) => {
 
             historyService.getUserHistory(socket.data.user, socket);
 
-            //USERS ONLINE
+            //USERS ONLINE — match combined slots "playing" total (capped)
             emitSocketToAll('site', 'online', {
-                online: Object.keys(config.app.chat.channels).reduce((acc, cur) => ({ ...acc, [cur]: Array.from(io.of('/').sockets.values()).filter(a => a.data.channel == cur).filter(a => a.data.user).filter((value, index, self) => self.findIndex(a => a.data.user.userid == value.data.user.userid) == index).length + Array.from(io.of('/').sockets.values()).filter(a => a.data.channel == cur).filter(a => !a.data.user).length }), {})
+                online: require('@/services/activityService.js').getOnlineByChannel()
             });
         }
     };

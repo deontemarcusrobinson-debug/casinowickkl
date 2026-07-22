@@ -14,6 +14,7 @@ var fakeBetPool = []; // recent synthetic bets for all_bets / big_bets
 var fakeLeaderboard = [];
 var catalogProvider = null;
 var started = false;
+var ONLINE_CAP = 8700;
 
 var FAKE_NAMES = [
     'NovaSpin', 'LuckyRex', 'JadeViper', 'CashOrbit', 'MintRush', 'GoldByte',
@@ -89,6 +90,52 @@ function refreshPlayingCounts() {
     Object.keys(playingCounts).forEach(function(id) {
         if(ids.indexOf(id) === -1) delete playingCounts[id];
     });
+
+    scalePlayingToCap();
+    broadcastOnline();
+}
+
+function getTotalPlaying() {
+    var catalog = getCatalog();
+    catalog.forEach(function(g) {
+        if(g && g.id) ensurePlayingFor(g.id);
+    });
+
+    var sum = 0;
+    Object.keys(playingCounts).forEach(function(id) {
+        sum += playingCounts[id] || 0;
+    });
+
+    return Math.min(ONLINE_CAP, Math.max(0, sum));
+}
+
+function scalePlayingToCap() {
+    var sum = 0;
+    Object.keys(playingCounts).forEach(function(id) {
+        sum += playingCounts[id] || 0;
+    });
+    if(sum <= ONLINE_CAP || sum <= 0) return;
+
+    var factor = ONLINE_CAP / sum;
+    Object.keys(playingCounts).forEach(function(id) {
+        playingCounts[id] = Math.max(8, Math.floor(playingCounts[id] * factor));
+    });
+}
+
+function getOnlineByChannel() {
+    var total = getTotalPlaying();
+    var channels = (config.app.chat && config.app.chat.channels) ? Object.keys(config.app.chat.channels) : ['en'];
+    return channels.reduce(function(acc, cur) {
+        acc[cur] = total;
+        return acc;
+    }, {});
+}
+
+function broadcastOnline() {
+    try {
+        var { emitSocketToAll } = require('@/utils/socket.js');
+        emitSocketToAll('site', 'online', { online: getOnlineByChannel() });
+    } catch (e) {}
 }
 
 function attachPlaying(list) {
@@ -259,6 +306,7 @@ function initialize() {
     refreshPlayingCounts();
     seedFakeBets();
     rebuildLeaderboardFakes();
+    broadcastOnline();
 
     setInterval(refreshPlayingCounts, 5 * 60 * 1000);
     scheduleNextFakeBet();
@@ -269,6 +317,9 @@ module.exports = {
     initialize,
     setCatalogProvider,
     getPlaying,
+    getTotalPlaying,
+    getOnlineByChannel,
+    broadcastOnline,
     attachPlaying,
     mergeWithFakeBets,
     mergeLeaderboard,
