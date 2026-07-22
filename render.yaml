@@ -1,11 +1,30 @@
 # GoldWitch — Render Blueprint
-# Dashboard: New → Blueprint → connect this GitHub repo
-# Docs: https://render.com/docs/deploy-mysql
-#
-# MySQL private service needs a paid plan (disk). Free web + paid MySQL is fine.
-# Or skip the MySQL service below and paste any MySQL host into the web service env.
+# New → Blueprint → this repo
+# MySQL private service needs a paid Starter plan (disk).
 
 services:
+  # MySQL first so Blueprint provisions DB before the web app boots hard against it
+  - type: pserv
+    name: goldwitch-mysql
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./docker/mysql/Dockerfile
+    dockerContext: ./docker/mysql
+    disk:
+      name: goldwitch-mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 10
+    envVars:
+      - key: MYSQL_DATABASE
+        value: vgowitch
+      - key: MYSQL_USER
+        value: casino
+      - key: MYSQL_PASSWORD
+        generateValue: true
+      - key: MYSQL_ROOT_PASSWORD
+        generateValue: true
+
   - type: web
     name: goldwitch
     runtime: node
@@ -27,7 +46,6 @@ services:
         value: "false"
       - key: SESSION_SECRET
         generateValue: true
-      # Auto-filled from the MySQL private service below
       - key: MYSQLHOST
         fromService:
           name: goldwitch-mysql
@@ -44,39 +62,3 @@ services:
           name: goldwitch-mysql
           type: pserv
           envVarKey: MYSQL_PASSWORD
-      # Optional secrets — set in Render Dashboard after deploy
-      - key: APP_URL
-        sync: false
-      - key: PAYPAL_MODE
-        value: live
-      - key: PAYPAL_CLIENT_ID
-        sync: false
-      - key: PAYPAL_CLIENT_SECRET
-        sync: false
-      - key: DRAKON_AGENT_CODE
-        sync: false
-      - key: DRAKON_AGENT_TOKEN
-        sync: false
-      - key: DRAKON_AGENT_SECRET_KEY
-        sync: false
-
-  - type: pserv
-    name: goldwitch-mysql
-    runtime: docker
-    plan: starter
-    region: oregon
-    dockerfilePath: ./docker/mysql/Dockerfile
-    dockerContext: ./docker/mysql
-    disk:
-      name: goldwitch-mysql-data
-      mountPath: /var/lib/mysql
-      sizeGB: 10
-    envVars:
-      - key: MYSQL_DATABASE
-        value: vgowitch
-      - key: MYSQL_USER
-        value: casino
-      - key: MYSQL_PASSWORD
-        generateValue: true
-      - key: MYSQL_ROOT_PASSWORD
-        generateValue: true

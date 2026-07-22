@@ -101,7 +101,7 @@ function waitForMysql(attempts, callback) {
             if(left <= 0) return callback(err);
 
             console.log('[boot] Waiting for MySQL… (' + left + ' left) ' + (err.message || err.code));
-            setTimeout(tryOnce, 3000);
+            setTimeout(tryOnce, 5000);
         });
     }
 
@@ -187,7 +187,7 @@ function migrateThenStart() {
 ensureRuntimeDirs();
 setDefaults();
 
-waitForMysql(40, function(err1) {
+waitForMysql(120, function(err1) {
     if(err1) {
         console.error('[boot] MySQL not reachable:', err1.message || err1);
         console.error('[boot] Fix: Render needs MySQL private service (or external MySQL) linked, then Redeploy.');
