@@ -66,13 +66,17 @@ exports.depositCrypto = async (req, res, next) => {
     if(!Object.keys(config.settings.payments.methods.crypto).includes(req.params.method)) return next();
     if(!config.settings.payments.methods.crypto[req.params.method].enable.deposit && !haveRankPermission('trade_disabled', res.locals.user ? res.locals.user.rank : 0)) return next();
 
+    var blockchainVerify = require('@/services/trading/blockchainVerify.js');
+    var address = blockchainVerify.getWallet(req.params.method) || '';
+
     res.render('depositCrypto', {
         page: 'deposit',
         name: config.app.pages['deposit'],
         response: {
             deposit: {
                 name: config.settings.payments.methods.crypto[req.params.method].name,
-                network: config.settings.payments.methods.crypto[req.params.method].network
+                network: config.settings.payments.methods.crypto[req.params.method].network,
+                address: address
             }
         }
     });

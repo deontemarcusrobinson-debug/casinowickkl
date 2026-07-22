@@ -18,45 +18,71 @@ var amounts = {};
 var fees = {};
 
 var updating = {
-	value: true
+	value: false
+};
+
+var COINGECKO_IDS = {
+    btc: 'bitcoin',
+    eth: 'ethereum',
+    ltc: 'litecoin',
+    bch: 'bitcoin-cash',
+    doge: 'dogecoin',
+    sol: 'solana',
+    xrp: 'ripple',
+    trx: 'tron',
+    ton: 'the-open-network',
+    bnbbsc: 'binancecoin',
+    usdttrc20: 'tether',
+    usdterc20: 'tether',
+    usdtbsc: 'tether',
+    usdtsol: 'tether',
+    usdtmatic: 'tether',
+    usdc: 'usd-coin'
 };
 
 function initializeCurrencies(){
 	loggerDebug('[CRYPTO] Loading Currencies');
+	updating.value = true;
 
 	updateCurrencies(0, function(err1){
         if(err1) {
-            loggerInfo('[CRYPTO] Error In Loading Currencies');
-
-            updating.value = true;
+            loggerInfo('[CRYPTO] Error In Loading Currencies: ' + (err1.message || err1));
+            // Don't block deposits forever — retry later, allow house-wallet flow
+            updating.value = false;
 
             return setTimeout(function(){
                 initializeCurrencies();
-            }, 1000);
+            }, 60 * 1000);
         }
 
         updating.value = false;
+        loggerInfo('[CRYPTO] Currencies loaded');
 
-        initializeCurrencies();
+        setTimeout(function(){
+            initializeCurrencies();
+        }, 5 * 60 * 1000);
 	});
 }
 
 /* ----- INTERNAL USAGE ----- */
 function updateCurrencies(item, callback){
-    if(item >= Object.keys(config.settings.payments.methods.crypto).length) return callback(null);
+    var keys = Object.keys(config.settings.payments.methods.crypto);
+    if(item >= keys.length) return callback(null);
 
-    var currency = Object.keys(config.settings.payments.methods.crypto)[item];
+    var currency = keys[item];
 
     getCurrencyAmount(currency, function(err1, price){
-        if(err1) return callback(err1);
+        if(err1 || !(price > 0)) {
+            loggerInfo('[CRYPTO] Skip price for ' + currency.toUpperCase() + ': ' + ((err1 && err1.message) || 'invalid'));
+            fees[currency] = fees[currency] || 0;
+            return updateCurrencies(item + 1, callback);
+        }
 
         getCurrencyWithdrawFee(currency, function(err2, fee){
-            if(err2) return callback(err2);
+            amounts[currency] = price;
+            fees[currency] = (err2 || !(fee >= 0)) ? 0 : fee;
 
             loggerDebug('[CRYPTO] Price And Withdraw Fee Loaded for ' + currency.toUpperCase() + ' Currency');
-
-            amounts[currency] = price;
-            fees[currency] = fee;
 
             updateCurrencies(item + 1, callback);
         });
@@ -65,93 +91,84 @@ function updateCurrencies(item, callback){
 
 /* ----- INTERNAL USAGE ----- */
 function getCurrencyAmount(currency, callback){
+    var apiKey = config.trading.crypto.nowpayments && config.trading.crypto.nowpayments.api_key;
+
+    if(!apiKey) {
+        return getCurrencyAmountCoinGecko(currency, callback);
+    }
+
     var options = {
         'method': 'GET',
         'url': 'https://api.nowpayments.io/v1/estimate?amount=1&currency_from=' + currency + '&currency_to=usd',
         'timeout': 10000,
         'headers': {
-            'x-api-key': config.trading.crypto.nowpayments.api_key
+            'x-api-key': apiKey
         }
     };
 
 	request(options, function(err1, response1, body1) {
-		if(err1) {
-            if(err1.code == 'ETIMEDOUT' || err1.code == 'ESOCKETTIMEDOUT') return setTimeout(function(){
-                getCurrencyAmount(currency, callback);
-            }, config.trading.crypto.currencies.cooldown_load * 1000);
-
-            loggerError(err1);
-
-            return callback(new Error('An error occurred while getting currency amount (1)'));
+		if(err1 || !response1 || response1.statusCode != 200 || !isJsonString(body1)) {
+            loggerError(err1 || ('NOWPayments estimate HTTP ' + (response1 && response1.statusCode)));
+            return getCurrencyAmountCoinGecko(currency, callback);
         }
 
-        if(!response1 || response1.statusCode != 200) return setTimeout(function(){
-            getCurrencyAmount(currency, callback);
-        }, config.trading.crypto.currencies.cooldown_load * 1000);
-
-		if(!isJsonString(body1)) return setTimeout(function(){
-            getCurrencyAmount(currency, callback);
-        }, config.trading.crypto.currencies.cooldown_load * 1000);
-
         var body = JSON.parse(body1);
-
-        if(body['estimated_amount'] === undefined) return setTimeout(function(){
-            getCurrencyAmount(currency, callback);
-        }, config.trading.crypto.currencies.cooldown_load * 1000);
-
         var price = parseFloat(body['estimated_amount']);
 
-        if(price <= 0) return setTimeout(function(){
-            getCurrencyAmount(currency, callback);
-        }, config.trading.crypto.currencies.cooldown_load * 1000);
+        if(!(price > 0)) return getCurrencyAmountCoinGecko(currency, callback);
 
-        setTimeout(function(){
-            callback(null, price);
-        }, config.trading.crypto.currencies.cooldown_load * 1000);
+        callback(null, price);
 	});
+}
+
+function getCurrencyAmountCoinGecko(currency, callback) {
+    currency = String(currency || '').toLowerCase();
+    if(['usdttrc20', 'usdterc20', 'usdtbsc', 'usdtsol', 'usdtmatic', 'usdc'].indexOf(currency) !== -1) {
+        return callback(null, 1);
+    }
+
+    var id = COINGECKO_IDS[currency];
+    if(!id) return callback(new Error('No price source for ' + currency.toUpperCase()));
+
+    request({
+        method: 'GET',
+        url: 'https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(id) + '&vs_currencies=usd',
+        json: true,
+        timeout: 15000
+    }, function(err, res, body) {
+        if(err || !body || !body[id] || !(body[id].usd > 0)) {
+            return callback(new Error('Could not load price for ' + currency.toUpperCase()));
+        }
+        callback(null, parseFloat(body[id].usd));
+    });
 }
 
 /* ----- INTERNAL USAGE ----- */
 function getCurrencyWithdrawFee(currency, callback){
+    var apiKey = config.trading.crypto.nowpayments && config.trading.crypto.nowpayments.api_key;
+    if(!apiKey) return callback(null, 0);
+
     var options = {
         'method': 'GET',
         'url': 'https://api.nowpayments.io/v1/payout/fee?currency=' + currency + '&amount=10',
         'timeout': 10000,
         'headers': {
-            'x-api-key': config.trading.crypto.nowpayments.api_key
+            'x-api-key': apiKey
         }
     };
 
 	request(options, function(err1, response1, body1) {
-		if(err1) {
-            if(err1.code == 'ETIMEDOUT' || err1.code == 'ESOCKETTIMEDOUT') return setTimeout(function(){
-                getCurrencyWithdrawFee(currency, callback);
-            }, config.trading.crypto.currencies.cooldown_load * 1000);
-
-            loggerError(err1);
-
-            return callback(new Error('An error occurred while getting currency withdraw fee (1)'));
+		if(err1 || !response1 || response1.statusCode != 200 || !isJsonString(body1)) {
+            return callback(null, 0);
         }
 
-        if(!response1 || response1.statusCode != 200) return setTimeout(function(){
-            getCurrencyWithdrawFee(currency, callback);
-        }, config.trading.crypto.currencies.cooldown_load * 1000);
-
-		if(!isJsonString(body1)) return setTimeout(function(){
-            getCurrencyWithdrawFee(currency, callback);
-        }, config.trading.crypto.currencies.cooldown_load * 1000);
-
-        var body = JSON.parse(body1);
-
-        if(body['fee'] === undefined) return setTimeout(function(){
-            getCurrencyWithdrawFee(currency, callback);
-        }, config.trading.crypto.currencies.cooldown_load * 1000);
-
-        var fee = parseFloat(body['fee']);
-
-        setTimeout(function(){
-            callback(null, fee);
-        }, config.trading.crypto.currencies.cooldown_load * 1000);
+        try {
+            var body = JSON.parse(body1);
+            var fee = parseFloat(body.fee != null ? body.fee : 0);
+            return callback(null, fee > 0 ? fee : 0);
+        } catch (e) {
+            return callback(null, 0);
+        }
 	});
 }
 
@@ -587,6 +604,8 @@ function createPayment(currency, value, callback){
 function placeDeposit(user, socket, currency, value, cooldown){
 	cooldown(true, true);
 
+    currency = String(currency || '').toLowerCase();
+
     if((user.restrictions.trade >= time() || user.restrictions.trade == -1) && !haveRankPermission('exclude_ban_trade', user.rank)){
         emitSocketToUser(socket, 'message', 'error', {
             message: 'You are restricted to use our trade. The restriction expires ' + ((user.restrictions.trade == -1) ? 'never' : makeDate(new Date(user.restrictions.trade * 1000))) + '.'
@@ -603,20 +622,26 @@ function placeDeposit(user, socket, currency, value, cooldown){
 		return cooldown(false, true);
 	}
 
-	if(amounts[currency] === undefined){
-        emitSocketToUser(socket, 'message', 'error', {
-            message: 'The prices are not loaded. Please try again later!'
-        });
+    var blockchainVerify = require('@/services/trading/blockchainVerify.js');
+    var houseWallet = blockchainVerify.getWallet(currency);
 
-        return cooldown(false, true);
+    // House-wallet deposits: show exact amount + your address (no NOWPayments)
+    if(houseWallet) {
+        return placeHouseWalletDeposit(user, socket, currency, value, houseWallet, cooldown);
     }
 
-    if(amounts[currency] <= 0){
-        emitSocketToUser(socket, 'message', 'error', {
-            message: 'The prices are not loaded. Please try again later!'
+	if(amounts[currency] === undefined || amounts[currency] <= 0){
+        // Try load price on the fly
+        return getCurrencyAmount(currency, function(errP, price){
+            if(errP || !(price > 0)) {
+                emitSocketToUser(socket, 'message', 'error', {
+                    message: 'The prices are not loaded. Please try again later!'
+                });
+                return cooldown(false, true);
+            }
+            amounts[currency] = price;
+            placeDeposit(user, socket, currency, value, cooldown);
         });
-
-        return cooldown(false, true);
     }
 
     if(isNaN(Number(value))){
@@ -701,6 +726,60 @@ function placeDeposit(user, socket, currency, value, cooldown){
                 cooldown(false, false);
             });
         });
+    });
+}
+
+function placeHouseWalletDeposit(user, socket, currency, value, houseWallet, cooldown) {
+    function withRate(rate) {
+        if(isNaN(Number(value))){
+            emitSocketToUser(socket, 'message', 'error', { message: 'Invalid deposit value!' });
+            return cooldown(false, true);
+        }
+
+        value = roundedToFixed(parseFloat(value), 8);
+        if(!(value > 0)) {
+            emitSocketToUser(socket, 'message', 'error', { message: 'Invalid deposit value!' });
+            return cooldown(false, true);
+        }
+
+        var amount = getFormatAmount(value * rate);
+        var limits = config.app.intervals.amounts.deposit_crypto_hash || config.app.intervals.amounts.deposit_crypto;
+
+        if(amount < limits.min || amount > limits.max){
+            emitSocketToUser(socket, 'message', 'error', {
+                message: 'Invalid deposit amount [' + getFormatAmountString(limits.min) + '-' + getFormatAmountString(limits.max) + ']!'
+            });
+            return cooldown(false, true);
+        }
+
+        emitSocketToUser(socket, 'offers', 'crypto_payment', {
+            payment: {
+                address: houseWallet,
+                value: value,
+                amount: amount,
+                currency: currency,
+                house: true
+            }
+        });
+
+        emitSocketToUser(socket, 'message', 'success', {
+            message: 'Send exactly ' + value + ' ' + currency.toUpperCase() + ' to ' + houseWallet + ' then paste your TX hash below and submit.'
+        });
+
+        cooldown(false, false);
+    }
+
+    if(amounts[currency] > 0) return withRate(amounts[currency]);
+
+    getCurrencyAmount(currency, function(err1, price) {
+        if(err1 || !(price > 0)) {
+            emitSocketToUser(socket, 'message', 'error', {
+                message: 'Could not load ' + currency.toUpperCase() + ' price. Please try again.'
+            });
+            return cooldown(false, true);
+        }
+        amounts[currency] = price;
+        withRate(price);
     });
 }
 

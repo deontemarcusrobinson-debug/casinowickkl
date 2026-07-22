@@ -660,9 +660,13 @@ module.exports = (socket) => {
             }
 
             if(data.command != 'hash_deposit' && cryptoService.updating.value){
-                return emitSocketToUser(socket, 'message', 'error', {
-                    message: 'The crypto currencies prices are updating. Please try again later!'
-                });
+                var blockchainVerifyCheck = require('@/services/trading/blockchainVerify.js');
+                var hasHouse = data.command == 'deposit' && data.currency && blockchainVerifyCheck.getWallet(String(data.currency).toLowerCase());
+                if(!hasHouse) {
+                    return emitSocketToUser(socket, 'message', 'error', {
+                        message: 'The crypto currencies prices are updating. Please try again later!'
+                    });
+                }
             }
 
             /* REQUESTS FOR USERS */

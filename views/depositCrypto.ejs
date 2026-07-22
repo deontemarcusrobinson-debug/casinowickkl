@@ -16,7 +16,7 @@
 		<div class="flex flex-col gap-1">
 			<div class="text-xl font-bold">Deposit with <%= response.deposit.name %></div>
 
-			<div class="text-xs text-muted-foreground">You will receive coins automatically after sending <%= app.paths[2].toUpperCase() %> to the address displayed below.</div>
+			<div class="text-xs text-muted-foreground">Enter the amount, click Deposit, then send the exact crypto amount to our wallet and submit your TX hash for approval.</div>
 		</div>
 
         <div class="submit flex flex-col gap-2">
@@ -41,7 +41,7 @@
                 </div>
 
                 <div class="flex flex-col gap-4">
-                    <div class="text-base font-bold">You receive (network fee excluded)</div>
+                    <div class="text-base font-bold">You receive (estimate)</div>
 
                     <div class="flex flex-row gap-2 items-center">
                         <%- include('./components/inputs/inputGroup.ejs', {
@@ -63,7 +63,7 @@
                         <button type="button" class="button button-hover button-primary shadow-2 large" id="crypto_deposit" data-currency="<%= app.paths[2] %>">Deposit</button>
                     </div>
 
-                    <div class="text-xs text-muted-foreground">The exchange rate shown above is an estimate. The final rate is determined by the time of the transaction.</div>
+                    <div class="text-xs text-muted-foreground">After you click Deposit you will see the exact amount and wallet address to pay.</div>
                 </div>
             </div>
 
@@ -78,43 +78,54 @@
                     <div class="crypto-deposit-qrcode <%= app.paths[2] %>" id="crypto_deposit_qrcode"></div>
 
                     <div class="flex flex-col gap-4">
-                        <div class="text-base font-bold">Send <span class="text-primary"><span id="crypto_deposit_payment_value">0.00</span> <%= app.paths[2].toUpperCase() %></span> (+fee) via <span class="text-primary"><%= response.deposit.network %></span> network to wallet address:</div>
+                        <div class="text-base font-bold">Send exactly <span class="text-primary"><span id="crypto_deposit_payment_value">0.00</span> <%= app.paths[2].toUpperCase() %></span> via <span class="text-primary"><%= response.deposit.network %></span> to:</div>
 
                         <div class="flex flex-row items-center gap-2">
                             <%- include('./components/inputs/inputGroup.ejs', {
                                 type: 'text',
                                 label: 'Wallet address',
-                                id: 'crypto_deposit_payment_address'
+                                id: 'crypto_deposit_payment_address',
+                                value: response.deposit.address || ''
                             }); %>
 
                             <button type="button" class="button button-hover button-primary shadow-2 large" data-copy="input" data-input="#crypto_deposit_payment_address">Copy</button>
                         </div>
 
-                        <div class="text-xs text-warning">Before sending, please check the token <%= response.deposit.name %>, network <%= response.deposit.network %> and address carefully, it is not possible to recover funds sent to the wrong address.</div>
-                        <div class="text-xs text-danger">Important! Check regularly your deposits history from your account page. If your payment is in "Partially Paid" status, please send on same address the difference (+fee), otherwise the payment will not be completed and you will lose the funds sent.</div>
+                        <div class="text-xs text-warning">Send the exact amount shown. Wrong network or wrong amount may delay or prevent crediting.</div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-card bg-opacity-50 flex flex-row justify-between rounded-2 border-2 border-secondary p-4">
-                <div class="flex flex-col items-start gap-1">
-                    <div class="text-muted-foreground font-bold">You receive (network fee excluded):</div>
-
-                    <div class="flex flex-row items-center justify-center gap-1">
-                        <%- include('./components/icon.ejs', {
-                            icon: 'diamond',
-                            className: 'text-primary size-5'
-                        }); %>
-
-                        <span class="text-xl" id="crypto_deposit_payment_amount">0.00</span>
+            <div class="bg-card bg-opacity-50 flex flex-col gap-4 rounded-2 border-2 border-secondary p-4">
+                <div class="flex flex-row justify-between items-center gap-2">
+                    <div class="flex flex-col items-start gap-1">
+                        <div class="text-muted-foreground font-bold">You receive (estimate):</div>
+                        <div class="flex flex-row items-center justify-center gap-1">
+                            <%- include('./components/icon.ejs', {
+                                icon: 'diamond',
+                                className: 'text-primary size-5'
+                            }); %>
+                            <span class="text-xl" id="crypto_deposit_payment_amount">0.00</span>
+                        </div>
                     </div>
+                    <button type="button" class="button button-hover button-accent shadow-2 large" id="crypto_deposit_back">Back</button>
                 </div>
 
-                <button type="button" class="button button-hover button-primary shadow-2 large" id="crypto_deposit_back">Back</button>
+                <div class="flex flex-col gap-2">
+                    <div class="text-base font-bold">After sending, paste your TX hash</div>
+                    <input type="hidden" id="crypto_hash_currency" value="<%= app.paths[2] %>">
+                    <%- include('./components/inputs/inputGroup.ejs', {
+                        type: 'text',
+                        label: 'Transaction hash / TXID',
+                        id: 'crypto_hash_tx',
+                        errors: [ 'required' ]
+                    }); %>
+                    <button type="button" class="button button-hover button-primary shadow-2 large" id="crypto_hash_submit">Submit TX hash for approval</button>
+                </div>
             </div>
 
             <div class="bg-card bg-opacity-50 text-left rounded-2 border-2 border-secondary p-4">
-                <div class="text-base font-bold">This address is for one-time use only. Do not send multiple deposits to the same address.</div>
+                <div class="text-base font-bold">An admin will approve your deposit after the TX is verified on-chain.</div>
             </div>
         </div>
 
