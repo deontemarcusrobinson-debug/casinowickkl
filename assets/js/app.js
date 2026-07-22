@@ -6626,7 +6626,7 @@ function pagination_addCasinoProviders(list){
         $('#casino_providers').empty();
 
 		list.forEach(function(item){
-            $('#casino_providers').append(casinoProvidersProvider(item));
+            $('#casino_providers').append(casinoProviderGames(item));
         });
 
 		initializeSwiper();

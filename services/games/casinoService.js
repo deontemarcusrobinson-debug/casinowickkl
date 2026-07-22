@@ -1471,39 +1471,33 @@ function getAllGames(user, socket, page, search, cooldown){
 function getProviders(user, socket, page, order, search, cooldown){
     cooldown(true, true);
 
-    var order_allowed = [ 0, 1 ];
-	if(!order_allowed.includes(order)){
-		emitSocketToUser(socket, 'message', 'error', {
-			message: 'Invalid order!'
-		});
+    page = parseInt(page, 10);
+    order = parseInt(order, 10);
+    if(isNaN(order) || [0, 1].indexOf(order) === -1) order = 0;
+    if(isNaN(page) || page < 1) page = 1;
+    search = String(search == null ? '' : search).trim();
 
-		return cooldown(false, true);
-	}
+    var listitems = Object.values(providers).filter(function(a) {
+        if(!a || !a.status) return false;
+        return (a.games || []).some(function(gid) {
+            return games[gid] && isGameListed(games[gid]);
+        });
+    }).map(function(a) {
+        return { id: a.id, name: a.name };
+    });
 
-    if(isNaN(Number(page))){
-		emitSocketToUser(socket, 'message', 'error', {
-			message: 'Invalid page!'
-		});
+    if(search) {
+        listitems = listitems.filter(function(a) {
+            return a.name.toLowerCase().indexOf(search.toLowerCase()) >= 0;
+        });
+    }
 
-		return cooldown(false, true);
-	}
+    var perPage = config.app.pagination.items.casino_providers || 10;
+    var pages = Math.max(1, Math.ceil(listitems.length / perPage));
 
-	page = parseInt(page);
-	search = search.trim();
-
-    var listitems = Object.values(providers).filter(a => a.games.length > 0).map(a => ({
-        id: a.id,
-        name: a.name
-    }));
-
-    listitems = listitems.filter(a => a.name.toLowerCase().indexOf(search.toLowerCase()) >= 0);
-
-    var pages = Math.ceil(listitems.length / config.app.pagination.items.casino_providers);
-
-    if(pages <= 0){
+    if(listitems.length <= 0){
         emitSocketToUser(socket, 'pagination', 'casino_providers', {
             list: [],
-            providers: [],
             pages: 1,
             page: 1
         });
@@ -1511,23 +1505,21 @@ function getProviders(user, socket, page, order, search, cooldown){
         return cooldown(false, false);
     }
 
-    if(page <= 0 || page > pages) {
-        emitSocketToUser(socket, 'message', 'error', {
-            message: 'Invalid page!'
-        });
+    if(page > pages) page = pages;
 
-        return cooldown(false, true);
-    }
+    if(order == 0) listitems.sort(function(a, b) { return a.name.localeCompare(b.name); });
+    else listitems.sort(function(a, b) { return b.name.localeCompare(a.name); });
 
-    if(order == 0) listitems.sort((a, b) => a.name.localeCompare(b.name));
-    else if(order == 1) listitems.sort((a, b) => b.name.localeCompare(a.name));
+    var result = listitems.slice((page - 1) * perPage, page * perPage);
 
-    var result = listitems.slice((page - 1) * config.app.pagination.items.casino_providers, page * config.app.pagination.items.casino_providers);
-
-    var list = result.map(a => {
+    var list = result.map(function(a) {
         var topGameId = providers[a.id].games
             .filter(function(b) { return games[b] && isGameListed(games[b]); })
-            .sort(function(b, c) { return stats[c].games - stats[b].games; })[0];
+            .sort(function(b, c) {
+                var sb = (stats[b] && stats[b].games) || 0;
+                var sc = (stats[c] && stats[c].games) || 0;
+                return sc - sb;
+            })[0];
 
         var gamesList = [];
         if(topGameId) {
@@ -1538,7 +1530,7 @@ function getProviders(user, socket, page, order, search, cooldown){
                 image: games[topGameId].game.image,
                 provider: games[topGameId].provider.name,
                 rtp: games[topGameId].rtp,
-                favorite: user && favorites[user.userid] !== undefined ? favorites[user.userid].some(c => c == topGameId) : false
+                favorite: user && favorites[user.userid] !== undefined ? favorites[user.userid].some(function(c) { return c == topGameId; }) : false
             }];
         }
 
