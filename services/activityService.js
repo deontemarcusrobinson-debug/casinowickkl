@@ -102,28 +102,44 @@ function fakeUser(forcedName) {
     });
 }
 
+var PLAYING_MIN = 9;
+var PLAYING_MAX = 350;
+var playingReseeded = false;
+
 function ensurePlayingFor(gameId) {
-    if(playingCounts[gameId] == null) {
-        // Seed different games at different activity levels (under 200)
-        playingCounts[gameId] = randInt(12, 165);
+    if(playingCounts[gameId] == null || playingCounts[gameId] < PLAYING_MIN) {
+        // Weighted so most games sit mid-range (looks real), a few hot/cold
+        var roll = Math.random();
+        var seed;
+        if(roll < 0.15) seed = randInt(PLAYING_MIN, 40);          // quieter
+        else if(roll < 0.75) seed = randInt(40, 160);             // normal (e.g. ~27–150)
+        else if(roll < 0.95) seed = randInt(160, 260);            // busy
+        else seed = randInt(260, PLAYING_MAX);                    // hottest
+        playingCounts[gameId] = seed;
     }
     return playingCounts[gameId];
 }
 
 function getPlaying(gameId) {
-    if(!gameId) return randInt(12, 80);
+    if(!gameId) return randInt(PLAYING_MIN, 80);
     return ensurePlayingFor(gameId);
 }
 
 function refreshPlayingCounts() {
+    // One-time wipe of old 8–14 scaled counts so games reseed into 9–350
+    if(!playingReseeded) {
+        playingCounts = {};
+        playingReseeded = true;
+    }
+
     var catalog = getCatalog();
     var ids = catalog.map(function(g) { return g.id; });
 
-    // Keep counts for current catalog; nudge up/down
+    // Nudge each game up/down inside 9–350 (do NOT scale down to fit online cap)
     ids.forEach(function(id) {
         var cur = ensurePlayingFor(id);
-        var delta = randInt(-18, 18);
-        playingCounts[id] = Math.max(8, Math.min(195, cur + delta));
+        var delta = randInt(-22, 28);
+        playingCounts[id] = Math.max(PLAYING_MIN, Math.min(PLAYING_MAX, cur + delta));
     });
 
     // Drop stale ids
@@ -131,8 +147,6 @@ function refreshPlayingCounts() {
         if(ids.indexOf(id) === -1) delete playingCounts[id];
     });
 
-    scalePlayingToCap();
-    // Don't snap English online to slots total — only nudge other languages
     nudgeOtherChannels();
 }
 
@@ -147,20 +161,7 @@ function getTotalPlaying() {
         sum += playingCounts[id] || 0;
     });
 
-    return Math.min(ONLINE_CAP, Math.max(0, sum));
-}
-
-function scalePlayingToCap() {
-    var sum = 0;
-    Object.keys(playingCounts).forEach(function(id) {
-        sum += playingCounts[id] || 0;
-    });
-    if(sum <= ONLINE_CAP || sum <= 0) return;
-
-    var factor = ONLINE_CAP / sum;
-    Object.keys(playingCounts).forEach(function(id) {
-        playingCounts[id] = Math.max(8, Math.floor(playingCounts[id] * factor));
-    });
+    return Math.max(0, sum);
 }
 
 function getChatChannels() {
