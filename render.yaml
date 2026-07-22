@@ -1,23 +1,19 @@
 # GoldWitch — Render Blueprint
-# New → Blueprint → this repo
-# MySQL private service needs a paid Starter plan (disk).
+# After changing the DB service: delete goldwitch-mysql in the dashboard, then Manual sync.
 
 services:
-  # MySQL first so Blueprint provisions DB before the web app boots hard against it
   - type: pserv
     name: goldwitch-mysql
     runtime: docker
     plan: starter
     region: oregon
-    dockerfilePath: ./docker/mysql/Dockerfile
-    dockerContext: ./docker/mysql
+    # Official Render MySQL example (more reliable than a custom image on an old disk)
+    repo: https://github.com/render-examples/mysql.git
     disk:
-      # New disk name so we don't reuse the broken MySQL 8 data directory
-      name: goldwitch-mysql-data-v2
+      name: goldwitch-mysql-data-v3
       mountPath: /var/lib/mysql
       sizeGB: 10
     envVars:
-      # Official MariaDB image still accepts MYSQL_* aliases
       - key: MYSQL_DATABASE
         value: vgowitch
       - key: MYSQL_USER
