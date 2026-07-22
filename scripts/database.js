@@ -57,12 +57,44 @@ function runSqlFile(tableName, filePath, kind, callback) {
     fs.readFile(filePath, 'utf8', function(err1, sql) {
         if(err1) return callback(err1);
 
-        pool.query(sql, function(err2) {
-            if(err2) return callback(err2);
-            console.log('\x1b[33m[database] Table ' + tableName + ' successfully ' + kind);
-            callback(null);
-        });
+        // Run statement-by-statement so one ALTER/INDEX hiccup doesn't abort the whole table.
+        var statements = String(sql)
+            .split(';')
+            .map(function(s) { return s.trim(); })
+            .filter(function(s) { return s.length > 0; });
+
+        var ignorable = {
+            ER_TABLE_EXISTS_ERROR: true,
+            ER_DUP_KEYNAME: true,
+            ER_DUP_FIELDNAME: true,
+            ER_CANT_DROP_FIELD_OR_KEY: true,
+            ER_DUP_ENTRY: true
+        };
+
+        function runNext(i) {
+            if(i >= statements.length) {
+                console.log('\x1b[33m[database] Table ' + tableName + ' successfully ' + kind);
+                return callback(null);
+            }
+
+            pool.query(statements[i], function(err2) {
+                if(err2) {
+                    if(ignorable[err2.code]) {
+                        return runNext(i + 1);
+                    }
+                    console.error('[database] SQL failed in ' + fileNameSafe(filePath) + ' #' + (i + 1) + ':', err2.code || '', err2.message || err2);
+                    return callback(err2);
+                }
+                runNext(i + 1);
+            });
+        }
+
+        runNext(0);
     });
+}
+
+function fileNameSafe(filePath) {
+    return path.basename(filePath);
 }
 
 function processMigrateTables(callback) {

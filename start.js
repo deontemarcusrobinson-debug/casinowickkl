@@ -1,14 +1,13 @@
 /**
  * Root entrypoint for Render / Railway / production.
- * Lives at project root so deploys don't depend on scripts/ being uploaded alone.
  *
- * 1) wait for MySQL
- * 2) create DB + migrate if scripts/database.js exists
- * 3) start app.js
+ * Bind PORT immediately (Render kills deploys that don't open a port),
+ * then wait for MySQL → create/migrate → start the real app.
  */
 require('dotenv').config();
 
 var { spawn } = require('child_process');
+var http = require('http');
 var path = require('path');
 var fs = require('fs');
 var mysql = require('mysql2');
@@ -17,6 +16,8 @@ var ROOT = __dirname;
 var dbHelperPath = path.join(ROOT, 'config', 'databaseEnv.js');
 var migrateScript = path.join(ROOT, 'scripts', 'database.js');
 var appScript = path.join(ROOT, 'app.js');
+var bootServer = null;
+var bootStatus = 'starting';
 
 function resolveDatabaseConfig() {
     if(fs.existsSync(dbHelperPath)) {
@@ -66,6 +67,33 @@ function setDefaults() {
     }
 }
 
+function listenBootServer(callback) {
+    var port = parseInt(process.env.PORT || process.env.APP_PORT || '3000', 10);
+
+    bootServer = http.createServer(function(req, res) {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('GoldWitch boot: ' + bootStatus + '\n');
+    });
+
+    bootServer.listen(port, '0.0.0.0', function() {
+        console.log('[boot] Holding PORT=' + port + ' open during MySQL migrate (Render requires an open port)');
+        callback(null);
+    });
+
+    bootServer.on('error', function(err) {
+        console.error('[boot] Could not bind boot port:', err.message || err);
+        callback(err);
+    });
+}
+
+function closeBootServer(callback) {
+    if(!bootServer) return callback();
+    bootServer.close(function() {
+        bootServer = null;
+        callback();
+    });
+}
+
 function waitForMysql(attempts, callback) {
     var db = resolveDatabaseConfig();
     var left = attempts;
@@ -82,6 +110,7 @@ function waitForMysql(attempts, callback) {
     }
 
     function tryOnce() {
+        bootStatus = 'waiting-for-mysql (' + left + ')';
         var conn = mysql.createConnection({
             host: db.host,
             port: db.port || 3306,
@@ -96,9 +125,9 @@ function waitForMysql(attempts, callback) {
                 return callback(null);
             }
 
+            console.error('[boot] MySQL connect error:', err.code || '', err.message || err);
             conn.destroy();
 
-            // Auth mismatch won't fix itself by waiting
             if(err && err.code === 'ER_NOT_SUPPORTED_AUTH_MODE') {
                 return callback(err);
             }
@@ -106,7 +135,7 @@ function waitForMysql(attempts, callback) {
             left--;
             if(left <= 0) return callback(err);
 
-            console.log('[boot] Waiting for MySQL… (' + left + ' left) ' + (err.message || err.code));
+            console.log('[boot] Waiting for MySQL… (' + left + ' left)');
             setTimeout(tryOnce, 5000);
         });
     }
@@ -133,7 +162,7 @@ function startApp() {
         process.exit(1);
     }
 
-    // Verify a core table exists before serving traffic
+    bootStatus = 'checking-tables';
     var db = resolveDatabaseConfig();
     var check = mysql.createConnection({
         host: db.host,
@@ -143,6 +172,7 @@ function startApp() {
         database: db.database,
         connectTimeout: 8000
     });
+
     check.query('SELECT 1 FROM `bannedip` LIMIT 1', function(errCheck) {
         check.destroy();
         if(errCheck) {
@@ -151,16 +181,16 @@ function startApp() {
             process.exit(1);
         }
 
-        console.log('[boot] Starting GoldWitch on PORT=' + (process.env.PORT || process.env.APP_PORT || '3000'));
-        var child = spawn(process.execPath, ['app.js'], {
-            cwd: ROOT,
-            stdio: 'inherit',
-            env: process.env
-        });
+        bootStatus = 'starting-app';
+        console.log('[boot] Closing boot server and loading app.js on PORT=' + (process.env.PORT || process.env.APP_PORT || '3000'));
 
-        child.on('exit', function(code) {
-            console.error('[boot] App process exited with code ' + code);
-            process.exit(code || 0);
+        closeBootServer(function() {
+            try {
+                require(appScript);
+            } catch (e) {
+                console.error('[boot] Failed to load app.js:', e && e.stack ? e.stack : e);
+                process.exit(1);
+            }
         });
     });
 }
@@ -171,6 +201,7 @@ function migrateThenStart() {
         return startApp();
     }
 
+    bootStatus = 'creating-database';
     console.log('[boot] MySQL is up — ensuring database + tables…');
 
     runNodeScript(['scripts/database.js', '--create'], function(err2) {
@@ -179,6 +210,7 @@ function migrateThenStart() {
             process.exit(1);
         }
 
+        bootStatus = 'migrating-tables';
         runNodeScript(['scripts/database.js', '--migrate'], function(err3) {
             if(err3) {
                 console.error('[boot] migrate failed:', err3.message || err3);
@@ -193,12 +225,19 @@ function migrateThenStart() {
 ensureRuntimeDirs();
 setDefaults();
 
-waitForMysql(120, function(err1) {
-    if(err1) {
-        console.error('[boot] MySQL not reachable:', err1.message || err1);
-        console.error('[boot] Fix: Render needs MySQL private service (or external MySQL) linked, then Redeploy.');
-        process.exit(1);
-    }
+listenBootServer(function(errListen) {
+    if(errListen) process.exit(1);
 
-    migrateThenStart();
+    waitForMysql(120, function(err1) {
+        if(err1) {
+            bootStatus = 'mysql-failed';
+            console.error('[boot] MySQL not reachable:', err1.code || '', err1.message || err1);
+            console.error('[boot] Fix: Render needs MySQL private service linked + mysql2 client, then Redeploy.');
+            // Keep boot server up so logs stay readable; exit after a short delay
+            setTimeout(function() { process.exit(1); }, 5000);
+            return;
+        }
+
+        migrateThenStart();
+    });
 });
