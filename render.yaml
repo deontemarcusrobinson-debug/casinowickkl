@@ -60,3 +60,15 @@ services:
           name: goldwitch-mysql
           type: pserv
           envVarKey: MYSQL_PASSWORD
+      - key: APP_URL
+        value: https://goldwitch-8gft.onrender.com
+      - key: DRAKON_AGENT_CODE
+        sync: false
+      - key: DRAKON_AGENT_TOKEN
+        sync: false
+      - key: DRAKON_AGENT_SECRET_KEY
+        sync: false
+      - key: DRAKON_AGENT_CURRENCY
+        value: USD
+      - key: DRAKON_LANGUAGE
+        value: en

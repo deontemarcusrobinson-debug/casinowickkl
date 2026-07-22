@@ -5,6 +5,7 @@ node_modules/
 .env
 .env.local
 .env.*.local
+RENDER-DRAKON-ENV.txt
 
 # Logs & runtime
 logs/
