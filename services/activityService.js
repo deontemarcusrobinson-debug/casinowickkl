@@ -10,11 +10,27 @@ var { getUserInfo } = require('@/utils/user.js');
 var config = require('@/config/config.js');
 
 var playingCounts = {}; // gameId -> number
+var channelOnline = {}; // chat channel -> online count
 var fakeBetPool = []; // recent synthetic bets for all_bets / big_bets
 var fakeLeaderboard = [];
 var catalogProvider = null;
 var started = false;
 var ONLINE_CAP = 8700;
+var OTHER_CHANNEL_CAP = 179;
+
+// Baseline activity by language (English/USA is computed from slots)
+var CHANNEL_SEEDS = {
+    fr: [70, 150],
+    de: [80, 160],
+    es: [90, 165],
+    pt: [55, 140],
+    ru: [45, 130],
+    jp: [40, 120],
+    il: [25, 95],
+    tr: [50, 145],
+    ro: [30, 110],
+    sv: [28, 100]
+};
 
 var FAKE_NAMES = [
     'NovaSpin', 'LuckyRex', 'JadeViper', 'CashOrbit', 'MintRush', 'GoldByte',
@@ -92,7 +108,7 @@ function refreshPlayingCounts() {
     });
 
     scalePlayingToCap();
-    broadcastOnline();
+    refreshChannelOnline(false);
 }
 
 function getTotalPlaying() {
@@ -122,13 +138,63 @@ function scalePlayingToCap() {
     });
 }
 
+function getChatChannels() {
+    return (config.app.chat && config.app.chat.channels) ? Object.keys(config.app.chat.channels) : ['en'];
+}
+
+function maxOtherOnline() {
+    var max = 0;
+    getChatChannels().forEach(function(ch) {
+        if(ch === 'en') return;
+        max = Math.max(max, channelOnline[ch] || 0);
+    });
+    return max;
+}
+
+function ensureChannelOnlineSeeded() {
+    getChatChannels().forEach(function(ch) {
+        if(ch === 'en') return;
+        if(channelOnline[ch] != null) return;
+        var range = CHANNEL_SEEDS[ch] || [30, 150];
+        channelOnline[ch] = randInt(range[0], Math.min(OTHER_CHANNEL_CAP, range[1]));
+    });
+}
+
+function refreshChannelOnline(broadcast) {
+    ensureChannelOnlineSeeded();
+
+    // Nudge non-English channels (always under 180, all different)
+    getChatChannels().forEach(function(ch) {
+        if(ch === 'en') return;
+        var cur = channelOnline[ch] != null ? channelOnline[ch] : randInt(30, 150);
+        var delta = randInt(-14, 16);
+        channelOnline[ch] = Math.max(18, Math.min(OTHER_CHANNEL_CAP, cur + delta));
+    });
+
+    // English / USA takes the slots total (highest), with small live jitter
+    var slotsTotal = getTotalPlaying();
+    var jitter = randInt(-55, 70);
+    var en = Math.min(ONLINE_CAP, Math.max(0, slotsTotal + jitter));
+    en = Math.max(en, maxOtherOnline() + 120); // always clearly highest
+    en = Math.min(ONLINE_CAP, en);
+    channelOnline.en = en;
+
+    if(broadcast !== false) broadcastOnline();
+}
+
 function getOnlineByChannel() {
-    var total = getTotalPlaying();
-    var channels = (config.app.chat && config.app.chat.channels) ? Object.keys(config.app.chat.channels) : ['en'];
-    return channels.reduce(function(acc, cur) {
-        acc[cur] = total;
-        return acc;
-    }, {});
+    ensureChannelOnlineSeeded();
+    if(channelOnline.en == null) refreshChannelOnline(false);
+
+    var out = {};
+    getChatChannels().forEach(function(ch) {
+        out[ch] = channelOnline[ch] != null ? channelOnline[ch] : 0;
+    });
+    // Keep English highest even if someone reads mid-refresh
+    if(out.en != null) {
+        out.en = Math.min(ONLINE_CAP, Math.max(out.en, maxOtherOnline() + 120));
+    }
+    return out;
 }
 
 function broadcastOnline() {
@@ -136,6 +202,12 @@ function broadcastOnline() {
         var { emitSocketToAll } = require('@/utils/socket.js');
         emitSocketToAll('site', 'online', { online: getOnlineByChannel() });
     } catch (e) {}
+}
+
+function scheduleChannelOnlineTick() {
+    refreshChannelOnline(true);
+    var delay = randInt(18, 42) * 1000; // fluctuate every ~20–40s
+    setTimeout(scheduleChannelOnlineTick, delay);
 }
 
 function attachPlaying(list) {
@@ -306,9 +378,10 @@ function initialize() {
     refreshPlayingCounts();
     seedFakeBets();
     rebuildLeaderboardFakes();
-    broadcastOnline();
+    refreshChannelOnline(true);
 
     setInterval(refreshPlayingCounts, 5 * 60 * 1000);
+    scheduleChannelOnlineTick();
     scheduleNextFakeBet();
     scheduleLeaderboardRefresh();
 }
