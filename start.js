@@ -72,6 +72,9 @@ function listenBootServer(callback) {
 
     bootServer = http.createServer(function(req, res) {
         res.writeHead(200, { 'Content-Type': 'text/plain' });
+        if(req.url && req.url.indexOf('/healthz') === 0) {
+            return res.end('ok\n');
+        }
         res.end('GoldWitch boot: ' + bootStatus + '\n');
     });
 
