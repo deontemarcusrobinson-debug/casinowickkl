@@ -357,7 +357,9 @@ function generateToken(callback){
 		'url': 'https://gator.drakon.casino/api/v1/auth/authentication',
 		'headers': {
 			'Authorization': 'Bearer ' + Buffer.from(config.games.games.casino.drakon.agent.token + ':' + config.games.games.casino.drakon.agent.secret_key).toString('base64')
-		}
+		},
+        timeout: 60000,
+        gzip: true
 	};
 
     request(options, function(err1, response1, body1) {
@@ -367,12 +369,16 @@ function generateToken(callback){
             return callback(new Error('An error occurred while generating token (1)'));
         }
 
-        if(!response1 || response1.statusCode != 200) return callback(new Error('An error occurred while generating token (2)'));
+        if(!response1 || response1.statusCode != 200) {
+            loggerError('[CASINO] Auth HTTP ' + (response1 && response1.statusCode) + ' body=' + String(body1 || '').slice(0, 300));
+            return callback(new Error('An error occurred while generating token (2)'));
+        }
 		if(!isJsonString(body1)) return callback(new Error('An error occurred while generating token (2)'));
 
         var body = JSON.parse(body1);
 
         token = body.access_token;
+        if(!token) return callback(new Error('An error occurred while generating token (3): no access_token'));
 
         callback(null);
 	});
@@ -385,7 +391,9 @@ function loadProviders(callback){
 		'url': 'https://gator.drakon.casino/api/v1/games/provider',
 		'headers': {
 			'Authorization': 'Bearer ' + token
-		}
+		},
+        timeout: 120000,
+        gzip: true
 	};
 
     request(options, function(err1, response1, body1) {
@@ -395,7 +403,10 @@ function loadProviders(callback){
             return callback(new Error('An error occurred while loading providers (1)'));
         }
 
-        if(!response1 || response1.statusCode != 200) return callback(new Error('An error occurred while loading providers (2)'));
+        if(!response1 || response1.statusCode != 200) {
+            loggerError('[CASINO] Providers HTTP ' + (response1 && response1.statusCode) + ' body=' + String(body1 || '').slice(0, 300));
+            return callback(new Error('An error occurred while loading providers (2)'));
+        }
 		if(!isJsonString(body1)) return callback(new Error('An error occurred while loading providers (3)'));
 
         var body = JSON.parse(body1);
@@ -439,23 +450,32 @@ function loadProviders(callback){
 
 /* ----- INTERNAL USAGE ----- */
 function loadGames(callback){
+    loggerInfo('[CASINO] Downloading games catalog from Drakon (can take 30–90s)…');
+
 	var options = {
 		'method': 'GET',
 		'url': 'https://gator.drakon.casino/api/v1/games/all',
 		'headers': {
 			'Authorization': 'Bearer ' + token
-		}
+		},
+        timeout: 180000,
+        gzip: true
 	};
 
     request(options, function(err1, response1, body1) {
 		if(err1) {
             loggerError(err1);
 
-            return callback(new Error('An error occurred while loading games (1)'));
+            return callback(new Error('An error occurred while loading games (1): ' + (err1.message || err1.code || err1)));
         }
 
-        if(!response1 || response1.statusCode != 200) return callback(new Error('An error occurred while loading games (2)'));
+        if(!response1 || response1.statusCode != 200) {
+            loggerError('[CASINO] Games HTTP ' + (response1 && response1.statusCode) + ' body=' + String(body1 || '').slice(0, 300));
+            return callback(new Error('An error occurred while loading games (2)'));
+        }
 		if(!isJsonString(body1)) return callback(new Error('An error occurred while loading games (3)'));
+
+        loggerInfo('[CASINO] Games catalog downloaded (' + String(body1).length + ' bytes), parsing…');
 
         var body = JSON.parse(body1);
 
@@ -1628,14 +1648,38 @@ function getPopularSlotsGames(userid){
         'nolimit_city_duck_hunters'
     ];
 
-    return ids.filter(a => games[a] !== undefined).map(a => ({
-        id: a,
-        enable: providers[games[a].provider.id] !== undefined ? games[a].status && providers[games[a].provider.id].status : false,
-        name: games[a].game.name,
-        image: games[a].game.image,
-        provider: games[a].provider.name,
-        rtp: games[a].rtp
-    }));
+    var list = ids.filter(a => games[a] !== undefined).map(a => mapGameCard(games[a]));
+
+    // If curated IDs aren't in this agent catalog, show any loaded slots
+    if(list.length === 0) {
+        list = Object.values(games).filter(a => a.type == 'slots' && a.status).slice(0, 30).map(mapGameCard);
+    }
+
+    return list;
+}
+
+function mapGameCard(a) {
+    return ({
+        id: a.id,
+        enable: providers[a.provider.id] !== undefined ? a.status && providers[a.provider.id].status : false,
+        name: a.game.name,
+        image: a.game.image,
+        provider: a.provider.name,
+        rtp: a.rtp
+    });
+}
+
+function getCasinoStatus(){
+    var agent = config.games.games.casino.drakon.agent || {};
+    return {
+        configured: !!(agent.code && agent.token && agent.secret_key),
+        authenticated: !!token,
+        providers: Object.keys(providers).length,
+        games: Object.keys(games).length,
+        slots: Object.values(games).filter(a => a.type == 'slots').length,
+        live: Object.values(games).filter(a => a.type == 'live').length,
+        updating: !!updating.value
+    };
 }
 
 function getPopularLiveGames(userid){
@@ -1668,14 +1712,11 @@ function getPopularLiveGames(userid){
         'eeze_classic_blackjack_1'
     ];
 
-    return ids.filter(a => games[a] !== undefined).map(a => ({
-        id: a,
-        enable: providers[games[a].provider.id] !== undefined ? games[a].status && providers[games[a].provider.id].status : false,
-        name: games[a].game.name,
-        image: games[a].game.image,
-        provider: games[a].provider.name,
-        rtp: games[a].rtp
-    }));
+    var list = ids.filter(a => games[a] !== undefined).map(a => mapGameCard(games[a]));
+    if(list.length === 0) {
+        list = Object.values(games).filter(a => a.type == 'live' && a.status).slice(0, 30).map(mapGameCard);
+    }
+    return list;
 }
 
 function getHotGamesList(userid){
@@ -2067,7 +2108,7 @@ function loadVendors(callback) {
 module.exports = {
     providers, games, stats, favorites,
     initializeCasino,
-    getPopularPrividers, getPopularSlotsGames, getPopularLiveGames, getSlotsGames, getLiveGames, getRecentGames, getFavoritesGames, getAllGames, getProviders, getProvidersProviderGames,
+    getPopularPrividers, getPopularSlotsGames, getPopularLiveGames, getSlotsGames, getLiveGames, getRecentGames, getFavoritesGames, getAllGames, getProviders, getProvidersProviderGames, getCasinoStatus,
     setFavoriteGame, unsetFavoriteGame,
     getLaunchGameDemo, getLaunchGameReal,
     getHotGamesList, getSlotsGamesList, getLiveGamesList,
