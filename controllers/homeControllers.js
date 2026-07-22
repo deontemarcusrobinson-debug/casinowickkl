@@ -40,8 +40,15 @@ exports.home = async (req, res) => {
         });
     }
 
-    pool.query('SELECT `category`, `gameid`, MAX(`time`) AS `time` FROM `games_history` WHERE `userid` = ' + pool.escape(res.locals.user.userid) + ' GROUP BY `category`, `game` ORDER BY `time` DESC LIMIT 20', function(err1, row1) {
-        if(err1) return res.status(409).render('409', { layout: 'layouts/error', error: 'An error occurred while rendering hone page (1)' });
+    pool.query(
+        'SELECT `category`, `gameid`, MAX(`time`) AS `time` FROM `games_history` WHERE `userid` = ' +
+            pool.escape(res.locals.user.userid) +
+            ' GROUP BY `category`, `gameid` ORDER BY `time` DESC LIMIT 20',
+        function(err1, row1) {
+        if(err1) {
+            console.error('[home] recent games query failed:', err1.code || '', err1.message || err1);
+            row1 = [];
+        }
 
         var level = calculateLevel(res.locals.user.xp);
 
@@ -58,7 +65,7 @@ exports.home = async (req, res) => {
             }
         };
 
-        response.home.games.recent = row1.filter(function(a) {
+        response.home.games.recent = (row1 || []).filter(function(a) {
             if(a.category == 'casino') return casinoService.games[a.gameid] !== undefined;
 
             return true;
@@ -78,12 +85,12 @@ exports.home = async (req, res) => {
             return ({
                 id: a.gameid,
                 category: a.category,
-                enable: config.settings.games.games.original[a.gameid].enable,
-                name: config.settings.games.games.original[a.gameid].name,
+                enable: config.settings.games.games.original[a.gameid] ? config.settings.games.games.original[a.gameid].enable : false,
+                name: config.settings.games.games.original[a.gameid] ? config.settings.games.games.original[a.gameid].name : a.gameid,
                 image: '/img/games/original/' + a.gameid + '.jpg',
                 provider: config.app.abbreviation,
-                description: config.settings.games.games.original[a.gameid].description,
-                rtp: 100 - config.settings.games.games.original[a.gameid].house_edge.value
+                description: config.settings.games.games.original[a.gameid] ? config.settings.games.games.original[a.gameid].description : '',
+                rtp: config.settings.games.games.original[a.gameid] ? (100 - config.settings.games.games.original[a.gameid].house_edge.value) : 0
             });
         });
 
