@@ -1,5 +1,5 @@
-/**
- * Root entrypoint for Render / Railway / production.
+﻿/**
+ * Root entrypoint for Railway / production.
  * Lives at project root so deploys don't depend on scripts/ being uploaded alone.
  *
  * 1) wait for MySQL
@@ -13,7 +13,7 @@ var path = require('path');
 var fs = require('fs');
 var mysql = require('mysql2');
 
-var ROOT = __dirname;
+var ROOT = require('path').join(__dirname, '..');
 var dbHelperPath = path.join(ROOT, 'config', 'databaseEnv.js');
 var migrateScript = path.join(ROOT, 'scripts', 'database.js');
 var appScript = path.join(ROOT, 'app.js');
@@ -48,20 +48,18 @@ function setDefaults() {
     if(!process.env.APP_ENV) process.env.APP_ENV = 'production';
     if(!process.env.SESSION_SECRET) {
         process.env.SESSION_SECRET = require('crypto').randomBytes(24).toString('hex');
-        console.log('[boot] SESSION_SECRET was empty — generated one for this boot');
+        console.log('[boot] SESSION_SECRET was empty â€” generated one for this boot');
     }
 
     if(!process.env.APP_URL || String(process.env.APP_URL).indexOf('YOUR') !== -1) {
-        var domain = process.env.RENDER_EXTERNAL_URL
-            || process.env.RAILWAY_PUBLIC_DOMAIN
-            || process.env.RAILWAY_STATIC_URL;
+        var domain = process.env.RAILWAY_PUBLIC_DOMAIN || process.env.RAILWAY_STATIC_URL;
         if(domain) {
             if(domain.indexOf('http') !== 0) domain = 'https://' + domain;
             process.env.APP_URL = domain.replace(/\/$/, '');
-            console.log('[boot] APP_URL set from host → ' + process.env.APP_URL);
+            console.log('[boot] APP_URL set from Railway â†’ ' + process.env.APP_URL);
         } else {
             process.env.APP_URL = 'http://localhost:' + (process.env.PORT || '3000');
-            console.log('[boot] APP_URL fallback → ' + process.env.APP_URL);
+            console.log('[boot] APP_URL fallback â†’ ' + process.env.APP_URL);
         }
     }
 }
@@ -77,7 +75,7 @@ function waitForMysql(attempts, callback) {
 
     if(!db.host || !db.user) {
         return callback(new Error(
-            'MySQL env vars missing. On Render: deploy MySQL (Blueprint) or set MYSQLHOST/MYSQLUSER/MYSQLPASSWORD/MYSQLDATABASE.'
+            'MySQL env vars missing. Add MySQL in Railway and link MYSQLHOST/MYSQLUSER/MYSQLPASSWORD/MYSQLDATABASE to this service.'
         ));
     }
 
@@ -97,17 +95,11 @@ function waitForMysql(attempts, callback) {
             }
 
             conn.destroy();
-
-            // Auth mismatch won't fix itself by waiting
-            if(err && err.code === 'ER_NOT_SUPPORTED_AUTH_MODE') {
-                return callback(err);
-            }
-
             left--;
             if(left <= 0) return callback(err);
 
-            console.log('[boot] Waiting for MySQL… (' + left + ' left) ' + (err.message || err.code));
-            setTimeout(tryOnce, 5000);
+            console.log('[boot] Waiting for MySQLâ€¦ (' + left + ' left) ' + (err.message || err.code));
+            setTimeout(tryOnce, 3000);
         });
     }
 
@@ -133,45 +125,26 @@ function startApp() {
         process.exit(1);
     }
 
-    // Verify a core table exists before serving traffic
-    var db = resolveDatabaseConfig();
-    var check = mysql.createConnection({
-        host: db.host,
-        port: db.port || 3306,
-        user: db.user,
-        password: db.password || '',
-        database: db.database,
-        connectTimeout: 8000
+    console.log('[boot] Starting GoldWitch on PORT=' + (process.env.PORT || process.env.APP_PORT || '3000'));
+    var child = spawn(process.execPath, ['app.js'], {
+        cwd: ROOT,
+        stdio: 'inherit',
+        env: process.env
     });
-    check.query('SELECT 1 FROM `bannedip` LIMIT 1', function(errCheck) {
-        check.destroy();
-        if(errCheck) {
-            console.error('[boot] Post-migrate check failed:', errCheck.code || '', errCheck.message || errCheck);
-            console.error('[boot] Tables may be missing. Fix MySQL env / migrate, then redeploy.');
-            process.exit(1);
-        }
 
-        console.log('[boot] Starting GoldWitch on PORT=' + (process.env.PORT || process.env.APP_PORT || '3000'));
-        var child = spawn(process.execPath, ['app.js'], {
-            cwd: ROOT,
-            stdio: 'inherit',
-            env: process.env
-        });
-
-        child.on('exit', function(code) {
-            console.error('[boot] App process exited with code ' + code);
-            process.exit(code || 0);
-        });
+    child.on('exit', function(code) {
+        console.error('[boot] App process exited with code ' + code);
+        process.exit(code || 0);
     });
 }
 
 function migrateThenStart() {
     if(!fs.existsSync(migrateScript)) {
-        console.warn('[boot] scripts/database.js missing — starting without migrate. Upload full project for auto-migrate.');
+        console.warn('[boot] scripts/database.js missing â€” starting without migrate. Upload full project for auto-migrate.');
         return startApp();
     }
 
-    console.log('[boot] MySQL is up — ensuring database + tables…');
+    console.log('[boot] MySQL is up â€” ensuring database + tablesâ€¦');
 
     runNodeScript(['scripts/database.js', '--create'], function(err2) {
         if(err2) {
@@ -193,12 +166,13 @@ function migrateThenStart() {
 ensureRuntimeDirs();
 setDefaults();
 
-waitForMysql(120, function(err1) {
+waitForMysql(40, function(err1) {
     if(err1) {
         console.error('[boot] MySQL not reachable:', err1.message || err1);
-        console.error('[boot] Fix: Render needs MySQL private service (or external MySQL) linked, then Redeploy.');
+        console.error('[boot] Fix: Railway project must have MySQL + variables linked to this service, then Redeploy.');
         process.exit(1);
     }
 
     migrateThenStart();
 });
+
