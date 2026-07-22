@@ -42,12 +42,11 @@ var COINGECKO_IDS = {
 
 function initializeCurrencies(){
 	loggerDebug('[CRYPTO] Loading Currencies');
-	updating.value = true;
+	// Do NOT lock deposits with updating=true — prices refresh in background
 
 	updateCurrencies(0, function(err1){
         if(err1) {
             loggerInfo('[CRYPTO] Error In Loading Currencies: ' + (err1.message || err1));
-            // Don't block deposits forever — retry later, allow house-wallet flow
             updating.value = false;
 
             return setTimeout(function(){
@@ -56,7 +55,15 @@ function initializeCurrencies(){
         }
 
         updating.value = false;
-        loggerInfo('[CRYPTO] Currencies loaded');
+        loggerInfo('[CRYPTO] Currencies loaded (' + Object.keys(amounts).length + ')');
+
+        try {
+            var { emitSocketToAll } = require('@/utils/socket.js');
+            emitSocketToAll('offers', 'crypto_amounts', {
+                amounts: amounts,
+                fees: fees
+            });
+        } catch (e) {}
 
         setTimeout(function(){
             initializeCurrencies();
@@ -66,6 +73,52 @@ function initializeCurrencies(){
 
 /* ----- INTERNAL USAGE ----- */
 function updateCurrencies(item, callback){
+    // Load all CoinGecko prices in one request, then fill amounts
+    var keys = Object.keys(config.settings.payments.methods.crypto);
+    var ids = [];
+    var idToCurrencies = {};
+
+    keys.forEach(function(currency) {
+        if(['usdttrc20', 'usdterc20', 'usdtbsc', 'usdtsol', 'usdtmatic', 'usdc'].indexOf(currency) !== -1) {
+            amounts[currency] = 1;
+            fees[currency] = fees[currency] || 0;
+            return;
+        }
+        var id = COINGECKO_IDS[currency];
+        if(!id) return;
+        if(ids.indexOf(id) === -1) ids.push(id);
+        if(!idToCurrencies[id]) idToCurrencies[id] = [];
+        idToCurrencies[id].push(currency);
+    });
+
+    if(!ids.length) return callback(null);
+
+    request({
+        method: 'GET',
+        url: 'https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(ids.join(',')) + '&vs_currencies=usd',
+        json: true,
+        timeout: 20000
+    }, function(err, res, body) {
+        if(err || !body) {
+            // Fallback: per-currency (slower)
+            return updateCurrenciesSequential(0, callback);
+        }
+
+        Object.keys(idToCurrencies).forEach(function(id) {
+            var usd = body[id] && body[id].usd;
+            if(!(usd > 0)) return;
+            idToCurrencies[id].forEach(function(currency) {
+                amounts[currency] = parseFloat(usd);
+                fees[currency] = fees[currency] || 0;
+            });
+        });
+
+        loggerDebug('[CRYPTO] Batch prices loaded for ' + Object.keys(amounts).length + ' currencies');
+        callback(null);
+    });
+}
+
+function updateCurrenciesSequential(item, callback){
     var keys = Object.keys(config.settings.payments.methods.crypto);
     if(item >= keys.length) return callback(null);
 
@@ -75,17 +128,12 @@ function updateCurrencies(item, callback){
         if(err1 || !(price > 0)) {
             loggerInfo('[CRYPTO] Skip price for ' + currency.toUpperCase() + ': ' + ((err1 && err1.message) || 'invalid'));
             fees[currency] = fees[currency] || 0;
-            return updateCurrencies(item + 1, callback);
+            return updateCurrenciesSequential(item + 1, callback);
         }
 
-        getCurrencyWithdrawFee(currency, function(err2, fee){
-            amounts[currency] = price;
-            fees[currency] = (err2 || !(fee >= 0)) ? 0 : fee;
-
-            loggerDebug('[CRYPTO] Price And Withdraw Fee Loaded for ' + currency.toUpperCase() + ' Currency');
-
-            updateCurrencies(item + 1, callback);
-        });
+        amounts[currency] = price;
+        fees[currency] = fees[currency] || 0;
+        updateCurrenciesSequential(item + 1, callback);
     });
 }
 
@@ -601,7 +649,7 @@ function createPayment(currency, value, callback){
 }
 
 /* ----- CLIENT USAGE ----- */
-function placeDeposit(user, socket, currency, value, cooldown){
+function placeDeposit(user, socket, currency, value, cooldown, amountCoins){
 	cooldown(true, true);
 
     currency = String(currency || '').toLowerCase();
@@ -627,23 +675,27 @@ function placeDeposit(user, socket, currency, value, cooldown){
 
     // House-wallet deposits: show exact amount + your address (no NOWPayments)
     if(houseWallet) {
-        return placeHouseWalletDeposit(user, socket, currency, value, houseWallet, cooldown);
+        return placeHouseWalletDeposit(user, socket, currency, value, houseWallet, cooldown, amountCoins);
     }
 
 	if(amounts[currency] === undefined || amounts[currency] <= 0){
-        // Try load price on the fly
         return getCurrencyAmount(currency, function(errP, price){
             if(errP || !(price > 0)) {
                 emitSocketToUser(socket, 'message', 'error', {
-                    message: 'The prices are not loaded. Please try again later!'
+                    message: 'Could not load ' + currency.toUpperCase() + ' price. Please try again.'
                 });
                 return cooldown(false, true);
             }
             amounts[currency] = price;
-            placeDeposit(user, socket, currency, value, cooldown);
+            // cooldown already true — continue without re-entering placeDeposit lock
+            return placeDepositContinueNowPayments(user, socket, currency, value, cooldown);
         });
     }
 
+    return placeDepositContinueNowPayments(user, socket, currency, value, cooldown);
+}
+
+function placeDepositContinueNowPayments(user, socket, currency, value, cooldown) {
     if(isNaN(Number(value))){
 		emitSocketToUser(socket, 'message', 'error', {
 			message: 'Invalid deposit value!'
@@ -729,20 +781,25 @@ function placeDeposit(user, socket, currency, value, cooldown){
     });
 }
 
-function placeHouseWalletDeposit(user, socket, currency, value, houseWallet, cooldown) {
+function placeHouseWalletDeposit(user, socket, currency, value, houseWallet, cooldown, amountCoins) {
     function withRate(rate) {
-        if(isNaN(Number(value))){
-            emitSocketToUser(socket, 'message', 'error', { message: 'Invalid deposit value!' });
+        var cryptoValue = parseFloat(value);
+        var coins = parseFloat(amountCoins);
+
+        // Prefer coins field when crypto value is missing/zero (UI shows 0 until prices load)
+        if((!(cryptoValue > 0) || isNaN(cryptoValue)) && coins > 0 && rate > 0) {
+            cryptoValue = roundedToFixed(coins / rate, 8);
+        } else if(cryptoValue > 0) {
+            cryptoValue = roundedToFixed(cryptoValue, 8);
+            coins = getFormatAmount(cryptoValue * rate);
+        }
+
+        if(!(cryptoValue > 0)) {
+            emitSocketToUser(socket, 'message', 'error', { message: 'Enter a deposit amount first!' });
             return cooldown(false, true);
         }
 
-        value = roundedToFixed(parseFloat(value), 8);
-        if(!(value > 0)) {
-            emitSocketToUser(socket, 'message', 'error', { message: 'Invalid deposit value!' });
-            return cooldown(false, true);
-        }
-
-        var amount = getFormatAmount(value * rate);
+        var amount = getFormatAmount(cryptoValue * rate);
         var limits = config.app.intervals.amounts.deposit_crypto_hash || config.app.intervals.amounts.deposit_crypto;
 
         if(amount < limits.min || amount > limits.max){
@@ -755,15 +812,21 @@ function placeHouseWalletDeposit(user, socket, currency, value, houseWallet, coo
         emitSocketToUser(socket, 'offers', 'crypto_payment', {
             payment: {
                 address: houseWallet,
-                value: value,
+                value: cryptoValue,
                 amount: amount,
                 currency: currency,
                 house: true
             }
         });
 
+        // Push live rates so the form converts next time
+        emitSocketToUser(socket, 'offers', 'crypto_amounts', {
+            amounts: amounts,
+            fees: fees
+        });
+
         emitSocketToUser(socket, 'message', 'success', {
-            message: 'Send exactly ' + value + ' ' + currency.toUpperCase() + ' to ' + houseWallet + ' then paste your TX hash below and submit.'
+            message: 'Send exactly ' + cryptoValue + ' ' + currency.toUpperCase() + ' to ' + houseWallet + ' then paste your TX hash below and submit.'
         });
 
         cooldown(false, false);

@@ -659,19 +659,16 @@ module.exports = (socket) => {
                 });
             }
 
-            if(data.command != 'hash_deposit' && cryptoService.updating.value){
-                var blockchainVerifyCheck = require('@/services/trading/blockchainVerify.js');
-                var hasHouse = data.command == 'deposit' && data.currency && blockchainVerifyCheck.getWallet(String(data.currency).toLowerCase());
-                if(!hasHouse) {
-                    return emitSocketToUser(socket, 'message', 'error', {
-                        message: 'The crypto currencies prices are updating. Please try again later!'
-                    });
-                }
+            // Never block deposits on price refresh — only withdrawals need loaded rates
+            if(data.command == 'withdraw' && cryptoService.updating.value){
+                return emitSocketToUser(socket, 'message', 'error', {
+                    message: 'The crypto currencies prices are updating. Please try again later!'
+                });
             }
 
             /* REQUESTS FOR USERS */
 
-            if(data.command == 'deposit') return cryptoService.placeDeposit(socket.data.user, socket, data.currency, data.value, cooldown);
+            if(data.command == 'deposit') return cryptoService.placeDeposit(socket.data.user, socket, data.currency, data.value, cooldown, data.amount);
             if(data.command == 'withdraw') return cryptoService.placeWithdraw(socket.data.user, socket, data.currency, data.amount, data.address, data.recaptcha, cooldown);
             if(data.command == 'hash_deposit') return cryptoHashDepositService.submitHashDeposit(socket.data.user, socket, data.currency, data.tx_hash, cooldown);
 

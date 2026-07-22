@@ -2509,6 +2509,12 @@ function socket_handler(type, method, data) {
                 $('#crypto_deposit_panel').addClass('active');
 			}
 
+            if(method == 'crypto_amounts'){
+                if(data.amounts) offers_currencyAmounts = data.amounts;
+                if(data.fees) offers_currencyFees = data.fees;
+                $('.crypto-panel [data-conversion="from"]').trigger('input');
+            }
+
             if(method == 'cash_payment'){
                 if(data.payment && data.payment.approve_url){
                     window.location.href = data.payment.approve_url;
@@ -7533,12 +7539,14 @@ $(document).ready(function() {
 	$(document).on('click', '#crypto_deposit', function() {
 		var currency = $(this).attr('data-currency');
         var value = $('#crypto_deposit_value').val();
+        var amount = $('.crypto-panel [data-conversion="from"]').val();
 
 		socket_emit({
             type: 'crypto',
             command: 'deposit',
             currency: currency,
-            value: value
+            value: value,
+            amount: amount
         });
 	});
 
